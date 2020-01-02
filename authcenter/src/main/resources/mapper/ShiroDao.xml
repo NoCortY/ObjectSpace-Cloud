@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.objectspace.authcenter.dao.ShiroDao">
+    <resultMap id="URPDto" type="URPDto">
+        <id column="user_id" property="userId"/>
+        <result column="user_email" property="userEmail"/>
+        <result column="user_status" property="userStatus"/>
+        <collection property="roleList" ofType="CloudRoleDto">
+            <id property="roleId" column="role_id"/>
+            <result property="roleName" column="role_name"/>
+            <result property="roleApplication" column="role_application"/>
+        </collection>
+        <collection property="cloudPermissionList" ofType="CloudPermissionDto">
+            <id property="permissionId" column="permission_id"/>
+            <result property="permissionName" column="permission_name"/>
+            <result property="permissionUrl" column="permission_url"/>
+            <result property="permissionApplication" column="permission_application"/>
+        </collection>
+    </resultMap>
+    <!--开启本mapper的namespace下的二级缓存-->
+    <!--
+        eviction:代表的是缓存回收策略，目前MyBatis提供以下策略。
+        (1) LRU,最近最少使用的，一处最长时间不用的对象
+        (2) FIFO,先进先出，按对象进入缓存的顺序来移除他们
+        (3) SOFT,软引用，移除基于垃圾回收器状态和软引用规则的对象
+        (4) WEAK,弱引用，更积极的移除基于垃圾收集器状态和弱引用规则的对象。
+        	这里采用的是LRU，  移除最长时间不用的对形象
+
+        flushInterval:刷新间隔时间，单位为毫秒，如果你不配置它，那么当
+        SQL被执行的时候才会去刷新缓存。
+
+        size:引用数目，一个正整数，代表缓存最多可以存储多少个对象，不宜设置过大。设置过大会导致内存溢出。
+        这里配置的是1024个对象
+
+        readOnly:只读，意味着缓存数据只能读取而不能修改，这样设置的好处是我们可以快速读取缓存，缺点是我们没有
+        办法修改缓存，他的默认值是false，不允许我们修改
+    -->
+    <cache eviction="LRU" type="cn.objectspace.common.cache.MyBatisCache"/>
+    <select id="queryAllUrlFilter" resultType="UrlFilter">
+        SELECT *
+        FROM
+        cloud_filter_map
+    </select>
+    <select id="queryCloudUserByUserEmail" parameterType="java.lang.String" resultType="CloudUser">
+        SELECT
+        user_email,
+        user_salt,
+        user_password,
+        user_status
+        FROM
+        cloud_user
+        <where>
+            user_email = #{userEmail}
+        </where>
+    </select>
+    <select id="queryURPByUserEmail" resultMap="URPDto">
+        SELECT
+        cu.user_id,
+        cu.user_email,
+        cu.user_status,
+        cr.role_id,
+        cr.role_name,
+        cr.role_application,
+        cp.permission_id,
+        cp.permission_name,
+        cp.permission_url,
+        cp.permission_application
+        FROM
+        cloud_user cu
+        LEFT JOIN cloud_user_role cur ON cu.user_id = cur.user_id
+        LEFT JOIN cloud_role cr ON cur.role_id = cr.role_id
+        LEFT JOIN cloud_role_permission crp ON cr.role_id = crp.role_id
+        LEFT JOIN cloud_permission cp ON crp.permission_id = cp.permission_id
+        <where>
+            cu.user_email = #{userEmail}
+            and
+            cp.permission_application = #{applicationId}
+        </where>
+    </select>
+    <insert id="insertCloudUser" parameterType="CloudUser">
+        INSERT INTO
+        cloud_user
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="userEmail!=null and userEmail!=''">
+                user_email,
+            </if>
+            <if test="userPassword!=null and userPassword!=''">
+                user_password,
+            </if>
+            <if test="userSalt!=null and userSalt!=''">
+                user_salt,
+            </if>
+            <if test="userName!=null and userName!=''">
+                user_name,
+            </if>
+            <if test="userProfile!=null and userProfile!=''">
+                user_profile,
+            </if>
+            <if test="userStatus!=null and userStatus!=''">
+                user_status,
+            </if>
+            <if test="userRegisterDate!=null">
+                user_register_date,
+            </if>
+            <if test="userLastLoginDate!=null">
+                user_last_login_date,
+            </if>
+        </trim>
+        VALUES
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="userEmail!=null and userEmail!=''">
+                #{userEmail},
+            </if>
+            <if test="userPassword!=null and userPassword!=''">
+                #{userPassword},
+            </if>
+            <if test="userSalt!=null and userSalt!=''">
+                #{userSalt},
+            </if>
+            <if test="userName!=null and userName!=''">
+                #{userName},
+            </if>
+            <if test="userProfile!=null and userProfile!=''">
+                #{userProfile},
+            </if>
+            <if test="userStatus!=null and userStatus!=''">
+                #{userStatus},
+            </if>
+            <if test="userRegisterDate!=null">
+                #{userRegisterDate},
+            </if>
+            <if test="userLastLoginDate!=null">
+                #{userLastLoginDate},
+            </if>
+        </trim>
+    </insert>
+</mapper>

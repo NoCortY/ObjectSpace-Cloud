@@ -1,0 +1,13 @@
+#为什么是bootstrap.yml
+#JVM classloader 是用bootstrap模式
+#所以bootstrap.yml 说明 这个也是一个配置文件
+#但这个配置文件是系统级别的，优先级最高
+#专门负责从外部资源配置本项目资源
+
+spring:
+  cloud:
+    config:
+      name: logcenter #从github上读取的资源名称，注意没有.yml后缀
+      profile: dev #本次访问的配置项
+      label: master
+      uri: http://127.0.0.1:7101

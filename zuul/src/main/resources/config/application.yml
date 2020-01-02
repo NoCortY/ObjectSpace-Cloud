@@ -1,0 +1,29 @@
+server:
+  port: 7000
+spring:
+  application:
+    name: ZuulGateway
+
+#服务注册配置
+eureka:
+  client:
+    #将客户端注册进注册中心
+    service-url:
+      #单机版注册
+      #defaultZone: http://47.98.165.84:7001/eureka/
+      defaultZone: http://127.0.0.1:7001/eureka/
+  instance:
+    #注册中心的链接名（右侧Status）
+    instance-id: ${spring.application.name}:${server.port}
+    #点到链接名左下角出现IP提示
+    prefer-ip-address: true
+zuul:
+  ignored-services: '*'
+  routes:
+    #映射 微服务名映射为自定义
+    ObjectService-AC: /AuthCenter/**
+  prefix: /ObjectCloud
+  sensitive-headers:
+ribbon:
+  ReadTimeout: 120000  #请求处理的超时时间
+  ConnectTimeout: 30000  #请求连接的超时时间
