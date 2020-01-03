@@ -1,0 +1,17 @@
+#服务名称
+spring:
+  application:
+    name: eureka01
+#服务端口
+server:
+  port: 7001
+
+#eureka相关配置
+eureka:
+  instance:
+    hostname: eureka.objectspace.cn
+  client:
+    service-url:
+      defaultZone: http://127.0.0.1:${server.port}/eureka/
+    fetch-registry: false
+    register-with-eureka: false

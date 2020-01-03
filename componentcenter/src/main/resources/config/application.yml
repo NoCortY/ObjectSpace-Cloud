@@ -1,0 +1,90 @@
+server:
+  port: 7303
+spring:
+  profiles: dev
+  application:
+    name: ObjectService-CC
+  datasource:
+    type: com.alibaba.druid.pool.DruidDataSource
+    druid:
+      driver-class-name: com.mysql.cj.jdbc.Driver
+      url: jdbc:mysql://rm-bp1capfjz96r8hhm6go.mysql.rds.aliyuncs.com:3306/cloud_componentcenter?characterEncoding=utf8&useSSL=false&serverTimezone=UTC&rewriteBatchedStatements=true
+      username: testsqlobject
+      password: TestObject971103
+      #连接初始值，连接池启动时创建的连接数量的初始值
+      initialSize: 1
+      #连接池的最大值，同一时间可以从池分配的最多连接数量，0时无限制
+      max-active: 10
+      #最小空闲值.当空闲的连接数少于阀值时，连接池就会预申请去一些连接，以免洪峰来时来不及申请
+      minIdle: 1
+      #最大空闲值.当经过一个高峰时间后，连接池可以慢慢将已经用不到的连接慢慢释放一部分，一直减少到maxIdle为止 ，0时无限制
+      # max-idle: 10 已被弃用
+      #连接等待超时时间
+      maxWait: 30000
+      #获取连接时候验证，会影响性能
+      testOnBorrow: true
+      #配置间隔多久才进行一次检测，检测需要关闭的空闲连接，单位是毫秒
+      timeBetweenEvictionRunsMillis: 3600000
+      #指定获取连接时连接校验的sql查询语句
+      validationQuery: select 1 from dual
+      #指定连接校验查询的超时时间
+      validationQueryTimeout: -1
+      #指定当连接超过废弃超时时间时，是否立刻删除该连接
+      removeAbandoned: true
+      #指定连接应该被废弃的时间
+      removeAbandonedTimeout: 300
+      #监控
+      filters: stat,log4j    #,wall
+      useGlobalDataSourceStat: true
+      connectionProperties: druid.stat.mergeSql=true;druid.stat.slowSqlMillis=500
+    #redis
+  redis:
+    database: 0
+    host: 192.168.43.90
+    #host: 127.0.0.1
+    port: 6379
+    password: NoCortY971103.
+    #password: 971103
+    timeout: 3000
+    jedis:
+      pool:
+        max-wait: 30000
+        max-active: 500
+        max-idle: 50
+        min-idle: 0
+
+  mail:
+    host: smtp.126.com
+    username: ObjectSpace@126.com
+    password: Object971103
+    default-encoding: UTF-8
+    properties:
+      mail:
+        smtp:
+          connectiontimeout: 5000
+          timeout: 3000
+          writetimeout: 5000
+eureka:
+  client:
+    service-url:
+      #defaultZone: http://47.98.165.84:7001/eureka
+      defaultZone: http://127.0.0.1:7001/eureka
+  instance:
+    instance-id: ObjectService-ComponentCenter-7301
+    status-page-url: http://localhost:7000/ObjectCloud/ComponentCenter/swagger-ui.html
+#MyBatis
+mybatis:
+  mapper-locations: classpath:mapper/*.xml
+  configuration:
+    cache-enabled: true #开启二级缓存
+    map-underscore-to-camel-case: true
+  type-aliases-package: cn.objectspace.authcenter.pojo #别名
+#日志配置
+logging:
+  config: classpath:config/logback-spring.xml
+  level:
+    org.springframework.boot.autoconfigure: ERROR
+    org.mybatis.spring.SqlSessionUtils: ERROR
+    com.zaxxer.hikari.HikariConfig: ERROR
+    org.apache.http.headers: ERROR
+    org.apache.http.wire: ERROR

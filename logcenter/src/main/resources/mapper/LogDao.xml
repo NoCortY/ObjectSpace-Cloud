@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.objectspace.logcenter.dao.LogDao">
+    <insert id="insertLog" parameterType="Log">
+        INSERT INTO
+        cloud_log
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="operateDate!=null">
+                operate_date,
+            </if>
+            <if test="inputParameter!=null and inputParameter!=''">
+                input_parameter,
+            </if>
+            <if test="outputParameter!=null and outputParameter!=''">
+                output_parameter,
+            </if>
+            <if test="operateInterface!=null and operateInterface">
+                operate_interface,
+            </if>
+            <if test="operateUserIp!=null and operateUserIp!=''">
+                operate_user_ip,
+            </if>
+            <if test="logApplication!=null">
+                log_application
+            </if>
+        </trim>
+        VALUES
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="operateDate!=null">
+                #{operateDate},
+            </if>
+            <if test="inputParameter!=null and inputParameter!=''">
+                #{inputParameter},
+            </if>
+            <if test="outputParameter!=null and outputParameter!=''">
+                #{outputParameter},
+            </if>
+            <if test="operateInterface!=null and operateInterface">
+                #{operateInterface},
+            </if>
+            <if test="operateUserIp!=null and operateUserIp!=''">
+                #{operateUserIp},
+            </if>
+            <if test="logApplication!=null">
+                #{logApplication}
+            </if>
+        </trim>
+    </insert>
+    <select id="queryLogCount" resultType="java.lang.Integer">
+        SELECT COUNT(id) FROM cloud_log;
+    </select>
+</mapper>
