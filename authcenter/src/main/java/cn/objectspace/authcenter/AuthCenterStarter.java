@@ -5,6 +5,7 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cloud.netflix.eureka.EnableEurekaClient;
 import org.springframework.cloud.netflix.hystrix.dashboard.EnableHystrixDashboard;
+import org.springframework.scheduling.annotation.EnableAsync;
 
 /**
 * @Description: 认证中心启动类
@@ -14,6 +15,7 @@ import org.springframework.cloud.netflix.hystrix.dashboard.EnableHystrixDashboar
 @EnableObjectCloudCore
 @EnableEurekaClient
 @EnableHystrixDashboard
+@EnableAsync
 @SpringBootApplication
 public class AuthCenterStarter {
     /**

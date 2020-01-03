@@ -8,6 +8,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.web.bind.annotation.*;
 
 @Api(value="ObjectService-AC",tags = "用户中心")
@@ -20,6 +21,7 @@ public class UserController {
     @ApiOperation(value="邮箱验证",notes = "发送邮件验证码",httpMethod = "GET")
     @ApiImplicitParam(paramType = "path",name="userEmail",value = "邮箱",dataType = "String")
     @SaveLog(applicationId = ConstantPool.Shiro.APPLICATION_ID)
+    @Async
     @GetMapping("/mailVerify/{userEmail}")
     @ResponseBody
     public ResponseMap<String> mailVerify(@PathVariable String userEmail){

@@ -24,6 +24,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.interceptor.TransactionAspectSupport;
 
 import java.util.Date;
 
@@ -96,6 +98,7 @@ public class ACServiceImpl implements ACService {
      * @Author: NoCortY
      * @Date: 2019/12/19
      */
+    @Transactional
     @Override
     public AuthDto userRegister(CloudUser cloudUser) {
         AuthDto authDto = null;
@@ -120,9 +123,12 @@ public class ACServiceImpl implements ACService {
         int effectiveNums = 0;
         try{
             effectiveNums = shiroDao.insertCloudUser(cloudUser);
+            shiroDao.insertUserRole(cloudUser.getUserId(),ConstantPool.Shiro.GENERAL_USER_ROLE_ID);
         } catch (Exception e){
             logger.error("注册异常");
             logger.error("异常信息:"+e.getMessage());
+            //事务回滚
+            TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
             authDto = new AuthDto(ConstantPool.Shiro.AC_FAILURE_CODE,ConstantPool.Shiro.AC_FAILURE_MESSAGE,cloudUser.getUserEmail());
             return authDto;
         }
@@ -158,6 +164,12 @@ public class ACServiceImpl implements ACService {
                 logger.error("异常信息:"+e.getMessage());
                 return null;
             }
+        }else{
+            //如果此时用户为null，那么说明要么是redis down了，要么是该用户本就是不合法用户，伪造了token
+            //那么就从session中拿
+            Session session = SecurityUtils.getSubject().getSession();
+            cloudUser = (CloudUser) SerializeUtil.unSerialize((byte[]) session.getAttribute(token));
+            if(cloudUser==null) return null;
         }
         //使用过的令牌失效
         redisUtil.del(SerializeUtil.serialize(token));
@@ -183,6 +195,13 @@ public class ACServiceImpl implements ACService {
             //如果从redis中无法获取该用户，说明redis有可能down了，那么直接尝试从session中拿
             Session session = SecurityUtils.getSubject().getSession();
             cloudUser = (CloudUser) SerializeUtil.unSerialize((byte[]) session.getAttribute(uuid));
+            if(cloudUser!=null){
+                //如果从session中得到了该用户的信息，说明已经登录，直接生成Token然后放入session中(因为redis已经down了)
+                String token = TokenUtil.getInstance().generateTokeCode();
+                session.setAttribute(token,SerializeUtil.serialize(cloudUser));
+                authDto = new AuthDto(ConstantPool.Shiro.AC_SUCCESS_CODE,ConstantPool.Shiro.AC_SUCCESS_MESSAGE,cloudUser.getUserEmail(),token,null);
+                return authDto;
+            }
         }else{
             String token = TokenUtil.getInstance().generateTokeCode();
             redisUtil.set(SerializeUtil.serialize(token),SerializeUtil.serialize(cloudUser));

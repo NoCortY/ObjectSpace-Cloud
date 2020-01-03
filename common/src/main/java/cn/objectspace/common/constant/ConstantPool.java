@@ -100,6 +100,8 @@ public class ConstantPool {
          * 项目使用邮箱
          */
         public static final String FROM_EMAIL = "ObjectSpace@126.com";
+
+        public static final Integer GENERAL_USER_ROLE_ID = 2;
         /**
          * 存用户信息的KEY名 每个登录用户只有可能有一个
          */

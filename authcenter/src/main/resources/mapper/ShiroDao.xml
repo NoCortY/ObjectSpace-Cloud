@@ -79,7 +79,7 @@
             cp.permission_application = #{applicationId}
         </where>
     </select>
-    <insert id="insertCloudUser" parameterType="CloudUser">
+    <insert id="insertCloudUser" parameterType="CloudUser" useGeneratedKeys="true" keyProperty="userId">
         INSERT INTO
         cloud_user
         <trim prefix="(" suffix=")" suffixOverrides=",">
@@ -135,5 +135,11 @@
                 #{userLastLoginDate},
             </if>
         </trim>
+    </insert>
+    <insert id="insertUserRole">
+        INSERT INTO
+        cloud_user_role(user_id,role_id)
+        VALUES
+        (#{userId},#{roleId})
     </insert>
 </mapper>

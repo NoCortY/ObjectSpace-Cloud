@@ -64,9 +64,11 @@ public class TokenFilter extends ZuulFilter {
         String requestUrl = request.getRequestURI();
         ObjectMapper objectMapper = new ObjectMapper();
         //如果是请求登录和注册,和swagger，则直接放行
-        if(requestUrl!=null&&(requestUrl.contains("/login")
-                ||requestUrl.contains("/register")
-                ||requestUrl.contains("/mailVerify")
+        logger.info("Zuul网关拦截:当前访问路径:{}",requestUrl);
+        if(requestUrl!=null&&(requestUrl.contains("/ObjectCloud/AuthCenter/AC/login")
+                ||requestUrl.contains("/ObjectCloud/AuthCenter/AC/register")
+                ||requestUrl.contains("/ObjectCloud/AuthCenter/captcha/kaptcha.jpg")
+                ||requestUrl.contains("/ObjectCloud/AuthCenter/UC/mailVerify")
                 ||requestUrl.contains("/swagger-ui.html")
                 ||requestUrl.contains("/webjars"))
                 ||requestUrl.contains("/swagger-resources")

@@ -50,4 +50,13 @@ public interface ShiroDao {
      * @Date: 2019/12/19
      */
     public Integer insertCloudUser(CloudUser cloudUser);
+
+    /**
+     * @Description: 给用户设置角色
+     * @Param:
+     * @return:
+     * @Author: NoCortY
+     * @Date: 2020/1/3
+     */
+    public Integer insertUserRole(@Param("userId") Integer userId,@Param("roleId") Integer roleId);
 }

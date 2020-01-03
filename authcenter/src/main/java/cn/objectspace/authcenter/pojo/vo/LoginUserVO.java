@@ -18,6 +18,9 @@ public class LoginUserVO {
     @ApiModelProperty(value="用户密码",required = true)
     @NotNull(message = "密码不能为空")
     private String userPassword;
+    @ApiModelProperty(value="图片验证码",required = true)
+    @NotNull(message = "验证码不能为空")
+    private String captcha;
 
     public String getUserEmail() {
         return userEmail;
@@ -33,5 +36,13 @@ public class LoginUserVO {
 
     public void setUserPassword(String userPassword) {
         this.userPassword = userPassword;
+    }
+
+    public String getCaptcha() {
+        return captcha;
+    }
+
+    public void setCaptcha(String captcha) {
+        this.captcha = captcha;
     }
 }

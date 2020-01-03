@@ -7,6 +7,7 @@ import cn.objectspace.authcenter.pojo.vo.LoginUserVO;
 import cn.objectspace.authcenter.pojo.vo.RegisterUserVO;
 import cn.objectspace.authcenter.service.ACService;
 import cn.objectspace.authcenter.service.UserService;
+import cn.objectspace.authcenter.util.CaptchaUtil;
 import cn.objectspace.common.annotation.SaveLog;
 import cn.objectspace.common.constant.ConstantPool;
 import cn.objectspace.common.pojo.entity.ResponseMap;
@@ -24,6 +25,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
 
 /**
@@ -87,9 +89,14 @@ public class ACController {
     @ApiImplicitParam(paramType = "body",name="loginUser",value = "登录用户信息",dataType = "LoginUserVO")
     @PostMapping("/login")
     @SaveLog(applicationId = ConstantPool.Shiro.APPLICATION_ID)
-    public ResponseMap<AuthDto> login(@Valid @RequestBody LoginUserVO loginUser, HttpServletResponse response){
+    public ResponseMap<AuthDto> login(@Valid @RequestBody LoginUserVO loginUser, HttpServletResponse response, HttpSession session){
         //定义接口返回通用对象
         ResponseMap<AuthDto> responseMap= new ResponseMap<AuthDto>();
+        if(!CaptchaUtil.veriry(session,loginUser.getCaptcha())){
+            responseMap.setCode(ConstantPool.Common.REQUEST_FAILURE_CODE);
+            responseMap.setMessage("验证码错误");
+            return responseMap;
+        }
         AuthDto authDto = null;
         CloudUser currentUser = new CloudUser();
         //将VO转换为Domain
