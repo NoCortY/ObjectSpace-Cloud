@@ -18,6 +18,14 @@ import java.util.Map;
 public class MenuController {
     @Autowired
     MenuService menuService;
+
+    /**
+     * @Description: 获取菜单
+     * @Param: [request]
+     * @return: cn.objectspace.common.pojo.entity.ResponseMap<java.util.Map<java.lang.String,cn.objectspace.authcenter.pojo.dto.MenuDto>>
+     * @Author: NoCortY
+     * @Date: 2020/1/3
+     */
     @GetMapping("/listMenu")
     public ResponseMap<Map<String,MenuDto>> listMenu(HttpServletRequest request){
         ResponseMap<Map<String,MenuDto>> responseMap = new ResponseMap<>();
