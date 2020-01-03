@@ -5,7 +5,8 @@
 本项目是http://www.objectspace.cn 网站后台 基于SpringCloud。
 
 ## AuthCenter—用户认证授权中心
-
+- ### 架构
+  ![1576573890742](C:\Users\NoCortY\AppData\Roaming\Typora\typora-user-images\1576573890742.png)
 - ### 快速启动
 
   ```sql
