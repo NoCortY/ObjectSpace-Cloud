@@ -20,21 +20,31 @@ public class MenuController {
     MenuService menuService;
 
     /**
-     * @Description: 获取菜单
+     * @Description: 初始化菜单
      * @Param: [request]
      * @return: cn.objectspace.common.pojo.entity.ResponseMap<java.util.Map<java.lang.String,cn.objectspace.authcenter.pojo.dto.MenuDto>>
      * @Author: NoCortY
      * @Date: 2020/1/3
      */
-    @GetMapping("/listMenu")
-    public ResponseMap<Map<String,MenuDto>> listMenu(HttpServletRequest request){
-        ResponseMap<Map<String,MenuDto>> responseMap = new ResponseMap<>();
+    @GetMapping("/initMenu")
+    public ResponseMap<Map<String, Map<String, MenuDto>>> init(HttpServletRequest request){
+        ResponseMap<Map<String, Map<String, MenuDto>>> responseMap = new ResponseMap<>();
         String uuid = HttpRequestUtil.getCookieValue(request,ConstantPool.Shiro.AC_UUID);
         String page = HttpRequestUtil.getStringParameter(request,"page");
-        Map<String,MenuDto> menu = menuService.getMenuList(page,uuid);
+        Map<String, Map<String, MenuDto>> menu = menuService.getMenuList(page,uuid);
         responseMap.setCode(ConstantPool.Common.REQUEST_SUCCESS_CODE);
         responseMap.setMessage(ConstantPool.Common.REQUEST_SUCCESS_MESSAGE);
         responseMap.setData(menu);
+        return responseMap;
+    }
+    @GetMapping("/initStatic")
+    public ResponseMap<Map<String,MenuDto>> initStatic(HttpServletRequest request){
+    	ResponseMap<Map<String,MenuDto>> responseMap = new ResponseMap<Map<String,MenuDto>>();
+    	String page = HttpRequestUtil.getStringParameter(request,"page");
+    	Map<String,MenuDto> staticInfo = menuService.getStatic(page);
+    	responseMap.setCode(ConstantPool.Common.REQUEST_SUCCESS_CODE);
+        responseMap.setMessage(ConstantPool.Common.REQUEST_SUCCESS_MESSAGE);
+        responseMap.setData(staticInfo);
         return responseMap;
     }
 }

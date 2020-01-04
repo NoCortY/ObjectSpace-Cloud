@@ -10,7 +10,7 @@ import org.apache.shiro.session.Session;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -19,11 +19,13 @@ public class MenuServiceImpl implements MenuService {
     @Autowired
     MenuDao menuDao;
     @Override
-    public Map<String,MenuDto> getMenuList(String page, String uuid) {
-        Map<String,MenuDto> parentMenu = new HashMap<String,MenuDto>();
+    public Map<String,Map<String,MenuDto>> getMenuList(String page, String uuid) {
+        Map<String,MenuDto> parentMenu = new LinkedHashMap<String,MenuDto>();
+        Map<String,Map<String,MenuDto>> resMap = new LinkedHashMap<>();
         Session currentSession = SecurityUtils.getSubject().getSession();
         CloudUser currentUser = (CloudUser) SerializeUtil.unSerialize((byte[]) currentSession.getAttribute(uuid));
         String userEmail = currentUser.getUserEmail();
+        /*************************************获取菜单********************************************/
         List<Integer> roleIdList = menuDao.queryRole(userEmail);
         for(Integer roleId : roleIdList){
             //取出所有角色对应的菜单
@@ -33,7 +35,9 @@ public class MenuServiceImpl implements MenuService {
                 parentMenu.put(menuDto.getCategory(),menuDto);
             }
         }
-        return parentMenu;
+        resMap.put("menuInfo", parentMenu);
+        /****************************************************************************************/
+        return resMap;
     }
     /**
      * @Description: 获取无限子代的菜单
@@ -53,4 +57,13 @@ public class MenuServiceImpl implements MenuService {
             return subMenuList;
         }
     }
+	@Override
+	public Map<String, MenuDto> getStatic(String page) {
+		Map<String,MenuDto> resMap = new LinkedHashMap<String,MenuDto>();
+        /*************************************获取首页********************************************/
+        MenuDto homeMenu = menuDao.queryHome(page);
+        resMap.put("homeInfo", homeMenu);
+        /*****************************************************************************************/
+        return resMap;
+	}
 }

@@ -31,6 +31,7 @@
         page = #{page}
         and role_id = #{roleId}
         and parent is null
+        and classify='menu'
         ORDER BY priority ASC
     </select>
     <select id="querySubMenu" resultType="MenuDto">
@@ -40,6 +41,15 @@
         WHERE
         parent = #{parentId}
         and role_id = #{roleId}
+    </select>
+    <select id="queryHome" parameterType="java.lang.String" resultType="MenuDto">
+    	SELECT
+    	title,icon,href
+    	FROM
+    	cloud_menu_info
+    	WHERE
+    	classify = 'home'
+    	and page = #{page}
     </select>
     <select id="queryRole" parameterType="java.lang.String" resultType="java.lang.Integer">
         SELECT
