@@ -10,8 +10,7 @@ spring:
           uri: ssh://git@47.98.165.84:/home/git/objectcloud-config.git
           #uri: ssh://git@127.0.0.1:/home/git/objectcloud-config.git
           username: git
-          password: Object971103.
-
+          password: #git密码
 #服务注册配置
 eureka:
   client:
