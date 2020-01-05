@@ -21,9 +21,10 @@ zuul:
   ignored-services: '*'
   routes:
     #映射 微服务名映射为自定义
-    ObjectService-AC: /AuthCenter/**
+    ObjectService-AC: /AuthCenter/** 
+    ObjectService-LC: /LogCenter/**
   prefix: /ObjectCloud
-  sensitive-headers:
+  sensitive-headers: 
 ribbon:
   ReadTimeout: 120000  #请求处理的超时时间
   ConnectTimeout: 30000  #请求连接的超时时间

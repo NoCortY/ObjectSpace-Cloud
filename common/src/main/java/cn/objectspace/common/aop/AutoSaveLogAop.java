@@ -123,7 +123,7 @@ public class AutoSaveLogAop {
         try{
             //调用日志中心，发送日志入库请求
             //Map modelMap = restUtil.postJsonObjectWithNameByAppName(ConstantPool.LogCenter.LC_APPLICATION_NAME+"/LogCenter/recordLog",ConstantPool.LogCenter.RECORD_LOG_NAME,log,Map.class);
-            ResponseMap responseMap = restUtil.postObjectByAppName(ConstantPool.LogCenter.LC_APPLICATION_NAME+"/LogCenter/recordLog",log,ResponseMap.class);
+            ResponseMap responseMap = restUtil.postObjectByAppName(ConstantPool.LogCenter.LC_APPLICATION_NAME+"/LC/recordLog",log,ResponseMap.class);
             if(ConstantPool.LogCenter.RECORD_LOG_SUCCESS_CODE.equals(responseMap.getCode())) {
                 logger.info(new Date() + "   操作日志入库成功!  ");
             }else{

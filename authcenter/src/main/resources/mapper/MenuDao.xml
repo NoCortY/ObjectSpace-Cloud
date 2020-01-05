@@ -42,13 +42,16 @@
         parent = #{parentId}
         and role_id = #{roleId}
     </select>
-    <select id="queryHome" parameterType="java.lang.String" resultType="MenuDto">
+    <select id="queryStatic" resultType="MenuDto">
     	SELECT
     	title,icon,href
+    	<if test="classify=='logo'.toString()">
+    	,image
+    	</if>
     	FROM
     	cloud_menu_info
     	WHERE
-    	classify = 'home'
+    	classify = #{classify}
     	and page = #{page}
     </select>
     <select id="queryRole" parameterType="java.lang.String" resultType="java.lang.Integer">

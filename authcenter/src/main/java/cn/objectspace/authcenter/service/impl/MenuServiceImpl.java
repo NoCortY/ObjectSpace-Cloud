@@ -61,8 +61,10 @@ public class MenuServiceImpl implements MenuService {
 	public Map<String, MenuDto> getStatic(String page) {
 		Map<String,MenuDto> resMap = new LinkedHashMap<String,MenuDto>();
         /*************************************获取首页********************************************/
-        MenuDto homeMenu = menuDao.queryHome(page);
+        MenuDto homeMenu = menuDao.queryStatic(page,"home");
         resMap.put("homeInfo", homeMenu);
+        MenuDto logo = menuDao.queryStatic(page, "logo");
+        resMap.put("logoInfo", logo);
         /*****************************************************************************************/
         return resMap;
 	}

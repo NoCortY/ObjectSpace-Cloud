@@ -2,6 +2,7 @@ package cn.objectspace.authcenter.web.controller;
 
 import cn.objectspace.authcenter.pojo.dto.MenuDto;
 import cn.objectspace.authcenter.service.MenuService;
+import cn.objectspace.common.annotation.SaveLog;
 import cn.objectspace.common.constant.ConstantPool;
 import cn.objectspace.common.pojo.entity.ResponseMap;
 import cn.objectspace.common.util.HttpRequestUtil;
@@ -27,6 +28,7 @@ public class MenuController {
      * @Date: 2020/1/3
      */
     @GetMapping("/initMenu")
+    @SaveLog(applicationId = ConstantPool.Shiro.APPLICATION_ID)
     public ResponseMap<Map<String, Map<String, MenuDto>>> init(HttpServletRequest request){
         ResponseMap<Map<String, Map<String, MenuDto>>> responseMap = new ResponseMap<>();
         String uuid = HttpRequestUtil.getCookieValue(request,ConstantPool.Shiro.AC_UUID);
@@ -38,6 +40,7 @@ public class MenuController {
         return responseMap;
     }
     @GetMapping("/initStatic")
+    @SaveLog(applicationId = ConstantPool.Shiro.APPLICATION_ID)
     public ResponseMap<Map<String,MenuDto>> initStatic(HttpServletRequest request){
     	ResponseMap<Map<String,MenuDto>> responseMap = new ResponseMap<Map<String,MenuDto>>();
     	String page = HttpRequestUtil.getStringParameter(request,"page");

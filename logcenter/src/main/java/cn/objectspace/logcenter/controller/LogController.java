@@ -1,5 +1,6 @@
 package cn.objectspace.logcenter.controller;
 
+import cn.objectspace.common.annotation.SaveLog;
 import cn.objectspace.common.constant.ConstantPool;
 import cn.objectspace.common.pojo.entity.ResponseMap;
 import cn.objectspace.logcenter.pojo.entity.Log;
@@ -15,7 +16,7 @@ import org.springframework.web.bind.annotation.*;
 * @Date: 2019/12/19
 */
 @RestController
-@RequestMapping("/LogCenter")
+@RequestMapping("/LC")
 public class LogController {
     @Autowired
     private LogService logService;
@@ -50,6 +51,7 @@ public class LogController {
      * @Date: 2019/12/30
      */
     @GetMapping("/logCount")
+    @SaveLog(applicationId = ConstantPool.LogCenter.APPLICATION_ID)
     public ResponseMap<Integer> logCount(){
         ResponseMap<Integer> responseMap = new ResponseMap<>();
         Integer logCount = logService.getLogCount();

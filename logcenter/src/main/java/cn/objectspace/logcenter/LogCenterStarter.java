@@ -5,11 +5,16 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cloud.netflix.eureka.EnableEurekaClient;
 import org.springframework.cloud.netflix.hystrix.dashboard.EnableHystrixDashboard;
 
+import cn.objectspace.common.annotation.EnableRibbonRest;
+import cn.objectspace.common.annotation.EnableSaveLog;
+
 /**
 * @Description: 日志中心启动器
 * @Author: NoCortY
 * @Date: 2019/12/19
 */
+@EnableRibbonRest
+@EnableSaveLog
 @EnableEurekaClient
 @EnableHystrixDashboard
 @SpringBootApplication
