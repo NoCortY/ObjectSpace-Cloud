@@ -13,8 +13,6 @@ import cn.objectspace.common.annotation.EnableSaveLog;
 * @Author: NoCortY
 * @Date: 2019/12/19
 */
-@EnableRibbonRest
-@EnableSaveLog
 @EnableEurekaClient
 @EnableHystrixDashboard
 @SpringBootApplication
