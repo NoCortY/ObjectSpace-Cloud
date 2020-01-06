@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.LinkedHashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -68,4 +69,17 @@ public class MenuServiceImpl implements MenuService {
         /*****************************************************************************************/
         return resMap;
 	}
+
+    @Override
+    public List<MenuDto> getPageMenu(String page, String classify,String uuid) {
+        Session currentSession = SecurityUtils.getSubject().getSession();
+        CloudUser currentUser = (CloudUser) SerializeUtil.unSerialize((byte[]) currentSession.getAttribute(uuid));
+        List<Integer> roleIdList = menuDao.queryRole(currentUser.getUserEmail());
+        List<MenuDto> menuDtoList = new LinkedList<>();
+        for(Integer roleId : roleIdList){
+            //取出所有角色对应的菜单
+            menuDtoList.addAll(menuDao.queryPageMenu(classify,roleId,page));
+        }
+        return menuDtoList;
+    }
 }

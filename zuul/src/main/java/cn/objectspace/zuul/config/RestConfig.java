@@ -1,7 +1,5 @@
 package cn.objectspace.zuul.config;
 
-import com.netflix.loadbalancer.IRule;
-import com.netflix.loadbalancer.RoundRobinRule;
 import org.springframework.cloud.client.loadbalancer.LoadBalanced;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -34,8 +32,8 @@ public class RestConfig {
      * @Author: NoCortY
      * @Date: 2019/12/20
      */
-    @Bean
+    /*@Bean
     public IRule iRule(){
         return new RoundRobinRule();
-    }
+    }*/
 }

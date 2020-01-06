@@ -100,6 +100,7 @@ public class TokenFilter extends ZuulFilter {
             headers.put(HttpHeaders.COOKIE,cookieList);
             logger.info("当前用户没有携带令牌，开始进行认证...");
             HttpEntity httpEntity = new HttpEntity(headers);
+            //restTemplate.getForObject("http://ObjectService-LC/LC/abc",ResponseMap.class);
             responseMap = restTemplate.postForEntity(ConstantPool.AC_APPLICATION_NAME + "/AC/authentication", httpEntity, ResponseMap.class);
             //但如果这个用户没有登录，还请求了认证接口，那么认证接口返回会认证失败
         }

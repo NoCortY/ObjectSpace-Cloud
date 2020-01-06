@@ -66,6 +66,7 @@
     CONSTRAINT `cloud_role_permission_ibfk_1` FOREIGN KEY (`role_id`) REFERENCES `cloud_role` (`role_id`),
     CONSTRAINT `cloud_role_permission_ibfk_2` FOREIGN KEY (`permission_id`) REFERENCES `cloud_permission` (`permission_id`)
   ) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8;
+  
   ```
 
   
@@ -73,5 +74,16 @@
 - 
 
 ## LogCenter—日志中心
+
+```sql
+CREATE TABLE cloud_notice(
+	id INTEGER PRIMARY KEY AUTO_INCREMENT,
+    title VARCHAR(64),
+    content VARCHAR(4096),
+    create_time DATE
+);
+```
+
+
 
 ## ComponentCenter—组件管理中心

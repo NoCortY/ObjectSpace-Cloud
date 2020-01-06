@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -48,6 +49,25 @@ public class MenuController {
     	responseMap.setCode(ConstantPool.Common.REQUEST_SUCCESS_CODE);
         responseMap.setMessage(ConstantPool.Common.REQUEST_SUCCESS_MESSAGE);
         responseMap.setData(staticInfo);
+        return responseMap;
+    }
+
+    @GetMapping("/pageMenu")
+    @SaveLog(applicationId = ConstantPool.Shiro.APPLICATION_ID)
+    public ResponseMap<List<MenuDto>> pageMenu(HttpServletRequest request){
+        ResponseMap<List<MenuDto>> responseMap = new ResponseMap<>();
+        String page = HttpRequestUtil.getStringParameter(request,"page");
+        String classify = HttpRequestUtil.getStringParameter(request,"classify");
+        String uuid = HttpRequestUtil.getCookieValue(request,ConstantPool.Shiro.AC_UUID);
+        List<MenuDto> menuDtoList = menuService.getPageMenu(page,classify,uuid);
+        if(menuDtoList!=null){
+            responseMap.setCode(ConstantPool.Common.REQUEST_SUCCESS_CODE);
+            responseMap.setMessage(ConstantPool.Common.REQUEST_SUCCESS_MESSAGE);
+            responseMap.setData(menuDtoList);
+        }else{
+            responseMap.setCode(ConstantPool.Common.REQUEST_FAILURE_CODE);
+            responseMap.setMessage(ConstantPool.Common.REQUEST_FAILURE_MESSAGE);
+        }
         return responseMap;
     }
 }

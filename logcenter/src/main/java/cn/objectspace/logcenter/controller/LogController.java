@@ -29,7 +29,6 @@ public class LogController {
      * @Date: 2019/12/19
      */
     @PostMapping("/recordLog")
-    @ResponseBody
     public ResponseMap<String> recordLog(@RequestBody Log log){
         ResponseMap<String> responseMap = new ResponseMap<>();
         if(logService.addLog(log)){

@@ -63,4 +63,21 @@
         WHERE
         u.user_email = #{userEmail}
     </select>
+    
+    <select id="queryPageMenu" resultType="MenuDto">
+        SELECT title,icon,href
+        FROM cloud_menu_info
+        <where>
+            <if test="classify!=null and classify!=''">
+                classify=#{classify}
+            </if>
+            <if test="roleId!=null and roleId!=''">
+                AND role_id = #{roleId}
+            </if>
+            <if test="page!=null and page!=''">
+                AND page = #{page}
+            </if>
+        </where>
+        ORDER BY priority ASC
+    </select>
 </mapper>
