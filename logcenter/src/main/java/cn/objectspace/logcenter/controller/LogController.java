@@ -50,18 +50,18 @@ public class LogController {
      * @Date: 2019/12/30
      */
     @GetMapping("/logCount")
+    @SaveLog(applicationId = ConstantPool.LogCenter.APPLICATION_ID)
     public ResponseMap<Integer> logCount(){
-		/*
-		 * ResponseMap<Integer> responseMap = new ResponseMap<>(); Integer logCount =
-		 * logService.getLogCount(); if(logCount!=null){
-		 * responseMap.setCode(ConstantPool.Common.REQUEST_SUCCESS_CODE);
-		 * responseMap.setMessage(ConstantPool.Common.REQUEST_SUCCESS_MESSAGE);
-		 * responseMap.setData(logCount); }else{
-		 * responseMap.setCode(ConstantPool.Common.REQUEST_FAILURE_CODE);
-		 * responseMap.setMessage(ConstantPool.Common.REQUEST_FAILURE_MESSAGE); } return
-		 * responseMap;
-		 */
-    	System.out.println("123");
-    	return null;
+        ResponseMap<Integer> responseMap = new ResponseMap<>();
+        Integer logCount = logService.getLogCount();
+        if(logCount!=null){
+            responseMap.setCode(ConstantPool.Common.REQUEST_SUCCESS_CODE);
+            responseMap.setMessage(ConstantPool.Common.REQUEST_SUCCESS_MESSAGE);
+            responseMap.setData(logCount);
+        }else{
+            responseMap.setCode(ConstantPool.Common.REQUEST_FAILURE_CODE);
+            responseMap.setMessage(ConstantPool.Common.REQUEST_FAILURE_MESSAGE);
+        }
+        return responseMap;
     }
 }

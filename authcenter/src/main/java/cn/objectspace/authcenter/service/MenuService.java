@@ -10,4 +10,5 @@ public interface MenuService {
     public Map<String,MenuDto> getStatic(String page);
 
     public List<MenuDto> getPageMenu(String page, String classify,String uuid);
+    
 }

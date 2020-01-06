@@ -13,5 +13,5 @@ public interface MenuDao {
     public List<MenuDto> querySubMenu(@Param("roleId")Integer roleId,@Param("parentId")Integer parentId);
     public List<Integer> queryRole(@Param("userEmail") String userEmail);
 
-    public List<MenuDto> queryPageMenu(@Param("classify")String classify,@Param("roleId")Integer roleId,@Param("page")String page);
+    public List<MenuDto> queryPageMenu(@Param("classify")String classify,@Param("roleId")Integer roleId,@Param("page")String page);   
 }
