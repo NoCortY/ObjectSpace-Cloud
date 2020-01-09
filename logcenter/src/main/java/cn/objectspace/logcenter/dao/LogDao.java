@@ -1,6 +1,10 @@
 package cn.objectspace.logcenter.dao;
 
+import cn.objectspace.logcenter.pojo.dto.CallCountDto;
 import cn.objectspace.logcenter.pojo.entity.Log;
+
+import java.util.List;
+
 import org.apache.ibatis.annotations.Mapper;
 
 /**
@@ -27,4 +31,10 @@ public interface LogDao {
      * @Date: 2019/12/30
      */
     public Integer queryLogCount();
+    
+    /**
+     * 查询各接口调用次数
+     * @return
+     */
+    public List<CallCountDto> queryCallCount();
 }

@@ -1,8 +1,12 @@
 package cn.objectspace.logcenter.service.impl;
 
 import cn.objectspace.logcenter.dao.LogDao;
+import cn.objectspace.logcenter.pojo.dto.CallCountDto;
 import cn.objectspace.logcenter.pojo.entity.Log;
 import cn.objectspace.logcenter.service.LogService;
+
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -37,4 +41,9 @@ public class LogServiceImpl implements LogService {
     public Integer getLogCount() {
         return logDao.queryLogCount();
     }
+
+	@Override
+	public List<CallCountDto> getCallCount() {
+		return logDao.queryCallCount();
+	}
 }

@@ -1,6 +1,9 @@
 package cn.objectspace.logcenter.service;
 
 
+import java.util.List;
+
+import cn.objectspace.logcenter.pojo.dto.CallCountDto;
 import cn.objectspace.logcenter.pojo.entity.Log;
 
 /**
@@ -26,4 +29,10 @@ public interface LogService {
      * @Date: 2019/12/30
      */
     public Integer getLogCount();
+    
+    /**
+     * 获取接口调用次数
+     * @return
+     */
+    public List<CallCountDto> getCallCount();
 }

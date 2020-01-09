@@ -51,4 +51,7 @@
     <select id="queryLogCount" resultType="java.lang.Integer">
         SELECT COUNT(id) FROM cloud_log;
     </select>
+    <select id="queryCallCount" resultType="CallCountDto">
+    	SELECT operate_interface,count(id) as call_count FROM cloud_log group by operate_interface ORDER BY call_count DESC LIMIT 5;
+    </select>
 </mapper>

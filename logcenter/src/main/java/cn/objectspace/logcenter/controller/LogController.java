@@ -3,8 +3,12 @@ package cn.objectspace.logcenter.controller;
 import cn.objectspace.common.annotation.SaveLog;
 import cn.objectspace.common.constant.ConstantPool;
 import cn.objectspace.common.pojo.entity.ResponseMap;
+import cn.objectspace.logcenter.pojo.dto.CallCountDto;
 import cn.objectspace.logcenter.pojo.entity.Log;
 import cn.objectspace.logcenter.service.LogService;
+
+import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -63,5 +67,21 @@ public class LogController {
             responseMap.setMessage(ConstantPool.Common.REQUEST_FAILURE_MESSAGE);
         }
         return responseMap;
+    }
+    
+    @GetMapping("/callCount")
+    @SaveLog(applicationId=ConstantPool.LogCenter.APPLICATION_ID)
+    public ResponseMap<List<CallCountDto>> callCount(){
+    	ResponseMap<List<CallCountDto>> responseMap = new ResponseMap<>();
+    	List<CallCountDto> callCountDtoList = logService.getCallCount();
+    	if(callCountDtoList==null) {
+    		responseMap.setCode(ConstantPool.Common.REQUEST_FAILURE_CODE);
+    		responseMap.setMessage(ConstantPool.Common.REQUEST_FAILURE_MESSAGE);
+    	}else {
+    		responseMap.setCode(ConstantPool.Common.REQUEST_SUCCESS_CODE);
+    		responseMap.setMessage(ConstantPool.Common.REQUEST_SUCCESS_MESSAGE);
+    		responseMap.setData(callCountDtoList);
+    	}
+    	return responseMap;
     }
 }

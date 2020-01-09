@@ -1,7 +1,5 @@
 package cn.objectspace.logcenter;
 
-import cn.objectspace.common.annotation.EnableRibbonRest;
-import cn.objectspace.common.annotation.EnableSaveLog;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cloud.netflix.eureka.EnableEurekaClient;
