@@ -8,6 +8,6 @@ spring:
   cloud:
     config:
       name: authcenter #从github上读取的资源名称，注意没有.yml后缀
-      profile: dev #本次访问的配置项
+      profile: prd #本次访问的配置项
       label: master
       uri: http://127.0.0.1:7101
