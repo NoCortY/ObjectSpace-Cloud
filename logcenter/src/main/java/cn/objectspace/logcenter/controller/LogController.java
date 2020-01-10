@@ -8,6 +8,7 @@ import cn.objectspace.logcenter.pojo.entity.Log;
 import cn.objectspace.logcenter.service.LogService;
 
 import java.util.List;
+import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -71,16 +72,16 @@ public class LogController {
     
     @GetMapping("/callCount")
     @SaveLog(applicationId=ConstantPool.LogCenter.APPLICATION_ID)
-    public ResponseMap<List<CallCountDto>> callCount(){
-    	ResponseMap<List<CallCountDto>> responseMap = new ResponseMap<>();
-    	List<CallCountDto> callCountDtoList = logService.getCallCount();
-    	if(callCountDtoList==null) {
+    public ResponseMap<Map<String,List<CallCountDto>>> callCount(){
+    	ResponseMap<Map<String,List<CallCountDto>>> responseMap = new ResponseMap<>();
+        Map<String,List<CallCountDto>> dataMap = logService.getCallCount();
+    	if(dataMap==null) {
     		responseMap.setCode(ConstantPool.Common.REQUEST_FAILURE_CODE);
     		responseMap.setMessage(ConstantPool.Common.REQUEST_FAILURE_MESSAGE);
     	}else {
     		responseMap.setCode(ConstantPool.Common.REQUEST_SUCCESS_CODE);
     		responseMap.setMessage(ConstantPool.Common.REQUEST_SUCCESS_MESSAGE);
-    		responseMap.setData(callCountDtoList);
+    		responseMap.setData(dataMap);
     	}
     	return responseMap;
     }

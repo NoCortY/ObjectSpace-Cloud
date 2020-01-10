@@ -51,7 +51,15 @@
     <select id="queryLogCount" resultType="java.lang.Integer">
         SELECT COUNT(id) FROM cloud_log;
     </select>
-    <select id="queryCallCount" resultType="CallCountDto">
-    	SELECT operate_interface,count(id) as call_count FROM cloud_log group by operate_interface ORDER BY call_count DESC LIMIT 5;
+    <select id="queryMaxInterfaceName" resultType="java.lang.String">
+    	SELECT operate_interface FROM (SELECT operate_interface,COUNT(id) as call_count FROM cloud_log group by operate_interface ORDER BY call_count DESC LIMIT 5) as lc;
+    </select>
+    <select id="queryCallCountWeek" resultType="CallCountDto" parameterType="java.lang.String">
+        select week_date.date as callDate,ifnull(lc.callCount,0) as callCount
+        from
+        (select DATE_SUB(CURDATE(), INTERVAL n.num DAY) as date from cloud_num n) as week_date
+        LEFT JOIN
+        (select operate_date,operate_interface,COUNT(id) as callCount FROM cloud_log WHERE operate_interface=#{interfaceName} group by operate_date) as lc
+        ON week_date.date = lc.operate_date
     </select>
 </mapper>

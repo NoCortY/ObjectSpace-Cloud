@@ -6,6 +6,7 @@ import cn.objectspace.logcenter.pojo.entity.Log;
 import java.util.List;
 
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 
 /**
 * @Description: 日志持久层
@@ -36,5 +37,15 @@ public interface LogDao {
      * 查询各接口调用次数
      * @return
      */
-    public List<CallCountDto> queryCallCount();
+    public List<String> queryMaxInterfaceName();
+
+
+    /**
+     * @Description: 查询接口调用次数（周）
+     * @Param:
+     * @return:
+     * @Author: NoCortY
+     * @Date: 2020/1/10
+     */
+    public List<CallCountDto> queryCallCountWeek(@Param("interfaceName")String interfaceName);
 }

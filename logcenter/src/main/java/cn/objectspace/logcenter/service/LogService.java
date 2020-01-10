@@ -2,6 +2,7 @@ package cn.objectspace.logcenter.service;
 
 
 import java.util.List;
+import java.util.Map;
 
 import cn.objectspace.logcenter.pojo.dto.CallCountDto;
 import cn.objectspace.logcenter.pojo.entity.Log;
@@ -34,5 +35,5 @@ public interface LogService {
      * 获取接口调用次数
      * @return
      */
-    public List<CallCountDto> getCallCount();
+    public Map<String,List<CallCountDto>> getCallCount();
 }
