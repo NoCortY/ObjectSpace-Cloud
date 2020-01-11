@@ -52,14 +52,14 @@ public class DatabaseRealm extends AuthorizingRealm {
             cloudUser = shiroDao.queryCloudUserByUserEmail(userEmail);
         }catch (Exception e){
             logger.error("认证失败");
-            logger.error("异常信息:"+e.getMessage());
+            logger.error("异常信息:{}",e.getMessage());
             return null;
         }
 
         if(cloudUser==null) throw new UnknownAccountException();
 
         if(!cloudUser.getUserStatus()){
-            logger.error("账号:"+cloudUser.getUserEmail()+"已被禁止登录");
+            logger.error("账号:{}已被禁止登录",cloudUser.getUserEmail());
             throw new DisabledAccountException();
         }
         passwordInDB = cloudUser.getUserPassword();

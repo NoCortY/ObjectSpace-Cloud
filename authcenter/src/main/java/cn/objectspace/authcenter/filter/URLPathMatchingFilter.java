@@ -22,7 +22,7 @@ public class URLPathMatchingFilter extends PathMatchingFilter {
             throws Exception {
         String requestURI = getPathWithinApplication(request);
 
-        logger.info("URL过滤器 请求路径:"+requestURI);
+        logger.info("URL过滤器 请求路径:{}",requestURI);
         Subject subject = SecurityUtils.getSubject();
         // 如果没有登录，就跳转到登录页面
         if (!subject.isAuthenticated())

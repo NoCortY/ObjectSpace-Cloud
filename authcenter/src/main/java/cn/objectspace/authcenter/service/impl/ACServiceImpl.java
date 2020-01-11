@@ -72,11 +72,11 @@ public class ACServiceImpl implements ACService {
             authDto = new AuthDto(ConstantPool.Shiro.AC_UKNOWN_ACCOUNT,ConstantPool.Shiro.AC_UKNOWN_ACCOUNT_MESSAGE,currentUser.getUserEmail());
             return authDto;
         }catch (DisabledAccountException e) {
-            logger.info("用户:"+currentUser.getUserEmail()+"已是封禁用户，但在尝试登录");
+            logger.info("用户:{}已是封禁用户，但在尝试登录",currentUser.getUserEmail());
             authDto = new AuthDto(ConstantPool.Shiro.AC_BINDED_CODE,ConstantPool.Shiro.AC_BINDED_MESSAGE,currentUser.getUserEmail());
             return authDto;
         } catch (AuthenticationException e) {
-            logger.info("用户:"+currentUser.getUserEmail()+"认证失败");
+            logger.info("用户:{}认证失败",currentUser.getUserEmail());
             authDto = new AuthDto(ConstantPool.Shiro.AC_FAILURE_CODE,ConstantPool.Shiro.AC_FAILURE_MESSAGE,currentUser.getUserEmail());
             return authDto;
         }
@@ -126,7 +126,7 @@ public class ACServiceImpl implements ACService {
             shiroDao.insertUserRole(cloudUser.getUserId(),ConstantPool.Shiro.GENERAL_USER_ROLE_ID);
         } catch (Exception e){
             logger.error("注册异常");
-            logger.error("异常信息:"+e.getMessage());
+            logger.error("异常信息:{}",e.getMessage());
             //事务回滚
             TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
             authDto = new AuthDto(ConstantPool.Shiro.AC_FAILURE_CODE,ConstantPool.Shiro.AC_FAILURE_MESSAGE,cloudUser.getUserEmail());
@@ -161,7 +161,7 @@ public class ACServiceImpl implements ACService {
                 urpDto = shiroDao.queryURPByUserEmail(cloudUser.getUserEmail(),applicationId);
             }catch (Exception e){
                 logger.error("尝试授权失败");
-                logger.error("异常信息:"+e.getMessage());
+                logger.error("异常信息:{}",e.getMessage());
                 return null;
             }
         }else{

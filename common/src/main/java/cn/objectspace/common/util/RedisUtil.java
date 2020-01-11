@@ -43,7 +43,7 @@ public class RedisUtil{
             return jedis.setnx(key,value);
         }catch (Exception e){
             logger.error("设置分布式锁异常");
-            logger.error("异常信息:"+e.getMessage());
+            logger.error("异常信息:{}",e.getMessage());
             return 0L;
         }finally {
             if(jedis!=null)
@@ -58,7 +58,7 @@ public class RedisUtil{
             return jedis.setex(key,expireSecond,value);
         }catch (Exception e){
             logger.error("往Redis中存入序列化key出现异常（有过期时间）");
-            logger.error("异常信息："+e.getMessage());
+            logger.error("异常信息：{}",e.getMessage());
             return "failure";
         }finally {
             if(jedis!=null)
@@ -79,7 +79,7 @@ public class RedisUtil{
             return jedis.setex(key,expireSecond,value);
         }catch (Exception e){
             logger.error("往Redis中存入key出现异常（有过期时间）");
-            logger.error("异常信息："+e.getMessage());
+            logger.error("异常信息：{}",e.getMessage());
             return "failure";
         }finally {
             if(jedis!=null)
@@ -101,7 +101,7 @@ public class RedisUtil{
             return jedis.set(key, value);
         }catch(Exception e){
             logger.error("往Redis中存入序列化key出现异常!");
-            logger.error("异常信息:"+e.getMessage());
+            logger.error("异常信息:{}",e.getMessage());
             return "failure";
         }finally {
             if(jedis!=null)
@@ -122,7 +122,7 @@ public class RedisUtil{
             return jedis.get(key);
         }catch(Exception e) {
             logger.error("从Redis中取出序列化对象出现异常!");
-            logger.error("异常信息:"+e.getMessage());
+            logger.error("异常信息:{}",e.getMessage());
             return null;
         }finally {
             if(jedis!=null)
@@ -144,7 +144,7 @@ public class RedisUtil{
             return jedis.set(key, value);
         } catch (Exception e) {
             logger.error("往Redis中存入String过程出现异常!");
-            logger.error("异常信息:" + e.getMessage());
+            logger.error("异常信息:{}",e.getMessage());
             return "failure";
         } finally {
             if (jedis != null)
@@ -166,7 +166,7 @@ public class RedisUtil{
             return jedis.get(key);
         } catch (Exception e) {
             logger.error("从缓存中取K,V时出现异常!");
-            logger.error("异常信息:" + e.getMessage());
+            logger.error("异常信息:{}", e.getMessage());
             return "failure";
         } finally {
             if (jedis != null)
@@ -186,8 +186,8 @@ public class RedisUtil{
             jedis = jedisPool.getResource();
             return jedis.del(key);
         }catch (Exception e){
-            logger.error("删除"+key+"出现异常!");
-            logger.error("异常信息:"+e.getMessage());
+            logger.error("删除{}出现异常!",key);
+            logger.error("异常信息:{}",e.getMessage());
             return -1L;
         }finally {
             if(jedis!=null)
@@ -207,8 +207,8 @@ public class RedisUtil{
             jedis = jedisPool.getResource();
             return jedis.del(key);
         }catch(Exception e) {
-            logger.error("删除"+key+"出现异常!");
-            logger.error("异常信息:"+e.getMessage());
+            logger.error("删除{}出现异常!",key);
+            logger.error("异常信息:{}",e.getMessage());
             return -1L;
         }finally {
             if(jedis!=null)
@@ -229,7 +229,7 @@ public class RedisUtil{
             return jedis.lpush(listName, values);
         } catch (Exception e) {
             logger.error("往Redis中存入list过程出现异常(lpush)!");
-            logger.error("异常信息:" + e.getMessage());
+            logger.error("异常信息:{}",e.getMessage());
             return -1L;
         } finally {
             if (jedis != null)
@@ -251,7 +251,7 @@ public class RedisUtil{
             return jedis.lpop(listName);
         } catch (Exception e) {
             logger.error("从Redis中获取list过程出现异常(lpop)!");
-            logger.error("异常信息:" + e.getMessage());
+            logger.error("异常信息{}:",e.getMessage());
             return "failure";
         } finally {
             if (jedis != null)
@@ -273,7 +273,7 @@ public class RedisUtil{
             return jedis.rpush(listName, values);
         } catch (Exception e) {
             logger.error("往Redis中存入list过程出现异常(rpush)!");
-            logger.error("异常信息:" + e.getMessage());
+            logger.error("异常信息:{}",e.getMessage());
             return -1L;
         } finally {
             if (jedis != null)
@@ -294,7 +294,7 @@ public class RedisUtil{
             return jedis.rpop(listName);
         }catch(Exception e) {
             logger.error("从Redis中获取list过程出现异常(rpop)!");
-            logger.error("异常信息:"+e.getMessage());
+            logger.error("异常信息:{}",e.getMessage());
             return "failure";
         }finally {
             if(jedis!=null)
@@ -315,7 +315,7 @@ public class RedisUtil{
             return jedis.lrange(listName, start, end);
         }catch(Exception e) {
             logger.error("获取指定list多个元素过程出现异常!");
-            logger.error("异常信息:"+e.getMessage());
+            logger.error("异常信息:{}",e.getMessage());
             return null;
         }finally {
             if(jedis!=null)
@@ -336,7 +336,7 @@ public class RedisUtil{
             return jedis.sort(listName);
         }catch(Exception e) {
             logger.error("排序出现异常!");
-            logger.error("异常信息:"+e.getMessage());
+            logger.error("异常信息:{}",e.getMessage());
             return null;
         }finally {
             if(jedis!=null)
@@ -357,7 +357,7 @@ public class RedisUtil{
             return jedis.sadd(setName, members);
         }catch(Exception e) {
             logger.error("sadd出现异常!");
-            logger.error("异常信息:"+e.getMessage());
+            logger.error("异常信息:{}",e.getMessage());
             return 0L;
         }finally {
             if(jedis!=null)
@@ -378,7 +378,7 @@ public class RedisUtil{
             return jedis.srem(setName, members);
         }catch(Exception e) {
             logger.error("srem出现异常!");
-            logger.error("异常信息:"+e.getMessage());
+            logger.error("异常信息:{}",e.getMessage());
             return 0L;
         }finally {
             if(jedis!=null)
@@ -399,7 +399,7 @@ public class RedisUtil{
             return jedis.smembers(setName);
         }catch(Exception e) {
             logger.error("smembers出现异常!");
-            logger.error("异常信息:"+e.getMessage());
+            logger.error("异常信息:{}",e.getMessage());
             return null;
         }finally {
             if(jedis!=null)
@@ -420,7 +420,7 @@ public class RedisUtil{
             return jedis.zadd(setName, score, member);
         }catch(Exception e) {
             logger.error("zadd出现异常!");
-            logger.error("异常信息:"+e.getMessage());
+            logger.error("异常信息:{}",e.getMessage());
             return 0L;
         }finally {
             if(jedis!=null)
@@ -442,7 +442,7 @@ public class RedisUtil{
             return jedis.zrange(setName, start, end);
         }catch(Exception e) {
             logger.error("zrange出现异常!");
-            logger.error("异常信息:"+e.getMessage());
+            logger.error("异常信息:{}",e.getMessage());
             return null;
         }finally {
             if(jedis!=null)
@@ -465,7 +465,7 @@ public class RedisUtil{
             return jedis.hmset(mapName,model);
         }catch(Exception e) {
             logger.error("hmset出现异常!");
-            logger.error("异常信息:"+e.getMessage());
+            logger.error("异常信息:{}",e.getMessage());
             return "failure";
         }finally {
             if(jedis!=null)
@@ -486,7 +486,7 @@ public class RedisUtil{
             return jedis.hmget(mapName, keys);
         }catch(Exception e) {
             logger.error("hmget出现异常!");
-            logger.error("异常信息:"+e.getMessage());
+            logger.error("异常信息:{}",e.getMessage());
             return null;
         }finally {
             if(jedis!=null)
@@ -507,7 +507,7 @@ public class RedisUtil{
             return jedis.hgetAll(mapName);
         }catch(Exception e) {
             logger.error("hgetAll出现异常!");
-            logger.error("异常信息:"+e.getMessage());
+            logger.error("异常信息:{}",e.getMessage());
             return null;
         }finally {
             if(jedis!=null)
@@ -528,7 +528,7 @@ public class RedisUtil{
             return jedis.keys(pattern);
         }catch(Exception e) {
             logger.error("keys出现异常!");
-            logger.error("异常信息:"+e.getMessage());
+            logger.error("异常信息:{}",e.getMessage());
             return null;
         }finally {
             if(jedis!=null)
@@ -565,7 +565,7 @@ public class RedisUtil{
             return set;
         }catch(Exception e) {
             logger.error("scan发生异常!");
-            logger.error("异常信息:"+e.getMessage());
+            logger.error("异常信息:{}",e.getMessage());
             return null;
         }finally {
             if(jedis!=null)
@@ -586,7 +586,7 @@ public class RedisUtil{
             return jedis.flushAll();
         }catch(Exception e) {
             logger.error("flushAll出现异常!");
-            logger.error("异常信息:"+e.getMessage());
+            logger.error("异常信息:{}",e.getMessage());
             return null;
         }finally {
             if(jedis!=null)

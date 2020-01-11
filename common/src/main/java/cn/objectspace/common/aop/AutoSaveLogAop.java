@@ -63,8 +63,8 @@ public class AutoSaveLogAop {
             object = joinPoint.proceed();
         } catch (Throwable throwable) {
             logger.info("====================================访问日志===================================");
-            logger.error("                      执行切入点出错！请检查"+joinPoint.getSignature().getName()+"的业务逻辑!");
-            logger.error("                      错误原因:"+throwable.getMessage());
+            logger.error("                      执行切入点出错！请检查{}的业务逻辑!",joinPoint.getSignature().getName());
+            logger.error("                      错误原因:{}",throwable.getMessage());
             logger.info("=============================================================================");
             return null;
         }
@@ -93,7 +93,7 @@ public class AutoSaveLogAop {
                 } catch (JsonProcessingException e) {
                     inputParameter.append("获取入参异常");
                     logger.error("获取入参异常");
-                    logger.error("异常信息:"+e.getMessage());
+                    logger.error("异常信息:{}",e.getMessage());
                 }
                 inputParameter.append("|");
             }
@@ -108,32 +108,20 @@ public class AutoSaveLogAop {
         } catch (JsonProcessingException e) {
         	outputParameter = "获取出参异常";
             logger.error("获取出参异常");
-            logger.error("异常信息"+e.getMessage());
+            logger.error("异常信息{}",e.getMessage());
         }
 
         logger.info("====================================访问日志===================================");
-        logger.info("                      访问时间:"+operateDate);
-        logger.info("                      访问接口:"+operateInterface);
-        logger.info("                      入参:"+inputParameter);
-        logger.info("                      出参:"+outputParameter);
-        logger.info("                      访问者IP(A):"+operateUserIp);
-        logger.info("                      访问者IP(B):"+ip);
-        logger.info("====================================日志入库===================================");
+        logger.info("                      访问时间:{}",operateDate);
+        logger.info("                      访问接口:{}",operateInterface);
+        logger.info("                      入参:{}",inputParameter);
+        logger.info("                      出参:{}",outputParameter);
+        logger.info("                      访问者IP(A):{}",operateUserIp);
+        logger.info("                      访问者IP(B):{}",ip);
+        logger.info("=======================================================================");
         log = new Log(operateDate,inputParameter.toString(),outputParameter,operateInterface,operateUserIp,applicationId);
-        try{
-            //调用日志中心，发送日志入库请求
-            //Map modelMap = restUtil.postJsonObjectWithNameByAppName(ConstantPool.LogCenter.LC_APPLICATION_NAME+"/LogCenter/recordLog",ConstantPool.LogCenter.RECORD_LOG_NAME,log,Map.class);
-            ResponseMap responseMap = restUtil.postObjectByAppName(ConstantPool.LogCenter.LC_APPLICATION_NAME+"/LC/recordLog",log,ResponseMap.class);
-            if(ConstantPool.LogCenter.RECORD_LOG_SUCCESS_CODE.equals(responseMap.getCode())) {
-                logger.info(new Date() + "   操作日志入库成功!  ");
-            }else{
-                logger.error(new Date() + "   操作日志入库失败!  ");
-            }
-        }catch(Exception e) {
-        	logger.error("日志入库异常!");
-        	logger.error("异常信息:"+e.getMessage());
-        }
-        logger.info("===============================================================================");
+        //调用日志中心，发送日志入库请求
+        restUtil.postObjectByAppName(ConstantPool.LogCenter.LC_APPLICATION_NAME+"/LC/recordLog",log,ResponseMap.class);
         
         return object;
     }

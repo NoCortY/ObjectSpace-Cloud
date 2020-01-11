@@ -12,6 +12,10 @@ import java.util.Date;
  *
  */
 public class CallCountDto implements Serializable {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 7832995511790133008L;
 	@JsonFormat(pattern = "yyyy-MM-dd",timezone="GMT+8")
 	private Date callDate;
 	private Integer callCount;
