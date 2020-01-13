@@ -103,12 +103,14 @@ public class AutoSaveLogAop {
         String ip = request.getRemoteAddr();
         //获取出参
         String outputParameter = null;
-        try {
-        	outputParameter= objectMapper.writeValueAsString(object);
-        } catch (JsonProcessingException e) {
-        	outputParameter = "获取出参异常";
-            logger.error("获取出参异常");
-            logger.error("异常信息{}",e.getMessage());
+        if(object!=null) {
+	        try {
+	        	outputParameter= objectMapper.writeValueAsString(object);
+	        } catch (JsonProcessingException e) {
+	        	outputParameter = "获取出参异常";
+	            logger.error("获取出参异常");
+	            logger.error("异常信息{}",e.getMessage());
+	        }
         }
 
         logger.info("====================================访问日志===================================");
