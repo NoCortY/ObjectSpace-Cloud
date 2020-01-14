@@ -7,12 +7,15 @@ import cn.objectspace.logcenter.pojo.dto.CallCountDto;
 import cn.objectspace.logcenter.pojo.entity.Log;
 import cn.objectspace.logcenter.service.LogService;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.web.bind.annotation.*;
 
 /**
@@ -33,18 +36,20 @@ public class LogController {
      * @Author: NoCortY
      * @Date: 2019/12/19
      */
+    @Async
     @PostMapping("/recordLog")
-    public ResponseMap<String> recordLog(@RequestBody Log log){
-        ResponseMap<String> responseMap = new ResponseMap<>();
-        if(logService.addLog(log)){
-            responseMap.setCode(ConstantPool.LogCenter.RECORD_LOG_SUCCESS_CODE);
-            responseMap.setMessage(ConstantPool.LogCenter.RECORD_LOG_SUCCESS_MESSAGE);
-        }else{
-            responseMap.setCode(ConstantPool.LogCenter.RECORD_LOG_FALURE_CODE);
-            responseMap.setMessage(ConstantPool.LogCenter.RECORD_LOG_FALURE_MESSAGE);
+    public void recordLog(@RequestBody Log log){
+    	SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        logger.info("====================================日志入库===================================");
+        try {
+        	if(logService.addLog(log)) logger.info("{}:   操作日志入库成功!  ",sdf.format(new Date()));
+            else logger.error("{}:   操作日志入库失败!  ",sdf.format(new Date()));
+            
+        }catch(Exception e) {
+        	logger.error("{}:   日志入库异常!",sdf.format(new Date()));
+        	logger.error("{}:   异常信息:{}",sdf.format(new Date()),e.getMessage());
         }
-        responseMap.setData(ConstantPool.Common.RES_NOT_DATA);
-        return responseMap;
+        logger.info("==========================================================================");
     }
 
     /**

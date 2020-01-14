@@ -32,7 +32,7 @@ public class SerializeUtil {
 
         }catch(IOException e){
             logger.error("序列化异常");
-            logger.error("异常信息:"+e.getMessage());
+            logger.error("异常信息:{}",e.getMessage());
         }
         return null;
     }
@@ -55,7 +55,7 @@ public class SerializeUtil {
 
         } catch (Exception e) {
             logger.error("反序列化异常");
-            logger.error("异常信息:"+e.getMessage());
+            logger.error("异常信息:{}",e.getMessage());
         }
         return null;
     }

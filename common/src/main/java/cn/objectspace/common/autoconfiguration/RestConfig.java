@@ -34,6 +34,7 @@ public class RestConfig {
     public RestTemplate restTemplate(){
         return new RestTemplate();
     }
+    
     /**
      * @Description: 配置负载均衡规则为重试
      * @Param: []

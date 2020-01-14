@@ -34,7 +34,7 @@ public class RestUtil {
            reqJson = objectMapper.writeValueAsString(reqObject);
         } catch (JsonProcessingException e) {
             logger.error("postJsonObjectWithName转换Json异常");
-            logger.error("异常信息:"+e.getMessage());
+            logger.error("异常信息:{}",e.getMessage());
             return null;
         }
         multiValueMap.add(name,reqJson);
@@ -55,7 +55,7 @@ public class RestUtil {
             reqJson = objectMapper.writeValueAsString(reqObject);
         } catch (JsonProcessingException e) {
             logger.error("postJsonObjectWithName转换Json异常");
-            logger.error("异常信息:"+e.getMessage());
+            logger.error("异常信息:{}",e.getMessage());
             return null;
         }
         multiValueMap.add(name,reqJson);
