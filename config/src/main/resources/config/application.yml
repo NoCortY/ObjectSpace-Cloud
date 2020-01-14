@@ -7,8 +7,7 @@ spring:
     config:
       server:
         git:
-          uri: ssh://git@47.98.165.84:/home/git/objectcloud-config.git
-          #uri: ssh://git@127.0.0.1:/home/git/objectcloud-config.git
+          #uri: ssh://git@47.98.165.84:/home/git/objectcloud-config.git
           username: git
           password: Object971103.
 #服务注册配置
@@ -17,7 +16,6 @@ eureka:
     #将客户端注册进注册中心
     service-url:
       #单机版注册
-      #defaultZone: http://47.98.165.84:7001/eureka/
       defaultZone: http://127.0.0.1:7001/eureka/
   instance:
     #注册中心的链接名（右侧Status）
