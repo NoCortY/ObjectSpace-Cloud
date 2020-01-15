@@ -22,6 +22,7 @@ zuul:
     #映射 微服务名映射为自定义
     ObjectService-AC: /AuthCenter/** 
     ObjectService-LC: /LogCenter/**
+    ObjetcService-CC: /ComCenter/**
   prefix: /ObjectCloud
   sensitive-headers: 
 ribbon:

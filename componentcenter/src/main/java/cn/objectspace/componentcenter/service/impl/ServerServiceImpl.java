@@ -12,7 +12,7 @@ import org.springframework.stereotype.Service;
 public class ServerServiceImpl implements ServerService {
     @Autowired
     ComponentDao componentDao;
-    Logger logger = LoggerFactory.getLogger(ServerServiceImpl.class)
+    Logger logger = LoggerFactory.getLogger(ServerServiceImpl.class);
     @Override
     public boolean registerServer(CloudServer cloudServer) {
         if(cloudServer==null||cloudServer.getServerIp()==null||cloudServer.getServerIp().length()==0) return false;
