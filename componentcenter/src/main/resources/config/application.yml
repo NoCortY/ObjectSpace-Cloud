@@ -1,7 +1,6 @@
 server:
   port: 7303
 spring:
-  profiles: dev
   application:
     name: ObjectService-CC
   datasource:
@@ -57,7 +56,7 @@ eureka:
     service-url:
       defaultZone: http://127.0.0.1:7001/eureka
   instance:
-    instance-id: ObjectService-ComponentCenter-7301
+    instance-id: ObjectService-CC-7303
     status-page-url: http://localhost:7000/ObjectCloud/ComponentCenter/swagger-ui.html
 #MyBatis
 mybatis:
@@ -65,7 +64,7 @@ mybatis:
   configuration:
     cache-enabled: true #开启二级缓存
     map-underscore-to-camel-case: true
-  type-aliases-package: cn.objectspace.authcenter.pojo #别名
+  type-aliases-package: cn.objectspace.componentcenter.pojo #别名
 #日志配置
 logging:
   config: classpath:config/logback-spring.xml

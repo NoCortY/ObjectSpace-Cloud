@@ -20,10 +20,13 @@ public class ServerServiceImpl implements ServerService {
         try{
             effectiveNum = componentDao.insertCloudServer(cloudServer);
         }catch (Exception e){
+            System.out.println(effectiveNum);
             logger.error("注册服务器出现异常");
             logger.error("异常信息:{}",e.getMessage());
+            e.printStackTrace();
+            return false;
         }
-        if(effectiveNum>0) return false;
+        if(effectiveNum<=0) return false;
         else return true;
     }
 }

@@ -1,6 +1,8 @@
 package cn.objectspace.componentcenter;
 
+import cn.objectspace.common.annotation.EnableObjectCloudCore;
 import cn.objectspace.common.annotation.EnableRedisUtil;
+import cn.objectspace.common.annotation.EnableRibbonRest;
 import cn.objectspace.common.annotation.EnableSaveLog;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -12,8 +14,7 @@ import org.springframework.cloud.netflix.hystrix.dashboard.EnableHystrixDashboar
 * @Author: NoCortY
 * @Date: 2019/12/30
 */
-@EnableRedisUtil
-@EnableSaveLog
+@EnableObjectCloudCore
 @EnableHystrixDashboard
 @EnableEurekaClient
 @SpringBootApplication
