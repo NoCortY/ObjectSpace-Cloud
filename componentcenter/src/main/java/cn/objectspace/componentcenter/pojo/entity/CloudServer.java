@@ -6,7 +6,11 @@ public class CloudServer implements Serializable {
     private static final long serialVersionUID = 1996457269403152119L;
     private String serverIp;
     private String serverName;
-    private String daemonLocation;
+    //是否被监控 1 是 0 否
+    private Boolean isMonitor;
+    //生产/测试域 1/0
+    private Boolean land;
+    private String serverDesc;
 
     public String getServerIp() {
         return serverIp;
@@ -24,11 +28,27 @@ public class CloudServer implements Serializable {
         this.serverName = serverName;
     }
 
-    public String getDaemonLocation() {
-        return daemonLocation;
+    public Boolean getMonitor() {
+        return isMonitor;
     }
 
-    public void setDaemonLocation(String daemonLocation) {
-        this.daemonLocation = daemonLocation;
+    public void setMonitor(Boolean monitor) {
+        isMonitor = monitor;
+    }
+
+    public Boolean getLand() {
+        return land;
+    }
+
+    public void setLand(Boolean land) {
+        this.land = land;
+    }
+
+    public String getServerDesc() {
+        return serverDesc;
+    }
+
+    public void setServerDesc(String serverDesc) {
+        this.serverDesc = serverDesc;
     }
 }

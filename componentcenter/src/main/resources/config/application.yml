@@ -52,18 +52,6 @@ spring:
         max-active: 500
         max-idle: 50
         min-idle: 0
-
-  mail:
-    host: smtp.126.com
-    username: ObjectSpace@126.com
-    password: Object971103
-    default-encoding: UTF-8
-    properties:
-      mail:
-        smtp:
-          connectiontimeout: 5000
-          timeout: 3000
-          writetimeout: 5000
 eureka:
   client:
     service-url:

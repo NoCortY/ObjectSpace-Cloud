@@ -167,4 +167,8 @@ public class ConstantPool {
          */
         public static final Integer ITERATIONS = 3;
     }
+    public static class ComponentCenter{
+        public static final String REGISTER_SERVER_SUCCESS="服务器注册成功";
+        public static final String REGISTER_SERVER_FALURE="服务器注册失败";
+    }
 }

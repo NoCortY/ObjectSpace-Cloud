@@ -22,7 +22,45 @@
         办法修改缓存，他的默认值是false，不允许我们修改
     -->
     <cache eviction="LRU" type="cn.objectspace.common.cache.MyBatisCache"/>
-    <insert id="insertComponent">
+    <insert id="insertCloudServer" parameterType="CloudServer">
+        INSERT INTO cloud_server
+        <trim prefix="(" suffix=")" prefixOverrides=",">
+            <if test="serverIp!=null and serverIp!=''">
+                server_ip,
+            </if>
+            <if test="serverName!=null and serverName!=''">
+                server_name,
+            </if>
+            <if test="isMonitor!=null">
+                is_monitor,
+            </if>
+            <if test="land!=null">
+                land,
+            </if>
+            <if test="serverDesc!=null and serverDesc!=''">
+                server_desc
+            </if>
+        </trim>
+        VALUES
+        <trim prefix="(" suffix=")" prefixOverrides=",">
+            <if test="serverIp!=null and serverIp!=''">
+                #{serverIp},
+            </if>
+            <if test="serverName!=null and serverName!=''">
+                #{serverName},
+            </if>
+            <if test="isMonitor!=null">
+                #{isMonitor},
+            </if>
+            <if test="land!=null">
+                #{land},
+            </if>
+            <if test="serverDesc!=null and serverDesc!=''">
+                #{serverDesc}
+            </if>
+        </trim>
+    </insert>
+    <!--<insert id="insertComponent">
         INSERT INTO cloud_microservice
         <trim prefix="(" suffix=")" suffixOverrides=",">
             <if test="applicationName!=null and applicationName!=''">
@@ -77,5 +115,5 @@
                 #{applicationDesc}
             </if>
         </trim>
-    </insert>
+    </insert>-->
 </mapper>

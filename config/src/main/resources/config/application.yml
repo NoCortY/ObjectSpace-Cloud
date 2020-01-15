@@ -7,7 +7,7 @@ spring:
     config:
       server:
         git:
-          #uri: ssh://git@47.98.165.84:/home/git/objectcloud-config.git
+          uri: ssh://git@47.98.165.84:/home/git/objectcloud-config.git
           username: git
           password: Object971103.
 #服务注册配置
