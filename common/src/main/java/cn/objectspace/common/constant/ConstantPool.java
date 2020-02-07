@@ -172,5 +172,10 @@ public class ConstantPool {
         public static final String REGISTER_SERVER_SUCCESS="服务器注册成功";
         public static final String REGISTER_SERVER_FALURE="服务器注册失败";
         public static final String ERROR_SERVER_IP = "错误的服务器IP";
+
+        /**
+         * 用户授权信息存入redis key
+         */
+        public static final String URPDTO_REDIS_KEY_CC = "urpdto_redis_key_cc:";
     }
 }

@@ -60,6 +60,18 @@
             </if>
         </trim>
     </insert>
+    <select id="queryServerByUserId" parameterType="java.lang.Integer" resultType="CloudServer">
+        SELECT
+        server_ip,
+        server_name ,
+        is_monitor,
+        server_desc
+        FROM
+        cloud_server
+        <where>
+            server_user = #{userId}
+        </where>
+    </select>
     <!--<insert id="insertComponent">
         INSERT INTO cloud_microservice
         <trim prefix="(" suffix=")" suffixOverrides=",">

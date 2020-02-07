@@ -131,9 +131,11 @@ public class ACController {
         AuthDto authDto = acService.authenticationInfo(acid);
         responseMap.setCode(authDto.getAuthCode());
         responseMap.setMessage(authDto.getAuthMessage());
-        responseMap.setData(ConstantPool.Common.RES_NOT_DATA);
-        if(ConstantPool.Shiro.AC_SUCCESS_CODE.equals(authDto.getAuthCode()))
-            HttpResponseUtil.addCookie(response,ConstantPool.Shiro.AC_TOKEN,authDto.getToken());
+        responseMap.setData(authDto.getToken());
+        //如果认证成功了那么就直接设置一个token存入cookie给用户
+        //如果认证成功了，就设置Cookie(该方法用网关会造成已发出请求到网关执行过程中设置cookie，下游服务无法获取刚设置上的cookie)
+        /*if(ConstantPool.Shiro.AC_SUCCESS_CODE.equals(authDto.getAuthCode()))
+            HttpResponseUtil.addCookie(response,ConstantPool.Shiro.AC_TOKEN,authDto.getToken());*/
         return responseMap;
     }
     /**
@@ -145,12 +147,13 @@ public class ACController {
      */
     @ApiOperation(value="授权",notes = "用户访问某个微服务之前先为它授权，授权需要给出当前微服务的applicationId",httpMethod = "POST")
     @ApiImplicitParam(paramType = "path",name="applicationId",value = "微服务ID",dataType = "String")
-    @PostMapping("/authorization/{applicationId}")
+    @PostMapping("/authorization/{applicationId}/{ACToken}")
     @SaveLog(applicationId = ConstantPool.Shiro.APPLICATION_ID)
-    public ResponseMap<URPDto> authorization(@PathVariable Integer applicationId, HttpServletRequest request,HttpServletResponse response){
+    public ResponseMap<URPDto> authorization(@PathVariable Integer applicationId, @PathVariable String ACToken){
         ResponseMap<URPDto> responseMap = new ResponseMap<>();
-        String token = HttpRequestUtil.getCookieValue(request,ConstantPool.Shiro.AC_TOKEN);
-        URPDto urpDto = acService.authorizationInfo(token,applicationId);
+        //2020/2/7 修改为通过REST参数获取cookie，解决zuul中设置cookie无法读取的问题
+        //String token = HttpRequestUtil.getCookieValue(request,ConstantPool.Shiro.AC_TOKEN);
+        URPDto urpDto = acService.authorizationInfo(ACToken,applicationId);
         if(urpDto==null){
             responseMap.setCode(ConstantPool.Common.REQUEST_FAILURE_CODE);
             responseMap.setMessage(ConstantPool.Common.REQUEST_FAILURE_MESSAGE);
@@ -160,7 +163,7 @@ public class ACController {
             responseMap.setData(urpDto);
         }
         //删除cookie
-        HttpResponseUtil.deleteCookie(response,ConstantPool.Shiro.AC_TOKEN);
+        //HttpResponseUtil.deleteCookie(response,ConstantPool.Shiro.AC_TOKEN);
         return responseMap;
     }
 }

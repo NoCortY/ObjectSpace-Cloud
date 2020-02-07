@@ -16,6 +16,9 @@ public class RestUtil {
     private Logger logger = LoggerFactory.getLogger(RestUtil.class);
     private RestTemplate restTemplate;
 
+    public RestTemplate getRestTemplate(){
+        return this.restTemplate;
+    }
     public void setRestTemplate(RestTemplate restTemplate) {
         this.restTemplate = restTemplate;
     }

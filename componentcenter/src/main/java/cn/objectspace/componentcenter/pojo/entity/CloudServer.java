@@ -11,6 +11,8 @@ public class CloudServer implements Serializable {
     //生产/测试域 1/0
     private Boolean land;
     private String serverDesc;
+    //服务器归属用户
+    private Integer serverUser;
 
     public String getServerIp() {
         return serverIp;
@@ -50,5 +52,13 @@ public class CloudServer implements Serializable {
 
     public void setServerDesc(String serverDesc) {
         this.serverDesc = serverDesc;
+    }
+
+    public Integer getServerUser() {
+        return serverUser;
+    }
+
+    public void setServerUser(Integer serverUser) {
+        this.serverUser = serverUser;
     }
 }

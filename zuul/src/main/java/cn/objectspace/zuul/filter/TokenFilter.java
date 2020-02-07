@@ -19,7 +19,9 @@ import org.springframework.web.client.RestTemplate;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static org.springframework.cloud.netflix.zuul.filters.support.FilterConstants.PRE_DECORATION_FILTER_ORDER;
 import static org.springframework.cloud.netflix.zuul.filters.support.FilterConstants.PRE_TYPE;
@@ -79,7 +81,7 @@ public class TokenFilter extends ZuulFilter {
             return null;
         }
         Cookie[] cookies = request.getCookies();
-        String token = null;
+        String token = request.getParameter(ConstantPool.AC_TOKEN);
         //接收AC返回值
         ResponseEntity<ResponseMap> responseMap = null;
         //zuul返回给页面
@@ -89,9 +91,6 @@ public class TokenFilter extends ZuulFilter {
             for (Cookie cookie : cookies) {
                 //备用cookie，为了携带header访问
                 cookieList.add(cookie.getName()+"="+cookie.getValue());
-                if (ConstantPool.AC_TOKEN.equals(cookie.getName())) {
-                    token = cookie.getValue();
-                }
             }
         }
         if(token==null) {
@@ -103,10 +102,19 @@ public class TokenFilter extends ZuulFilter {
             //restTemplate.getForObject("http://ObjectService-LC/LC/abc",ResponseMap.class);
             responseMap = restTemplate.postForEntity(ConstantPool.AC_APPLICATION_NAME + "/AC/authentication", httpEntity, ResponseMap.class);
             //但如果这个用户没有登录，还请求了认证接口，那么认证接口返回会认证失败
+            token = (String) responseMap.getBody().getData();
         }
         if(token!=null||(responseMap.getBody()!=null&&ConstantPool.AC_SUCCESS_CODE.equals(responseMap.getBody().getCode()))){
             //如果携带了token，或者经过认证之后获得了token，那么就直接放行，但是此时不排除token是伪造的
             //所以放行之后在访问微服务时，会将这个token再次提交给AC，AC会在进行授权时验证这个token是否是真实的，进而进行pass or reject
+
+            Map<String,List<String>> requestQueryParams = requestContext.getRequestQueryParams();
+            //如果参数列表为null，那么就new一个，用于存放token
+            if (requestQueryParams==null) requestQueryParams=new HashMap<>();
+            ArrayList<String> paramsList = new ArrayList<>();
+            paramsList.add(token);
+            requestQueryParams.put("ACToken", paramsList);
+            requestContext.setRequestQueryParams(requestQueryParams);
             requestContext.setSendZuulResponse(true);
             logger.info("认证成功，放行请求");
             return null;
