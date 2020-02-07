@@ -42,8 +42,8 @@ public class RestConfig {
      * @Author: NoCortY
      * @Date: 2019/12/20
      */
-    @Bean
+    /*@Bean
     public IRule iRule(){
         return new RoundRobinRule();
-    }
+    }*/
 }

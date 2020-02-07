@@ -38,7 +38,7 @@ public class ACFilter implements Filter {
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
         //ServlerRequest转HttpServletRequest
         request = (HttpServletRequest) request;
-        if(((HttpServletRequest) request).getSession().getAttribute("userId")!=null){
+        if(((HttpServletRequest) request).getSession().getAttribute("CCUserId")!=null){
             logger.info("用户已通过授权，直接放行");
             chain.doFilter(request,response);
         }else{
@@ -66,7 +66,7 @@ public class ACFilter implements Filter {
                 ObjectMapper objectMapper = new ObjectMapper();
                 System.out.println(objectMapper.writeValueAsString(responseMap.getData()));
                 URPDto urpDto =  objectMapper.readValue(objectMapper.writeValueAsString(responseMap.getData()),URPDto.class);
-                ((HttpServletRequest) request).getSession().setAttribute("userId",urpDto.getUserId());
+                ((HttpServletRequest) request).getSession().setAttribute("CCUserId",urpDto.getUserId());
                 //用户授权信息存入redis，下次不用再访问AC
                 redisUtil.set(SerializeUtil.serialize(ConstantPool.ComponentCenter.URPDTO_REDIS_KEY_CC+urpDto.getUserId()),SerializeUtil.serialize(urpDto),3600);
                 //放行

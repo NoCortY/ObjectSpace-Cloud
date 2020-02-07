@@ -107,13 +107,12 @@ public class TokenFilter extends ZuulFilter {
         if(token!=null||(responseMap.getBody()!=null&&ConstantPool.AC_SUCCESS_CODE.equals(responseMap.getBody().getCode()))){
             //如果携带了token，或者经过认证之后获得了token，那么就直接放行，但是此时不排除token是伪造的
             //所以放行之后在访问微服务时，会将这个token再次提交给AC，AC会在进行授权时验证这个token是否是真实的，进而进行pass or reject
-
             Map<String,List<String>> requestQueryParams = requestContext.getRequestQueryParams();
             //如果参数列表为null，那么就new一个，用于存放token
             if (requestQueryParams==null) requestQueryParams=new HashMap<>();
             ArrayList<String> paramsList = new ArrayList<>();
             paramsList.add(token);
-            requestQueryParams.put("ACToken", paramsList);
+            requestQueryParams.put(ConstantPool.AC_TOKEN, paramsList);
             requestContext.setRequestQueryParams(requestQueryParams);
             requestContext.setSendZuulResponse(true);
             logger.info("认证成功，放行请求");

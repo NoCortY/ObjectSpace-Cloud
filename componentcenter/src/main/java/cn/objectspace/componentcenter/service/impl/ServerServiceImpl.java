@@ -3,10 +3,14 @@ package cn.objectspace.componentcenter.service.impl;
 import cn.objectspace.componentcenter.dao.ComponentDao;
 import cn.objectspace.componentcenter.pojo.entity.CloudServer;
 import cn.objectspace.componentcenter.service.ServerService;
+import org.apache.catalina.Server;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
+
+import java.util.List;
 
 @Service
 public class ServerServiceImpl implements ServerService {
@@ -28,5 +32,14 @@ public class ServerServiceImpl implements ServerService {
         }
         if(effectiveNum<=0) return false;
         else return true;
+    }
+
+    @Override
+    public List<CloudServer> getMySelfServer(Integer userId) {
+        if(userId==null){
+            logger.info("用户ID为空是非法操作");
+            return null;
+        }
+        return componentDao.queryServerByUserId(userId);
     }
 }

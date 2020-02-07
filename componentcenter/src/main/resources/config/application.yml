@@ -1,5 +1,9 @@
 server:
   port: 7303
+  servlet:
+    session:
+      cookie:
+        name: CCSESSIONID
 spring:
   application:
     name: ObjectService-CC

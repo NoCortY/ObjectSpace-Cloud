@@ -10,6 +10,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -46,6 +48,22 @@ public class ServerController {
         return responseMap;
     }
 
+    @SaveLog(applicationId = ConstantPool.ComponentCenter.APPLICATION_ID)
+    @GetMapping("/listMyselfServer")
+    public ResponseMap<List<CloudServer>> listMyselfServer(HttpServletRequest request){
+        ResponseMap<List<CloudServer>> responseMap = new ResponseMap<>();
+        Integer userId = (Integer) request.getSession().getAttribute("CCUserId");
+        List<CloudServer> cloudServerList = serverService.getMySelfServer(userId);
+        if(cloudServerList!=null){
+            responseMap.setCode(ConstantPool.Common.REQUEST_SUCCESS_CODE);
+            responseMap.setMessage(ConstantPool.Common.REQUEST_SUCCESS_MESSAGE);
+            responseMap.setData(cloudServerList);
+        }else{
+            responseMap.setCode(ConstantPool.Common.REQUEST_FAILURE_CODE);
+            responseMap.setMessage(ConstantPool.Common.REQUEST_FAILURE_MESSAGE);
+        }
+        return responseMap;
+    }
     /*@GetMapping("/test")
     public String test(){
         return "成功";
