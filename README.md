@@ -2,7 +2,7 @@
 
 ## 简介
 
-本项目是http://www.objectspace.cn 网站后台 基于SpringCloud。
+本项目是http://www.objectspace.cn 网站后台 基于SpringCloud微服务框架。
 
 ## AuthCenter—用户认证授权中心
 - ### 架构
