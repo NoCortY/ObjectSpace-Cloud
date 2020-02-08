@@ -10,6 +10,12 @@
     <modelVersion>4.0.0</modelVersion>
     <artifactId>componentcenter</artifactId>
     <dependencies>
+
+        <!-- WebSocket 支持 -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-websocket</artifactId>
+        </dependency>
         <dependency>
             <groupId>cn.objectspace</groupId>
             <artifactId>common</artifactId>

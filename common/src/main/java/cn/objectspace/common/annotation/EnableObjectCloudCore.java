@@ -4,7 +4,6 @@ import cn.objectspace.common.aop.AutoSaveLogAop;
 import cn.objectspace.common.autoconfiguration.RedisConfig;
 import cn.objectspace.common.autoconfiguration.RestConfig;
 import cn.objectspace.common.autoconfiguration.SpringUtilConfig;
-import cn.objectspace.common.autoconfiguration.websocket.WebSocketConfig;
 import org.springframework.context.annotation.Import;
 
 import java.lang.annotation.*;
@@ -20,7 +19,6 @@ import java.lang.annotation.*;
 @Import({RedisConfig.class,
         RestConfig.class,
         SpringUtilConfig.class,
-        AutoSaveLogAop.class,
-        WebSocketConfig.class})
+        AutoSaveLogAop.class})
 public @interface EnableObjectCloudCore {
 }

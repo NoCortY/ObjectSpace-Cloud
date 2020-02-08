@@ -11,11 +11,6 @@
 
     <artifactId>common</artifactId>
     <dependencies>
-        <!-- WebSocket 支持 -->
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-websocket</artifactId>
-        </dependency>
         <!-- feign and hystrix -->
         <dependency>
             <groupId>org.springframework.cloud</groupId>
