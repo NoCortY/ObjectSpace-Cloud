@@ -1,7 +1,7 @@
 package cn.objectspace.componentcenter.service;
 
 import cn.objectspace.componentcenter.pojo.entity.CloudServer;
-import org.apache.catalina.Server;
+import cn.objectspace.componentcenter.pojo.entity.daemon.ServerInfoDto;
 
 import java.util.List;
 
@@ -28,4 +28,13 @@ public interface ServerService {
      * @Date: 2020/2/7
      */
     public List<CloudServer> getMySelfServer(Integer userId);
+
+    /**
+     * @Description: 心跳业务逻辑
+     * @Param:
+     * @return:
+     * @Author: NoCortY
+     * @Date: 2020/2/10
+     */
+    public boolean ping(ServerInfoDto serverInfoDto);
 }

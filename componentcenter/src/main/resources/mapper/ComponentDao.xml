@@ -72,6 +72,342 @@
             server_user = #{userId}
         </where>
     </select>
+
+    <insert id="insertServerStateInfo" parameterType="ServerInfoDto">
+        INSERT INTO cloud_server_info_now
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="computerName!=null and computerName!=''">
+                computer_name,
+            </if>
+            <if test="userDomain!=null and userDomain!=''">
+                user_domain,
+            </if>
+            <if test="ip!=null and ip!=''">
+                ip,
+            </if>
+            <if test="osName!=null and osName!=''">
+                os_name,
+            </if>
+            <if test="osArch!=null and osArch!=''">
+                os_arch,
+            </if>
+            <if test="osVersion!=null and osVersion!=''">
+                os_version,
+            </if>
+            <if test="memTotal!=null">
+                mem_total,
+            </if>
+            <if test="memUsed!=null">
+                mem_used,
+            </if>
+            <if test="memFree!=null">
+                mem_free,
+            </if>
+            <if test="swapFree!=null">
+                swap_free,
+            </if>
+            <if test="swapUsedPercent!=null">
+                swap_used_percent,
+            </if>
+            <if test="serverUser!=null">
+                server_user,
+            </if>
+            <if test="recordTime!=null">
+                record_time
+            </if>
+        </trim>
+        VALUES
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="computerName!=null and computerName!=''">
+                #{computerName},
+            </if>
+            <if test="userDomain!=null and userDomain!=''">
+                #{userDomain},
+            </if>
+            <if test="ip!=null and ip!=''">
+                #{ip},
+            </if>
+            <if test="osName!=null and osName!=''">
+                #{osName},
+            </if>
+            <if test="osArch!=null and osArch!=''">
+                #{osArch},
+            </if>
+            <if test="osVersion!=null and osVersion!=''">
+                #{osVersion},
+            </if>
+            <if test="memTotal!=null">
+                #{memTotal},
+            </if>
+            <if test="memUsed!=null">
+                #{memUsed},
+            </if>
+            <if test="memFree!=null">
+                #{memFree},
+            </if>
+            <if test="swapFree!=null">
+                #{swapFree},
+            </if>
+            <if test="swapUsedPercent!=null">
+                #{swapUsedPercent},
+            </if>
+            <if test="serverUser!=null">
+                #{serverUser},
+            </if>
+            <if test="recordTime!=null">
+                #{recordTime}
+            </if>
+        </trim>
+    </insert>
+    <insert id="insertCpuStateInfo" parameterType="CpuDto">
+        <foreach collection ="list" item="cpu" index= "index" separator =",">
+            INSERT INTO cloud_cpu_info_now
+            <trim prefix="(" suffix=")" suffixOverrides=",">
+                cpu_id,
+                <if test="cpuServerIp!=null and cpuServerIp!=''">
+                    cpu_server_ip,
+                </if>
+                <if test="cpuServerUser!=null">
+                    cpu_server_user,
+                </if>
+                <if test="frequency!=null">
+                    frequency,
+                </if>
+                <if test="vendor!=null and vendor!=''">
+                    vendor,
+                </if>
+                <if test="model!=null and model!=''">
+                    model,
+                </if>
+                <if test="userUsed!=null">
+                    user_used,
+                </if>
+                <if test="systemUsed!=null">
+                    system_used,
+                </if>
+                <if test="combine!=null">
+                    combine,
+                </if>
+                <if test="idle!=null">
+                    idle,
+                </if>
+                <if test="recordTime!=null">
+                    record_time
+                </if>
+            </trim>
+            VALUES
+        <!-- 这里有可能存在BUG就是有可能动态sql无法和上面的列相对应，解决方案暂时未定-->
+            <trim prefix="(" suffix=")" suffixOverrides=",">
+                #{index},
+                <if test="cpu.cpuServerIp!=null and cpu.cpuServerIp!=''">
+                    #{cpu.cpuServerIp},
+                </if>
+                <if test="cpu.cpuServerUser!=null">
+                    #{cpu.cpuServerUser},
+                </if>
+                <if test="cpu.frequency!=null">
+                    #{cpu.frequency},
+                </if>
+                <if test="vendor!=null and vendor!=''">
+                    #{cpu.vendor},
+                </if>
+                <if test="model!=null and model!=''">
+                    #{cpu.model},
+                </if>
+                <if test="userUsed!=null">
+                    #{cpu.userUsed},
+                </if>
+                <if test="systemUsed!=null">
+                    #{cpu.systemUsed},
+                </if>
+                <if test="combine!=null">
+                    #{cpu.combine},
+                </if>
+                <if test="idle!=null">
+                    #{cpu.idle},
+                </if>
+                <if test="recordTime!=null">
+                    #{cpu.recordTime}
+                </if>
+            </trim>
+        </foreach>
+    </insert>
+    <insert id="insertDiskStateInfo" parameterType="DiskDto">
+        <foreach collection="list" index="index" item="disk">
+            INSERT INTO cloud_disk_info_now
+            <trim prefix="(" suffix=")" suffixOverrides=",">
+                <if test="diskServerIp!=null and diskServerIp!=''">
+                    disk_server_ip,
+                </if>
+                <if test="diskServerUser!=null">
+                    disk_server_user,
+                </if>
+                <if test="diskName!=null and diskName!=''">
+                    disk_name,
+                </if>
+                <if test="diskType!=null!=null and diskType!=''">
+                    disk_type,
+                </if>
+                <if test="total!=null">
+                    total,
+                </if>
+                <if test="free!=null">
+                    free,
+                </if>
+                <if test="avail!=null">
+                    avail,
+                </if>
+                <if test="used!=null">
+                    used,
+                </if>
+                <if test="usePercent!=null">
+                    use_percent,
+                </if>
+                <if test="readDisk!=null">
+                    read_disk,
+                </if>
+                <if test="writeDisk!=null">
+                    write_disk,
+                </if>
+                <if test="recordTime!=null">
+                    record_time
+                </if>
+            </trim>
+            VALUES
+            <trim prefix="(" suffix=")" suffixOverrides=",">
+                <if test="diskServerIp!=null and diskServerIp!=''">
+                    #{diskServerIp},
+                </if>
+                <if test="diskServerUser!=null">
+                    #{diskServerUser},
+                </if>
+                <if test="diskName!=null and diskName!=''">
+                    #{diskName},
+                </if>
+                <if test="diskType!=null!=null and diskType!=''">
+                    #{diskType},
+                </if>
+                <if test="total!=null">
+                    #{total},
+                </if>
+                <if test="free!=null">
+                    #{free},
+                </if>
+                <if test="avail!=null">
+                    #{avail},
+                </if>
+                <if test="used!=null">
+                    #{used},
+                </if>
+                <if test="usePercent!=null">
+                    #{usePercent},
+                </if>
+                <if test="readDisk!=null">
+                    #{readDisk},
+                </if>
+                <if test="writeDisk!=null">
+                    #{writeDisk},
+                </if>
+                <if test="recordTime!=null">
+                    #{recordTime}
+                </if>
+            </trim>
+        </foreach>>
+    </insert>
+    <insert id="insertNetStateInfo" parameterType="NetDto">
+        <foreach collection="list" item="net" index="index">
+            INSERT INTO cloud_net_info_now
+            <trim prefix="(" suffix=")" suffixOverrides=",">
+                <if test="netServerIp!=null and netServerIp!=''">
+                    net_server_ip,
+                </if>
+                <if test="netServerUser!=null">
+                    net_server_user,
+                </if>
+                <if test="netName!=null and netName!=''">
+                    net_name,
+                </if>
+                <if test="netIp!=null and netIp!=''">
+                    net_ip,
+                </if>
+                <if test="netMask!=null and netMask!=''">
+                    net_mask,
+                </if>
+                <if test="rxPackets!=null">
+                    rx_packets,
+                </if>
+                <if test="txPackets!=null">
+                    tx_packets,
+                </if>
+                <if test="rxBytes!=null">
+                    rx_bytes,
+                </if>
+                <if test="txBytes!=null">
+                    tx_bytes,
+                </if>
+                <if test="rxErrors!=null">
+                    rx_errors,
+                </if>
+                <if test="txErrors!=null">
+                    tx_errors,
+                </if>
+                <if test="rxDropped!=null">
+                    rx_dropped,
+                </if>
+                <if test="txDropped!=null">
+                    tx_dropped,
+                </if>
+                <if test="recordTime!=null">
+                    record_time
+                </if>
+            </trim>
+            VALUES
+            <trim prefix="(" suffix=")" suffixOverrides=",">
+                <if test="netServerIp!=null and netServerIp!=''">
+                    #{netServerIp},
+                </if>
+                <if test="netServerUser!=null">
+                    #{netServerUser},
+                </if>
+                <if test="netName!=null and netName!=''">
+                    #{netName},
+                </if>
+                <if test="netIp!=null and netIp!=''">
+                    #{netIp},
+                </if>
+                <if test="netMask!=null and netMask!=''">
+                    #{netMask},
+                </if>
+                <if test="rxPackets!=null">
+                    #{rxPackets},
+                </if>
+                <if test="txPackets!=null">
+                    #{txPackets},
+                </if>
+                <if test="rxBytes!=null">
+                    #{rxBytes},
+                </if>
+                <if test="txBytes!=null">
+                    #{txBytes},
+                </if>
+                <if test="rxErrors!=null">
+                    #{rxErrors},
+                </if>
+                <if test="txErrors!=null">
+                    #{txErrors},
+                </if>
+                <if test="rxDropped!=null">
+                    #{rxDropped},
+                </if>
+                <if test="txDropped!=null">
+                    #{txDropped},
+                </if>
+                <if test="recordTime!=null">
+                    #{recordTime}
+                </if>
+            </trim>
+        </foreach>
+    </insert>
     <!--<insert id="insertComponent">
         INSERT INTO cloud_microservice
         <trim prefix="(" suffix=")" suffixOverrides=",">

@@ -215,6 +215,28 @@ public class RedisUtil{
                 jedis.close();
         }
     }
+
+    /**
+     * @Description: 从列表左侧push入一个元素  序列化版本
+     * @Param: [listName, values]
+     * @return: java.lang.Long
+     * @Author: NoCortY
+     * @Date: 2020/2/10
+     */
+    public Long lpush(byte[] listName,byte[]... values){
+        Jedis jedis = null;
+        try{
+            jedis = jedisPool.getResource();
+            return jedis.lpushx(listName,values);
+        }catch (Exception e){
+            logger.error("往Redis中存入list过程出现异常(lpush byte)!");
+            logger.error("异常信息:{}",e.getMessage());
+            return -1L;
+        }finally {
+            if(jedis!=null)
+                jedis.close();
+        }
+    }
     /**
      * @Description:  往Redis List左侧Push元素
      * @Param: [listName, values]

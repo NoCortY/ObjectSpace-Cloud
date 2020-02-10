@@ -4,6 +4,7 @@ import cn.objectspace.common.annotation.SaveLog;
 import cn.objectspace.common.constant.ConstantPool;
 import cn.objectspace.common.pojo.entity.ResponseMap;
 import cn.objectspace.componentcenter.pojo.entity.CloudServer;
+import cn.objectspace.componentcenter.pojo.entity.daemon.ServerInfoDto;
 import cn.objectspace.componentcenter.service.ServerService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -64,8 +65,10 @@ public class ServerController {
         }
         return responseMap;
     }
-    /*@GetMapping("/test")
-    public String test(){
-        return "成功";
-    }*/
+    @SaveLog(applicationId = ConstantPool.ComponentCenter.APPLICATION_ID)
+    @PostMapping("/ping")
+    public void ping(@RequestBody ServerInfoDto serverInfoDto){
+        //心跳接收器
+
+    }
 }

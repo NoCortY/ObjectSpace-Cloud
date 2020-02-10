@@ -177,5 +177,22 @@ public class ConstantPool {
          * 用户授权信息存入redis key
          */
         public static final String URPDTO_REDIS_KEY_CC = "urpdto_redis_key_cc:";
+
+        /**
+         * redis 正在监控的服务器MAP
+         */
+        public static final String MONITOR_SERVER_MAP = "monitor_server_map";
+        /**
+         * 服务器在线状态
+         */
+        public static final String SERVER_ONLINE = "online";
+        /**
+         * 服务器离线状态
+         */
+        public static final String SERVER_OFFLINE = "offline";
+        /**
+         * redis服务器心跳维持时间
+         */
+        public static final Integer SERVER_HEARTBEAT_EXTIME = 60;
     }
 }
