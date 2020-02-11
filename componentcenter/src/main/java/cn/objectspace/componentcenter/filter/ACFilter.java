@@ -31,8 +31,10 @@ public class ACFilter implements Filter {
         //ServlerRequest转HttpServletRequest
         request = (HttpServletRequest) request;
         String requestURI = ((HttpServletRequest) request).getRequestURI();
-        System.out.println(requestURI);
+        //System.out.println(requestURI);
         if("/CC/server/ping".equals(requestURI)){
+            //如果是发送心跳的，直接放行即可
+            logger.info("访问白名单url");
             chain.doFilter(request,response);
             return;
         }
