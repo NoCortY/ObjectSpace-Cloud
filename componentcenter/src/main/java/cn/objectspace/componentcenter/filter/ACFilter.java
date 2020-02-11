@@ -3,27 +3,19 @@ package cn.objectspace.componentcenter.filter;
 import cn.objectspace.common.constant.ConstantPool;
 import cn.objectspace.common.pojo.entity.ResponseMap;
 import cn.objectspace.common.pojo.entity.URPDto;
-import cn.objectspace.common.util.HttpRequestUtil;
 import cn.objectspace.common.util.RedisUtil;
 import cn.objectspace.common.util.RestUtil;
 import cn.objectspace.common.util.SerializeUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.apache.tomcat.util.bcel.Const;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 
 import javax.servlet.*;
 import javax.servlet.annotation.WebFilter;
-import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 
 @Component
 @WebFilter(filterName = "ACFilter",urlPatterns = "/**")

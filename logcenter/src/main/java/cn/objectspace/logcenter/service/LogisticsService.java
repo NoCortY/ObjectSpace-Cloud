@@ -1,8 +1,8 @@
 package cn.objectspace.logcenter.service;
 
-import java.util.List;
-
 import cn.objectspace.logcenter.pojo.dto.NoticeDto;
+
+import java.util.List;
 
 
 public interface LogisticsService {
