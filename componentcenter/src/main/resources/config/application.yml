@@ -11,7 +11,7 @@ spring:
     type: com.alibaba.druid.pool.DruidDataSource
     druid:
       driver-class-name: com.mysql.cj.jdbc.Driver
-      url: jdbc:mysql://rm-bp1capfjz96r8hhm6go.mysql.rds.aliyuncs.com:3306/cloud_componentcenter?characterEncoding=utf8&useSSL=false&serverTimezone=UTC&rewriteBatchedStatements=true
+      url: jdbc:mysql://rm-bp1capfjz96r8hhm6go.mysql.rds.aliyuncs.com:3306/cloud_componentcenter?characterEncoding=utf8&useSSL=false&serverTimezone=UTC&rewriteBatchedStatements=true&allowMultiQueries=true
       username: testsqlobject
       password: TestObject971103
       #连接初始值，连接池启动时创建的连接数量的初始值

@@ -18,8 +18,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.interceptor.TransactionAspectSupport;
 
+import java.util.ArrayList;
 import java.util.Date;
-import java.util.LinkedList;
 import java.util.List;
 
 @Service
@@ -82,9 +82,9 @@ public class ServerServiceImpl implements ServerService {
         redisUtil.set(SerializeUtil.serialize(serverUser+":"+serverIp),SerializeUtil.serialize(serverInfoDto), ConstantPool.ComponentCenter.SERVER_HEARTBEAT_EXTIME);
         //设置当前时间
         Date nowDate = new Date();
-        LinkedList<CpuDto> cpuList = (LinkedList<CpuDto>) serverInfoDto.getCpuList();
-        LinkedList<DiskDto> diskList = (LinkedList<DiskDto>) serverInfoDto.getDiskList();
-        LinkedList<NetDto> netList = (LinkedList<NetDto>) serverInfoDto.getNetList();
+        ArrayList<CpuDto> cpuList = (ArrayList<CpuDto>) serverInfoDto.getCpuList();
+        ArrayList<DiskDto> diskList = (ArrayList<DiskDto>) serverInfoDto.getDiskList();
+        ArrayList<NetDto> netList = (ArrayList<NetDto>) serverInfoDto.getNetList();
 
         for(CpuDto cpuDto:cpuList){
             //设置CPU识别信息
@@ -119,6 +119,8 @@ public class ServerServiceImpl implements ServerService {
             TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
             return false;
         }
+
+        return true;
 
     }
 }

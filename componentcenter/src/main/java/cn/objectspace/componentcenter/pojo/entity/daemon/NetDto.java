@@ -19,7 +19,7 @@ public class NetDto implements Serializable {
     //名
     private String netName;
     //IP
-    private String ip;
+    private String netIp;
     //子网掩码
     private String netMask;
     //接包数
@@ -65,12 +65,12 @@ public class NetDto implements Serializable {
         this.netName = netName;
     }
 
-    public String getIp() {
-        return ip;
+    public String getNetIp() {
+        return netIp;
     }
 
-    public void setIp(String ip) {
-        this.ip = ip;
+    public void setNetIp(String netIp) {
+        this.netIp = netIp;
     }
 
     public String getNetMask() {
@@ -160,7 +160,7 @@ public class NetDto implements Serializable {
                 "netServerIp='" + netServerIp + '\'' +
                 ", netServerUser=" + netServerUser +
                 ", netName='" + netName + '\'' +
-                ", ip='" + ip + '\'' +
+                ", netIp='" + netIp + '\'' +
                 ", netMask='" + netMask + '\'' +
                 ", rxPackets=" + rxPackets +
                 ", txPackets=" + txPackets +

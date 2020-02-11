@@ -75,7 +75,8 @@ public class TokenFilter extends ZuulFilter {
                 ||requestUrl.contains("/webjars"))
                 ||requestUrl.contains("/swagger-resources")
                 ||requestUrl.contains("/v2")
-                ||requestUrl.contains("/csrf")){
+                ||requestUrl.contains("/csrf")
+                ||requestUrl.contains("/ObjectCloud/ComCenter/CC/server/ping")){
             //放行白名单
             requestContext.setSendZuulResponse(true);
             return null;

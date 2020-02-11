@@ -67,8 +67,18 @@ public class ServerController {
     }
     @SaveLog(applicationId = ConstantPool.ComponentCenter.APPLICATION_ID)
     @PostMapping("/ping")
-    public void ping(@RequestBody ServerInfoDto serverInfoDto){
+    public ResponseMap<String> ping(@RequestBody ServerInfoDto serverInfoDto){
+            ResponseMap<String> responseMap = new ResponseMap<>();
         //心跳接收器
-
+        if(serverService.ping(serverInfoDto)){
+            responseMap.setCode(ConstantPool.Common.REQUEST_SUCCESS_CODE);
+            responseMap.setMessage(ConstantPool.Common.REQUEST_SUCCESS_MESSAGE);
+            responseMap.setData(ConstantPool.Common.RES_NOT_DATA);
+        }else{
+            responseMap.setCode(ConstantPool.Common.REQUEST_FAILURE_CODE);
+            responseMap.setMessage(ConstantPool.Common.REQUEST_FAILURE_MESSAGE);
+            responseMap.setData(ConstantPool.Common.RES_NOT_DATA);
+        }
+        return responseMap;
     }
 }

@@ -30,6 +30,12 @@ public class ACFilter implements Filter {
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
         //ServlerRequest转HttpServletRequest
         request = (HttpServletRequest) request;
+        String requestURI = ((HttpServletRequest) request).getRequestURI();
+        System.out.println(requestURI);
+        if("/CC/server/ping".equals(requestURI)){
+            chain.doFilter(request,response);
+            return;
+        }
         if(((HttpServletRequest) request).getSession().getAttribute("CCUserId")!=null){
             logger.info("用户已通过授权，直接放行");
             chain.doFilter(request,response);
