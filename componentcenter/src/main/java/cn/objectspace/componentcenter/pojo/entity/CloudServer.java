@@ -6,12 +6,9 @@ public class CloudServer implements Serializable {
     private static final long serialVersionUID = 1996457269403152119L;
     private String serverIp;
     private String serverName;
-    //是否被监控 1 是 0 否
+    private String serverOsType;
+    private String serverOsVersion;
     private Boolean isMonitor;
-    //生产/测试域 1/0
-    private Boolean land;
-    private String serverDesc;
-    //服务器归属用户
     private Integer serverUser;
 
     public String getServerIp() {
@@ -30,6 +27,22 @@ public class CloudServer implements Serializable {
         this.serverName = serverName;
     }
 
+    public String getServerOsType() {
+        return serverOsType;
+    }
+
+    public void setServerOsType(String serverOsType) {
+        this.serverOsType = serverOsType;
+    }
+
+    public String getServerOsVersion() {
+        return serverOsVersion;
+    }
+
+    public void setServerOsVersion(String serverOsVersion) {
+        this.serverOsVersion = serverOsVersion;
+    }
+
     public Boolean getMonitor() {
         return isMonitor;
     }
@@ -38,27 +51,23 @@ public class CloudServer implements Serializable {
         isMonitor = monitor;
     }
 
-    public Boolean getLand() {
-        return land;
-    }
-
-    public void setLand(Boolean land) {
-        this.land = land;
-    }
-
-    public String getServerDesc() {
-        return serverDesc;
-    }
-
-    public void setServerDesc(String serverDesc) {
-        this.serverDesc = serverDesc;
-    }
-
     public Integer getServerUser() {
         return serverUser;
     }
 
     public void setServerUser(Integer serverUser) {
         this.serverUser = serverUser;
+    }
+
+    @Override
+    public String toString() {
+        return "CloudServer{" +
+                "serverIp='" + serverIp + '\'' +
+                ", serverName='" + serverName + '\'' +
+                ", serverOsType='" + serverOsType + '\'' +
+                ", serverOsVersion='" + serverOsVersion + '\'' +
+                ", isMonitor=" + isMonitor +
+                ", serverUser=" + serverUser +
+                '}';
     }
 }

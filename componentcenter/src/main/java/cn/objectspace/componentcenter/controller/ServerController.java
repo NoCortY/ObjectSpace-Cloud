@@ -73,7 +73,8 @@ public class ServerController {
         if(serverService.ping(serverInfoDto)){
             responseMap.setCode(ConstantPool.Common.REQUEST_SUCCESS_CODE);
             responseMap.setMessage(ConstantPool.Common.REQUEST_SUCCESS_MESSAGE);
-            responseMap.setData(ConstantPool.Common.RES_NOT_DATA);
+            //响应ping
+            responseMap.setData(ConstantPool.ComponentCenter.PONG);
         }else{
             responseMap.setCode(ConstantPool.Common.REQUEST_FAILURE_CODE);
             responseMap.setMessage(ConstantPool.Common.REQUEST_FAILURE_MESSAGE);

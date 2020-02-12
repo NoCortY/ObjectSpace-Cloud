@@ -227,7 +227,7 @@ public class RedisUtil{
         Jedis jedis = null;
         try{
             jedis = jedisPool.getResource();
-            return jedis.lpushx(listName,values);
+            return jedis.lpush(listName, values);
         }catch (Exception e){
             logger.error("往Redis中存入list过程出现异常(lpush byte)!");
             logger.error("异常信息:{}",e.getMessage());
@@ -258,7 +258,27 @@ public class RedisUtil{
                 jedis.close();
         }
     }
-
+    /**
+     * @Description:  弹出Redis List左侧元素 byte
+     * @Param: [listName]
+     * @return: java.lang.byte[]
+     * @Author: NoCortY
+     * @Date: 2020/02/12
+     */
+    public byte[] lpop(byte[] listName) {
+        Jedis jedis = null;
+        try {
+            jedis = jedisPool.getResource();
+            return jedis.lpop(listName);
+        } catch (Exception e) {
+            logger.error("从Redis中获取list过程出现异常(lpop)!");
+            logger.error("异常信息{}:",e.getMessage());
+            return "failure".getBytes();
+        } finally {
+            if (jedis != null)
+                jedis.close();
+        }
+    }
     /**
      * @Description:  弹出Redis List左侧元素
      * @Param: [listName]
@@ -324,6 +344,27 @@ public class RedisUtil{
         }
     }
     /**
+     * @Description:  遍历list中的start —— end 的元素 byte
+     * @Param: [listName, start, end]
+     * @return: java.util.List<java.lang.String>
+     * @Author: NoCortY
+     * @Date: 2020/02/12
+     */
+    public List<byte[]> lrange(byte[] listName, long start, long end) {
+        Jedis jedis = null;
+        try {
+            jedis = jedisPool.getResource();
+            return jedis.lrange(listName, start, end);
+        }catch(Exception e) {
+            logger.error("获取指定list多个元素过程出现异常!");
+            logger.error("异常信息:{}",e.getMessage());
+            return null;
+        }finally {
+            if(jedis!=null)
+                jedis.close();
+        }
+    }
+    /**
      * @Description:  遍历list中的start —— end 的元素
      * @Param: [listName, start, end]
      * @return: java.util.List<java.lang.String>
@@ -337,6 +378,49 @@ public class RedisUtil{
             return jedis.lrange(listName, start, end);
         }catch(Exception e) {
             logger.error("获取指定list多个元素过程出现异常!");
+            logger.error("异常信息:{}",e.getMessage());
+            return null;
+        }finally {
+            if(jedis!=null)
+                jedis.close();
+        }
+    }
+
+    /**
+     * @Description: 获取列表长度 byte
+     * @Param: [listName]
+     * @return: java.lang.Long
+     * @Author: NoCortY
+     * @Date: 2020/2/12
+     */
+    public Long lLen(byte[] listName){
+        Jedis jedis = null;
+        try{
+            jedis = jedisPool.getResource();
+            return jedis.llen(listName);
+        }catch (Exception e){
+            logger.error("获取list长度异常");
+            logger.error("异常信息:{}",e.getMessage());
+            return null;
+        }finally {
+            if(jedis!=null)
+                jedis.close();
+        }
+    }
+    /**
+     * @Description: 获取列表长度
+     * @Param: [listName]
+     * @return: java.lang.Long
+     * @Author: NoCortY
+     * @Date: 2020/2/12
+     */
+    public Long lLen(String listName){
+        Jedis jedis = null;
+        try{
+            jedis = jedisPool.getResource();
+            return jedis.llen(listName);
+        }catch (Exception e){
+            logger.error("获取list长度异常");
             logger.error("异常信息:{}",e.getMessage());
             return null;
         }finally {

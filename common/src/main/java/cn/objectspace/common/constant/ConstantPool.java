@@ -194,5 +194,6 @@ public class ConstantPool {
          * redis服务器心跳维持时间
          */
         public static final Integer SERVER_HEARTBEAT_EXTIME = 60;
+        public static final String PONG = "pong" ;
     }
 }

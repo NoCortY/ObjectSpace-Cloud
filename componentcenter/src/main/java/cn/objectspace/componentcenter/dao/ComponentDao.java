@@ -6,6 +6,7 @@ import cn.objectspace.componentcenter.pojo.entity.daemon.DiskDto;
 import cn.objectspace.componentcenter.pojo.entity.daemon.NetDto;
 import cn.objectspace.componentcenter.pojo.entity.daemon.ServerInfoDto;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
@@ -32,6 +33,16 @@ public interface ComponentDao {
      * @Date: 2020/2/6
      */
     public List<CloudServer> queryServerByUserId(Integer userId);
+
+
+    /**
+     * @Description: 根据用户ID和服务器IP来查询服务器
+     * @Param:
+     * @return:
+     * @Author: NoCortY
+     * @Date: 2020/2/12
+     */
+    public CloudServer queryServerByUserIdAndServerIp(@Param("userId") Integer userId, @Param("serverIp") String serverIp);
 
     /**
      * @Description: 记录服务器状态
@@ -60,6 +71,14 @@ public interface ComponentDao {
      */
     public Integer insertDiskStateInfo(List<DiskDto> diskDtoList);
 
+
+    /**
+     * @Description: 记录网卡状态
+     * @Param:
+     * @return:
+     * @Author: NoCortY
+     * @Date: 2020/2/12
+     */
     public Integer insertNetStateInfo(List<NetDto> netDtoList);
 
 }

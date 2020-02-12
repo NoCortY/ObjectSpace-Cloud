@@ -15,6 +15,8 @@ import redis.clients.jedis.JedisPoolConfig;
 @Configuration
 public class RedisConfig {
 
+    @Value("${spring.redis.database}")
+    private Integer database;
     @Value("${spring.redis.host}")
     private String host;
 
@@ -40,9 +42,10 @@ public class RedisConfig {
         jedisPoolConfig.setMaxWaitMillis(maxWaitMillis);
         // 是否启用pool的jmx管理功能, 默认true
         jedisPoolConfig.setJmxEnabled(true);
-        JedisPool jedisPool = new JedisPool(jedisPoolConfig, host, port, timeout, password);
+        JedisPool jedisPool = new JedisPool(jedisPoolConfig, host, port, timeout, password,database);
         return jedisPool;
     }
+
 
     /**
      * @Description: 自定义redis工具类配置bean

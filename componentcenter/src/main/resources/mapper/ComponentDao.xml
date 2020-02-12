@@ -31,14 +31,17 @@
             <if test="serverName!=null and serverName!=''">
                 server_name,
             </if>
+            <if test="serverOsType!=null and serverOsType!=''">
+                server_os_type,
+            </if>
+            <if test="serverOsVersion!=null and serverOsVersion!=''">
+                server_os_version,
+            </if>
             <if test="isMonitor!=null">
                 is_monitor,
             </if>
-            <if test="land!=null">
-                land,
-            </if>
-            <if test="serverDesc!=null and serverDesc!=''">
-                server_desc
+            <if test="serverUser!=null">
+                server_user
             </if>
         </trim>
         VALUES
@@ -49,23 +52,40 @@
             <if test="serverName!=null and serverName!=''">
                 #{serverName},
             </if>
+            <if test="serverOsType!=null and serverOsType!=''">
+                #{serverOsType},
+            </if>
+            <if test="serverOsVersion!=null and serverOsVersion!=''">
+                #{serverOsVersion},
+            </if>
             <if test="isMonitor!=null">
                 #{isMonitor},
             </if>
-            <if test="land!=null">
-                #{land},
-            </if>
-            <if test="serverDesc!=null and serverDesc!=''">
-                #{serverDesc}
+            <if test="serverUser!=null">
+                #{serverUser}
             </if>
         </trim>
     </insert>
+    <select id="queryServerByUserIdAndServerIp" resultType="CloudServer">
+        SELECT
+        server_ip,
+        server_name,
+        server_os_type,
+        server_os_version,
+        is_monitor
+        FROM
+        cloud_server
+        <where>
+            server_user=#{userId} and server_ip = #{serverIp}
+        </where>
+    </select>
     <select id="queryServerByUserId" parameterType="java.lang.Integer" resultType="CloudServer">
         SELECT
         server_ip,
         server_name ,
-        is_monitor,
-        server_desc
+        server_os_type,
+        server_os_version,
+        is_monitor
         FROM
         cloud_server
         <where>
