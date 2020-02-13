@@ -96,7 +96,7 @@ public class MyBatisCache implements Cache {
         //如果不存在这个list，那么也不用再删除了，直接返回。
         if(redisUtil.lLen(SerializeUtil.serialize("MyBatisCache:"+id))==null) return;
         List<byte[]> keys = redisUtil.lrange(SerializeUtil.serialize("MyBatisCache:"+id),0,redisUtil.lLen(SerializeUtil.serialize("MyBatisCache:"+id)));
-        //如果list中key为null
+        //如果list中key为null 直接返回
         if(keys==null) return;
         for(byte[] key:keys) {
             redisUtil.del(key);
