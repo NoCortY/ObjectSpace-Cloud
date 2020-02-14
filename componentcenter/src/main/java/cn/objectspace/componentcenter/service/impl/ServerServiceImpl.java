@@ -6,6 +6,7 @@ import cn.objectspace.common.util.RedisUtil;
 import cn.objectspace.common.util.SerializeUtil;
 import cn.objectspace.componentcenter.dao.ComponentDao;
 import cn.objectspace.componentcenter.pojo.dto.CloudServerDto;
+import cn.objectspace.componentcenter.pojo.dto.ServerDetailDto;
 import cn.objectspace.componentcenter.pojo.dto.daemon.CpuDto;
 import cn.objectspace.componentcenter.pojo.dto.daemon.DiskDto;
 import cn.objectspace.componentcenter.pojo.dto.daemon.NetDto;
@@ -71,6 +72,22 @@ public class ServerServiceImpl implements ServerService {
             return null;
         }
         return componentDao.queryCountOfServerByUserId(userId);
+    }
+
+    /**
+     * @Description: 获取服务器详细配置信息
+     * @Param: [serverIp, userId]
+     * @return: cn.objectspace.componentcenter.pojo.dto.ServerDetailDto
+     * @Author: NoCortY
+     * @Date: 2020/2/14
+     */
+    @Override
+    public ServerDetailDto getServerDetail(String serverIp, Integer userId) {
+        if(StringUtils.isBlank(serverIp)||userId==null){
+            logger.error("查询详细信息时服务器IP和userId缺失为非法操作");
+            return null;
+        }
+        return componentDao.queryDetailOfServerByUserIdAndServerIp(serverIp,userId);
     }
 
     /**

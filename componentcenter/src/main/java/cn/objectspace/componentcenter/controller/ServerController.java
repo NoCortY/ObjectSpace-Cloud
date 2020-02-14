@@ -5,6 +5,7 @@ import cn.objectspace.common.constant.ConstantPool;
 import cn.objectspace.common.pojo.entity.ResponseMap;
 import cn.objectspace.common.util.HttpRequestUtil;
 import cn.objectspace.componentcenter.pojo.dto.CloudServerDto;
+import cn.objectspace.componentcenter.pojo.dto.ServerDetailDto;
 import cn.objectspace.componentcenter.pojo.dto.daemon.ServerInfoDto;
 import cn.objectspace.componentcenter.pojo.entity.CloudServer;
 import cn.objectspace.componentcenter.service.ServerService;
@@ -56,7 +57,7 @@ public class ServerController {
     @GetMapping("/listMyselfServer")
     public ResponseMap<List<CloudServerDto>> listMyselfServer(HttpServletRequest request) throws JsonProcessingException {
         ResponseMap<List<CloudServerDto>> responseMap = new ResponseMap<>();
-        Integer userId = (Integer) request.getSession().getAttribute("CCUserId");
+        Integer userId = (Integer) request.getSession().getAttribute(ConstantPool.ComponentCenter.SESSION_USER_ID_KEY);
         //分页
         Integer page = HttpRequestUtil.getIntegerParameter(request,"page");
         Integer limit = HttpRequestUtil.getIntegerParameter(request,"limit");
@@ -86,6 +87,29 @@ public class ServerController {
             responseMap.setCode(ConstantPool.Common.REQUEST_FAILURE_CODE);
             responseMap.setMessage(ConstantPool.Common.REQUEST_FAILURE_MESSAGE);
             responseMap.setData(ConstantPool.Common.RES_NOT_DATA);
+        }
+        return responseMap;
+    }
+    /**
+     * @Description: 获取服务器详细信息
+     * @Param: [serverIp, request]
+     * @return: cn.objectspace.common.pojo.entity.ResponseMap<cn.objectspace.componentcenter.pojo.dto.ServerDetailDto>
+     * @Author: NoCortY
+     * @Date: 2020/2/14
+     */
+    @SaveLog(applicationId = ConstantPool.ComponentCenter.APPLICATION_ID)
+    @PostMapping("/serverDetail/{serverIp}")
+    public ResponseMap<ServerDetailDto> serverDetatil(@PathVariable String serverIp,HttpServletRequest request){
+        ResponseMap<ServerDetailDto> responseMap = new ResponseMap<>();
+        Integer userId = (Integer) request.getSession().getAttribute(ConstantPool.ComponentCenter.SESSION_USER_ID_KEY);
+        ServerDetailDto serverDetailDto = serverService.getServerDetail(serverIp,userId);
+        if(serverDetailDto==null){
+            responseMap.setCode(ConstantPool.Common.REQUEST_FAILURE_CODE);
+            responseMap.setMessage(ConstantPool.Common.REQUEST_FAILURE_MESSAGE);
+        }else {
+            responseMap.setCode(ConstantPool.Common.REQUEST_SUCCESS_CODE);
+            responseMap.setMessage(ConstantPool.Common.REQUEST_SUCCESS_MESSAGE);
+            responseMap.setData(serverDetailDto);
         }
         return responseMap;
     }

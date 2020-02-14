@@ -1,6 +1,7 @@
 package cn.objectspace.componentcenter.service;
 
 import cn.objectspace.componentcenter.pojo.dto.CloudServerDto;
+import cn.objectspace.componentcenter.pojo.dto.ServerDetailDto;
 import cn.objectspace.componentcenter.pojo.dto.daemon.ServerInfoDto;
 import cn.objectspace.componentcenter.pojo.entity.CloudServer;
 
@@ -38,6 +39,15 @@ public interface ServerService {
      * @Date: 2020/2/14
      */
     public Integer getCountOfMySelfServer(Integer userId);
+
+    /**
+     * @Description: 获取服务器详细信息
+     * @Param:
+     * @return:
+     * @Author: NoCortY
+     * @Date: 2020/2/14
+     */
+    public ServerDetailDto getServerDetail(String serverIp,Integer userId);
 
     /**
      * @Description: 心跳业务逻辑

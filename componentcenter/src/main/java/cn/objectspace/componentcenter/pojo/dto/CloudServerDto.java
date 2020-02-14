@@ -42,11 +42,11 @@ public class CloudServerDto implements Serializable {
         this.serverOsVersion = serverOsVersion;
     }
 
-    public Boolean getMonitor() {
-        return isMonitor;
+    public Boolean getIsMonitor() {
+        return this.isMonitor;
     }
 
-    public void setMonitor(Boolean monitor) {
-        isMonitor = monitor;
+    public void setIsMonitor(Boolean isMonitor) {
+        this.isMonitor = isMonitor;
     }
 }

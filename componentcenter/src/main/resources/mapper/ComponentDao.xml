@@ -21,6 +21,31 @@
         readOnly:只读，意味着缓存数据只能读取而不能修改，这样设置的好处是我们可以快速读取缓存，缺点是我们没有
         办法修改缓存，他的默认值是false，不允许我们修改
     -->
+    <resultMap id="ServerDetailDto" type="ServerDetailDto">
+        <id column="ip" property="ip"/>
+        <result column="computer_name" property="computerName"/>
+        <result column="os_name" property="osName"/>
+        <result column="os_version" property="osVersion"/>
+        <result column="os_arch" property="osArch"/>
+        <result column="mem_total" property="memTotal"/>
+        <result column="swap_total" property="swapTotal"/>
+        <collection property="cpuDetailDtos" ofType="CpuDetailDto">
+            <id column="cpu_id" property="cpuId"/>
+            <result column="frequency" property="frequency"/>
+            <result column="vendor" property="vendor"/>
+            <result column="model" property="model"/>
+        </collection>
+        <collection property="diskDetailDtos" ofType="DiskDetailDto">
+            <id column="disk_name" property="diskName"/>
+            <result column="disk_type" property="diskType"/>
+            <result column="total" property="total"/>
+        </collection>
+        <collection property="netDetailDtos" ofType="NetDetailDto">
+            <id column="net_name" property="netName"/>
+            <result column="net_ip" property="netIp"/>
+            <result column="net_mask" property="netMask"/>
+        </collection>
+    </resultMap>
     <cache eviction="LRU" type="cn.objectspace.common.cache.MyBatisCache"/>
     <insert id="insertCloudServer" parameterType="CloudServer">
         INSERT INTO cloud_server
@@ -103,7 +128,36 @@
             server_user = #{userId}
         </where>
     </select>
+    <select id="queryDetailOfServerByUserIdAndServerIp" resultMap="ServerDetailDto">
+        SELECT
+        s.computer_name,
+        s.ip,
+        s.os_name,
+        s.os_version,
+        s.os_arch,
+        s.mem_total,
+        s.swap_total,
+        c.cpu_id,
+        c.frequency,
+        c.vendor,
+        c.model,
+        d.disk_name,
+        d.disk_type,
+        d.total,
+        net.net_name,
+        net.net_ip,
+        net.net_mask
+        FROM
+        cloud_server_info_now s LEFT JOIN cloud_cpu_info_now c
+                                     ON s.ip = c.cpu_server_ip and s.server_user = c.cpu_server_user and s.record_time = c.record_time
+                                     LEFT JOIN cloud_disk_info_now d
+                                     ON c.cpu_server_ip = d.disk_server_ip and c.cpu_server_user = d.disk_server_user and c.record_time = d.record_time
+                                     LEFT JOIN cloud_net_info_now net
+                                     ON d.disk_server_ip = net.net_server_ip and d.disk_server_user = net.net_server_user and d.record_time = net.record_time,
+                                     (select (max(record_time)) as max_record_time from cloud_server_info_now) mt
+        WHERE s.ip = #{serverIp} and s.record_time = mt.max_record_time and s.server_user = #{userId};
 
+    </select>
     <insert id="insertServerStateInfo" parameterType="ServerInfoDto">
         INSERT INTO cloud_server_info_now
         <trim prefix="(" suffix=")" suffixOverrides=",">
@@ -134,6 +188,9 @@
             <if test="memFree!=null">
                 mem_free,
             </if>
+            <if test="swap_total!=null">
+                swap_total,
+            </if>>
             <if test="swapFree!=null">
                 swap_free,
             </if>
@@ -176,6 +233,9 @@
             <if test="memFree!=null">
                 #{memFree},
             </if>
+            <if test="swap_total!=null">
+                #{swapTotal},
+            </if>>
             <if test="swapFree!=null">
                 #{swapFree},
             </if>

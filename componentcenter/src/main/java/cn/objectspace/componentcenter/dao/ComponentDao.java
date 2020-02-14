@@ -1,6 +1,7 @@
 package cn.objectspace.componentcenter.dao;
 
 import cn.objectspace.componentcenter.pojo.dto.CloudServerDto;
+import cn.objectspace.componentcenter.pojo.dto.ServerDetailDto;
 import cn.objectspace.componentcenter.pojo.dto.daemon.CpuDto;
 import cn.objectspace.componentcenter.pojo.dto.daemon.DiskDto;
 import cn.objectspace.componentcenter.pojo.dto.daemon.NetDto;
@@ -88,5 +89,14 @@ public interface ComponentDao {
      * @Date: 2020/2/12
      */
     public Integer insertNetStateInfo(List<NetDto> netDtoList);
+
+    /**
+     * @Description: 通过用户ID和服务器IP查询服务器详细信息
+     * @Param:
+     * @return:
+     * @Author: NoCortY
+     * @Date: 2020/2/14
+     */
+    public ServerDetailDto queryDetailOfServerByUserIdAndServerIp(@Param("serverIp") String serverIp,@Param("userId") Integer userId);
 
 }

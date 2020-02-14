@@ -194,6 +194,14 @@ public class ConstantPool {
          * redis服务器心跳维持时间
          */
         public static final Integer SERVER_HEARTBEAT_EXTIME = 60;
+        /**
+         * 心跳响应
+         */
         public static final String PONG = "pong" ;
+        /**
+         * ComponentCenter保存用户Id的key
+         */
+        public static final String SESSION_USER_ID_KEY = "CCUserId";
+
     }
 }
