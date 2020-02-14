@@ -155,6 +155,7 @@ public class ACServiceImpl implements ACService {
         }
         URPDto urpDto = null;
         CloudUser cloudUser = null;
+        //先从Redis中拿
         cloudUser = (CloudUser) SerializeUtil.unSerialize(redisUtil.get(SerializeUtil.serialize(token)));
         if(cloudUser!=null){
             try{
@@ -164,15 +165,28 @@ public class ACServiceImpl implements ACService {
                 logger.error("异常信息:{}",e.getMessage());
                 return null;
             }
+            //使用过的令牌失效
+            redisUtil.del(SerializeUtil.serialize(token));
         }else{
-            //如果此时用户为null，那么说明要么是redis down了，要么是该用户本就是不合法用户，伪造了token
+            //如果此时用户为null，那么说明要么是redis down了，要么是该用户本就是不合法用户，伪造了token，或者是Redis中的token过期了。
             //那么就从session中拿
             Session session = SecurityUtils.getSubject().getSession();
             cloudUser = (CloudUser) SerializeUtil.unSerialize((byte[]) session.getAttribute(token));
-            if(cloudUser==null) return null;
+            //拿完如果是null，直接就是非法用户，如果不是null，那么说明是合法用户，要让这个token失效。
+            if(cloudUser==null){
+                return null;
+            }else {
+                try{
+                    urpDto = shiroDao.queryURPByUserEmail(cloudUser.getUserEmail(),applicationId);
+                }catch (Exception e){
+                    logger.error("尝试授权失败");
+                    logger.error("异常信息:{}",e.getMessage());
+                    return null;
+                }
+                //失效
+                session.removeAttribute(token);
+            }
         }
-        //使用过的令牌失效
-        redisUtil.del(SerializeUtil.serialize(token));
         return urpDto;
     }
 
@@ -187,24 +201,29 @@ public class ACServiceImpl implements ACService {
     public AuthDto authenticationInfo(String uuid) {
         AuthDto authDto = null;
         if(uuid==null||"".equals(uuid)){
+            //判空
             authDto = new AuthDto(ConstantPool.Shiro.AC_FAILURE_CODE,ConstantPool.Shiro.AC_FAILURE_MESSAGE,null,null,null);
             return authDto;
         }
         CloudUser cloudUser = (CloudUser) SerializeUtil.unSerialize(redisUtil.get(SerializeUtil.serialize(uuid)));
         if(cloudUser==null){
-            //如果从redis中无法获取该用户，说明redis有可能down了，那么直接尝试从session中拿
+            //如果从redis中无法获取该用户，说明redis有可能down了，那么直接尝试从session中拿，也有可能是Redis中的uuid过期了。
             Session session = SecurityUtils.getSubject().getSession();
             cloudUser = (CloudUser) SerializeUtil.unSerialize((byte[]) session.getAttribute(uuid));
             if(cloudUser!=null){
-                //如果从session中得到了该用户的信息，说明已经登录，直接生成Token然后放入session中(因为redis已经down了)
+                //如果从session中得到了该用户的信息，说明已经登录，直接生成Token然后放入session中(因为redis已经down了)，并且尝试放入Redis中（续约操作）
                 String token = TokenUtil.getInstance().generateTokeCode();
                 session.setAttribute(token,SerializeUtil.serialize(cloudUser));
+                //续约
+                redisUtil.set(SerializeUtil.serialize(token),SerializeUtil.serialize(cloudUser));
                 authDto = new AuthDto(ConstantPool.Shiro.AC_SUCCESS_CODE,ConstantPool.Shiro.AC_SUCCESS_MESSAGE,cloudUser.getUserEmail(),token,null);
                 return authDto;
             }
         }else{
+            //token放入Redis
             String token = TokenUtil.getInstance().generateTokeCode();
-            redisUtil.set(SerializeUtil.serialize(token),SerializeUtil.serialize(cloudUser));
+            //token有效期15秒，用完即作废，暂时方案。正常应该是访问AC服务也会消耗token
+            redisUtil.set(SerializeUtil.serialize(token),SerializeUtil.serialize(cloudUser),15);
             authDto = new AuthDto(ConstantPool.Shiro.AC_SUCCESS_CODE,ConstantPool.Shiro.AC_SUCCESS_MESSAGE,cloudUser.getUserEmail(),token,null);
             return authDto;
         }

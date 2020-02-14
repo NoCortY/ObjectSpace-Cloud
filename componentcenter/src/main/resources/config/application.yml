@@ -55,9 +55,6 @@ spring:
         max-active: 500
         max-idle: 50
         min-idle: 0
-  jackson:
-    parser:
-      allow_unquoted_control_chars: true
 eureka:
   client:
     service-url:

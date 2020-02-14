@@ -1,4 +1,4 @@
-package cn.objectspace.componentcenter.pojo.entity.daemon;
+package cn.objectspace.componentcenter.pojo.dto.daemon;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 

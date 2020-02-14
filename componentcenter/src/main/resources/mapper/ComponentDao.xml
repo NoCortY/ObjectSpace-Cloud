@@ -66,7 +66,7 @@
             </if>
         </trim>
     </insert>
-    <select id="queryServerByUserIdAndServerIp" resultType="CloudServer">
+    <select id="queryServerByUserIdAndServerIp" resultType="CloudServerDto">
         SELECT
         server_ip,
         server_name,
@@ -79,13 +79,24 @@
             server_user=#{userId} and server_ip = #{serverIp}
         </where>
     </select>
-    <select id="queryServerByUserId" parameterType="java.lang.Integer" resultType="CloudServer">
+    <select id="queryServerByUserId" resultType="CloudServerDto">
         SELECT
         server_ip,
         server_name ,
         server_os_type,
         server_os_version,
         is_monitor
+        FROM
+        cloud_server
+        <where>
+            server_user = #{userId}
+        </where>
+        limit #{startItem},#{limit}
+    </select>
+
+    <select id="queryCountOfServerByUserId" resultType="java.lang.Integer">
+        SELECT
+        count(server_ip)
         FROM
         cloud_server
         <where>

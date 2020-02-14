@@ -1,14 +1,16 @@
 package cn.objectspace.componentcenter.service.impl;
 
 import cn.objectspace.common.constant.ConstantPool;
+import cn.objectspace.common.util.PageUtil;
 import cn.objectspace.common.util.RedisUtil;
 import cn.objectspace.common.util.SerializeUtil;
 import cn.objectspace.componentcenter.dao.ComponentDao;
+import cn.objectspace.componentcenter.pojo.dto.CloudServerDto;
+import cn.objectspace.componentcenter.pojo.dto.daemon.CpuDto;
+import cn.objectspace.componentcenter.pojo.dto.daemon.DiskDto;
+import cn.objectspace.componentcenter.pojo.dto.daemon.NetDto;
+import cn.objectspace.componentcenter.pojo.dto.daemon.ServerInfoDto;
 import cn.objectspace.componentcenter.pojo.entity.CloudServer;
-import cn.objectspace.componentcenter.pojo.entity.daemon.CpuDto;
-import cn.objectspace.componentcenter.pojo.entity.daemon.DiskDto;
-import cn.objectspace.componentcenter.pojo.entity.daemon.NetDto;
-import cn.objectspace.componentcenter.pojo.entity.daemon.ServerInfoDto;
 import cn.objectspace.componentcenter.service.ServerService;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
@@ -47,12 +49,28 @@ public class ServerServiceImpl implements ServerService {
     }
 
     @Override
-    public List<CloudServer> getMySelfServer(Integer userId) {
+    public List<CloudServerDto> getMySelfServer(Integer userId, Integer page, Integer limit) {
         if(userId==null){
             logger.info("用户ID为空是非法操作");
             return null;
         }
-        return componentDao.queryServerByUserId(userId);
+        return componentDao.queryServerByUserId(userId, PageUtil.getRowIndex(page,limit),limit);
+    }
+
+    /**
+     * @Description: 获取自己名下服务器台数
+     * @Param: [userId]
+     * @return: java.lang.Integer
+     * @Author: NoCortY
+     * @Date: 2020/2/14
+     */
+    @Override
+    public Integer getCountOfMySelfServer(Integer userId) {
+        if(userId==null){
+            logger.info("用户ID为空是非法操作");
+            return null;
+        }
+        return componentDao.queryCountOfServerByUserId(userId);
     }
 
     /**
@@ -84,7 +102,7 @@ public class ServerServiceImpl implements ServerService {
                 cloudServer.setServerName(serverInfoDto.getComputerName());
                 cloudServer.setServerOsType(serverInfoDto.getOsName());
                 cloudServer.setServerOsVersion(serverInfoDto.getOsVersion());
-                cloudServer.setMonitor(true);
+                cloudServer.setIsMonitor(true);
                 cloudServer.setServerUser(serverUser);
                 try{
                     componentDao.insertCloudServer(cloudServer);

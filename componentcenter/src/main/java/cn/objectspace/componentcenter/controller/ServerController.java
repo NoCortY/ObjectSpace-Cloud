@@ -3,9 +3,12 @@ package cn.objectspace.componentcenter.controller;
 import cn.objectspace.common.annotation.SaveLog;
 import cn.objectspace.common.constant.ConstantPool;
 import cn.objectspace.common.pojo.entity.ResponseMap;
+import cn.objectspace.common.util.HttpRequestUtil;
+import cn.objectspace.componentcenter.pojo.dto.CloudServerDto;
+import cn.objectspace.componentcenter.pojo.dto.daemon.ServerInfoDto;
 import cn.objectspace.componentcenter.pojo.entity.CloudServer;
-import cn.objectspace.componentcenter.pojo.entity.daemon.ServerInfoDto;
 import cn.objectspace.componentcenter.service.ServerService;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -51,14 +54,18 @@ public class ServerController {
 
     @SaveLog(applicationId = ConstantPool.ComponentCenter.APPLICATION_ID)
     @GetMapping("/listMyselfServer")
-    public ResponseMap<List<CloudServer>> listMyselfServer(HttpServletRequest request){
-        ResponseMap<List<CloudServer>> responseMap = new ResponseMap<>();
+    public ResponseMap<List<CloudServerDto>> listMyselfServer(HttpServletRequest request) throws JsonProcessingException {
+        ResponseMap<List<CloudServerDto>> responseMap = new ResponseMap<>();
         Integer userId = (Integer) request.getSession().getAttribute("CCUserId");
-        List<CloudServer> cloudServerList = serverService.getMySelfServer(userId);
+        //分页
+        Integer page = HttpRequestUtil.getIntegerParameter(request,"page");
+        Integer limit = HttpRequestUtil.getIntegerParameter(request,"limit");
+        List<CloudServerDto> cloudServerList = serverService.getMySelfServer(userId,page,limit);
         if(cloudServerList!=null){
             responseMap.setCode(ConstantPool.Common.REQUEST_SUCCESS_CODE);
             responseMap.setMessage(ConstantPool.Common.REQUEST_SUCCESS_MESSAGE);
             responseMap.setData(cloudServerList);
+            responseMap.setCount(serverService.getCountOfMySelfServer(userId));
         }else{
             responseMap.setCode(ConstantPool.Common.REQUEST_FAILURE_CODE);
             responseMap.setMessage(ConstantPool.Common.REQUEST_FAILURE_MESSAGE);

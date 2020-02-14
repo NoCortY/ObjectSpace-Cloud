@@ -16,6 +16,8 @@ public class ResponseMap<T> {
     private String message;
     @ApiModelProperty(value="数据")
     private T data;
+    @ApiModelProperty(value="条数")
+    private Integer count;
 
     public String getCode() {
         return code;
@@ -39,5 +41,13 @@ public class ResponseMap<T> {
 
     public void setData(T data) {
         this.data = data;
+    }
+
+    public Integer getCount() {
+        return count;
+    }
+
+    public void setCount(Integer count) {
+        this.count = count;
     }
 }

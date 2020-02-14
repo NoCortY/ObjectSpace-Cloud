@@ -1,10 +1,11 @@
 package cn.objectspace.componentcenter.dao;
 
+import cn.objectspace.componentcenter.pojo.dto.CloudServerDto;
+import cn.objectspace.componentcenter.pojo.dto.daemon.CpuDto;
+import cn.objectspace.componentcenter.pojo.dto.daemon.DiskDto;
+import cn.objectspace.componentcenter.pojo.dto.daemon.NetDto;
+import cn.objectspace.componentcenter.pojo.dto.daemon.ServerInfoDto;
 import cn.objectspace.componentcenter.pojo.entity.CloudServer;
-import cn.objectspace.componentcenter.pojo.entity.daemon.CpuDto;
-import cn.objectspace.componentcenter.pojo.entity.daemon.DiskDto;
-import cn.objectspace.componentcenter.pojo.entity.daemon.NetDto;
-import cn.objectspace.componentcenter.pojo.entity.daemon.ServerInfoDto;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
@@ -32,8 +33,15 @@ public interface ComponentDao {
      * @Author: NoCortY
      * @Date: 2020/2/6
      */
-    public List<CloudServer> queryServerByUserId(Integer userId);
-
+    public List<CloudServerDto> queryServerByUserId(@Param("userId") Integer userId, @Param("startItem") Integer startItem, @Param("limit") Integer limit);
+    /**
+     * @Description: 自己名下的服务器个数
+     * @Param:
+     * @return: 
+     * @Author: NoCortY
+     * @Date: 2020/2/14
+     */
+    public Integer queryCountOfServerByUserId(@Param("userId")Integer userId);
 
     /**
      * @Description: 根据用户ID和服务器IP来查询服务器
@@ -42,7 +50,7 @@ public interface ComponentDao {
      * @Author: NoCortY
      * @Date: 2020/2/12
      */
-    public CloudServer queryServerByUserIdAndServerIp(@Param("userId") Integer userId, @Param("serverIp") String serverIp);
+    public CloudServerDto queryServerByUserIdAndServerIp(@Param("userId") Integer userId, @Param("serverIp") String serverIp);
 
     /**
      * @Description: 记录服务器状态
