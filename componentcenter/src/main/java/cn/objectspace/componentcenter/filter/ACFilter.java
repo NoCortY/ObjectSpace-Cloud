@@ -31,20 +31,21 @@ public class ACFilter implements Filter {
         //ServlerRequest转HttpServletRequest
         request = (HttpServletRequest) request;
         String requestURI = ((HttpServletRequest) request).getRequestURI();
+        String token = request.getParameter(ConstantPool.Shiro.AC_TOKEN);
         //System.out.println(requestURI);
         if("/CC/server/ping".equals(requestURI)){
             //如果是发送心跳的，直接放行即可
             logger.info("访问白名单url");
+            restUtil.getRestTemplate().postForObject(ConstantPool.Shiro.AC_APPLICATION_NAME + "/AC/destroyToken/" + token, null, Void.class);
             chain.doFilter(request,response);
             return;
         }
         if(((HttpServletRequest) request).getSession().getAttribute(ConstantPool.ComponentCenter.SESSION_USER_ID_KEY)!=null){
             logger.info("用户已通过授权，直接放行");
+            restUtil.getRestTemplate().postForObject(ConstantPool.Shiro.AC_APPLICATION_NAME + "/AC/destroyToken/" + token, null, Void.class);
             chain.doFilter(request,response);
         }else{
             logger.info("该用户第一次访问本服务，进行授权...");
-
-            String token = request.getParameter(ConstantPool.Shiro.AC_TOKEN);
             //接收返回值
             ResponseMap responseMap = null;
            /* //携带cookie

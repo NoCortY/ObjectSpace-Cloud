@@ -215,14 +215,15 @@ public class ACServiceImpl implements ACService {
                 String token = TokenUtil.getInstance().generateTokeCode();
                 session.setAttribute(token,SerializeUtil.serialize(cloudUser));
                 //续约
-                redisUtil.set(SerializeUtil.serialize(token),SerializeUtil.serialize(cloudUser));
+                redisUtil.set(SerializeUtil.serialize(token), SerializeUtil.serialize(cloudUser), 15);
                 authDto = new AuthDto(ConstantPool.Shiro.AC_SUCCESS_CODE,ConstantPool.Shiro.AC_SUCCESS_MESSAGE,cloudUser.getUserEmail(),token,null);
                 return authDto;
             }
         }else{
             //token放入Redis
             String token = TokenUtil.getInstance().generateTokeCode();
-            //token有效期15秒，用完即作废，暂时方案。正常应该是访问AC服务也会消耗token
+            //token有效期15秒，用完即作废，暂时方案。正常应该是访问AC服务也会消耗token(暂时并存)
+            //如果外部服务没有进行消费的token，直接通过销毁程序进行删除
             redisUtil.set(SerializeUtil.serialize(token),SerializeUtil.serialize(cloudUser),15);
             authDto = new AuthDto(ConstantPool.Shiro.AC_SUCCESS_CODE,ConstantPool.Shiro.AC_SUCCESS_MESSAGE,cloudUser.getUserEmail(),token,null);
             return authDto;
@@ -230,5 +231,19 @@ public class ACServiceImpl implements ACService {
         //如果依旧为null
         authDto = new AuthDto(ConstantPool.Shiro.AC_FAILURE_CODE,ConstantPool.Shiro.AC_FAILURE_MESSAGE,null,null,null);
         return authDto;
+    }
+
+    /**
+     * @Description: 销毁token, 如果没有用到token，那么直接通过这里进行销毁
+     * @Param: [token]
+     * @return: void
+     * @Author: NoCortY
+     * @Date: 2020/2/15
+     */
+    @Override
+    public void tokenDestroy(String token) {
+        if (token != null) {
+            redisUtil.del(SerializeUtil.serialize(token));
+        }
     }
 }

@@ -21,6 +21,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
@@ -165,5 +166,14 @@ public class ACController {
         //删除cookie
         //HttpResponseUtil.deleteCookie(response,ConstantPool.Shiro.AC_TOKEN);
         return responseMap;
+    }
+
+    @ApiOperation(value = "Token销毁", notes = "没有使用到的Token及时进行销毁", httpMethod = "POST")
+    @ApiImplicitParam(paramType = "path", name = "applicationId", value = "微服务ID", dataType = "String")
+    @PostMapping("/destroyToken/{ACToken}")
+    @SaveLog(applicationId = ConstantPool.Shiro.APPLICATION_ID)
+    @Async
+    public void destroyToken(@PathVariable String ACToken) {
+        acService.tokenDestroy(ACToken);
     }
 }

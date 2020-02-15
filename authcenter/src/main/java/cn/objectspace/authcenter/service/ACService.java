@@ -42,4 +42,6 @@ public interface ACService {
      * @Date: 2019/12/16
      */
     public AuthDto authenticationInfo(String uuid);
+
+    public void tokenDestroy(String token);
 }

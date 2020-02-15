@@ -15,6 +15,7 @@ import org.aspectj.lang.reflect.MethodSignature;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.request.RequestAttributes;
 import org.springframework.web.context.request.RequestContextHolder;
@@ -77,26 +78,32 @@ public class AutoSaveLogAop {
         //获取请求路径(操作的接口)
         String operateInterface = request.getRequestURI();
         //获取入参
+        Async async = ((MethodSignature) joinPoint.getSignature()).getMethod().getAnnotation(Async.class);
         StringBuffer inputParameter = new StringBuffer();
-        Object[] objects = joinPoint.getArgs();
-        for(Object o : objects){
-            if(!(o instanceof HttpServletRequest)&&!(o instanceof HttpServletResponse)){
-                //过滤HttpServletRequest和HttpServletResponse
-                //且密码不能显示
-                try {
-                    //将入参转换为json格式
-                    String in = objectMapper.writeValueAsString(o);
-                    if(in.contains("userPassword")){
-                        in = "当前日志中含有敏感信息，不予显示";
+        if (async == null) {
+            //非异步方法才获取入参
+            Object[] objects = joinPoint.getArgs();
+            for (Object o : objects) {
+                if (!(o instanceof HttpServletRequest) && !(o instanceof HttpServletResponse)) {
+                    //过滤HttpServletRequest和HttpServletResponse
+                    //且密码不能显示
+                    try {
+                        //将入参转换为json格式
+                        String in = objectMapper.writeValueAsString(o);
+                        if (in.contains("userPassword")) {
+                            in = "当前日志中含有敏感信息，不予显示";
+                        }
+                        inputParameter.append(in);
+                    } catch (JsonProcessingException e) {
+                        inputParameter.append("获取入参异常");
+                        logger.error("获取入参异常");
+                        logger.error("异常信息:{}", e.getMessage());
                     }
-                    inputParameter.append(in);
-                } catch (JsonProcessingException e) {
-                    inputParameter.append("获取入参异常");
-                    logger.error("获取入参异常");
-                    logger.error("异常信息:{}",e.getMessage());
+                    inputParameter.append("|");
                 }
-                inputParameter.append("|");
             }
+        } else {
+            inputParameter.append("async");
         }
         //IP地址
         String operateUserIp = getRemoteHost(request);
