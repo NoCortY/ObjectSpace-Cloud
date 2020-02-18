@@ -21,6 +21,7 @@
         readOnly:只读，意味着缓存数据只能读取而不能修改，这样设置的好处是我们可以快速读取缓存，缺点是我们没有
         办法修改缓存，他的默认值是false，不允许我们修改
     -->
+    <cache eviction="LRU" type="cn.objectspace.common.cache.MyBatisCache"/>
     <resultMap id="ServerDetailDto" type="ServerDetailDto">
         <id column="ip" property="ip"/>
         <result column="computer_name" property="computerName"/>
@@ -46,7 +47,6 @@
             <result column="net_mask" property="netMask"/>
         </collection>
     </resultMap>
-    <cache eviction="LRU" type="cn.objectspace.common.cache.MyBatisCache"/>
     <insert id="insertCloudServer" parameterType="CloudServer">
         INSERT INTO cloud_server
         <trim prefix="(" suffix=")" prefixOverrides=",">
@@ -188,9 +188,9 @@
             <if test="memFree!=null">
                 mem_free,
             </if>
-            <if test="swap_total!=null">
+            <if test="swapTotal!=null">
                 swap_total,
-            </if>>
+            </if>
             <if test="swapFree!=null">
                 swap_free,
             </if>
@@ -233,9 +233,9 @@
             <if test="memFree!=null">
                 #{memFree},
             </if>
-            <if test="swap_total!=null">
+            <if test="swapTotal!=null">
                 #{swapTotal},
-            </if>>
+            </if>
             <if test="swapFree!=null">
                 #{swapFree},
             </if>
@@ -347,6 +347,10 @@
             )
         </foreach>
     </insert>
+
+    <select id="queryServerIpByUserId" parameterType="java.lang.Integer" resultType="java.lang.String">
+        SELECT server_ip FROM cloud_server WHERE server_user = #{userId}
+    </select>
     <!--<insert id="insertComponent">
         INSERT INTO cloud_microservice
         <trim prefix="(" suffix=")" suffixOverrides=",">

@@ -2,6 +2,7 @@ package cn.objectspace.componentcenter.service;
 
 import cn.objectspace.componentcenter.pojo.dto.CloudServerDto;
 import cn.objectspace.componentcenter.pojo.dto.ServerDetailDto;
+import cn.objectspace.componentcenter.pojo.dto.ServerResumeDto;
 import cn.objectspace.componentcenter.pojo.dto.daemon.ServerInfoDto;
 import cn.objectspace.componentcenter.pojo.entity.CloudServer;
 
@@ -57,4 +58,6 @@ public interface ServerService {
      * @Date: 2020/2/10
      */
     public boolean ping(ServerInfoDto serverInfoDto);
+
+    public List<ServerResumeDto> getServerResumes(Integer userId);
 }

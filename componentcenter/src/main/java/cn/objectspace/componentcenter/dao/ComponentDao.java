@@ -99,4 +99,7 @@ public interface ComponentDao {
      */
     public ServerDetailDto queryDetailOfServerByUserIdAndServerIp(@Param("serverIp") String serverIp,@Param("userId") Integer userId);
 
+
+    public List<String> queryServerIpByUserId(@Param("userId") Integer userId);
+
 }

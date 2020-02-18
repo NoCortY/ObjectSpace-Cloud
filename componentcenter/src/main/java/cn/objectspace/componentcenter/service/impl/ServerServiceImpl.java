@@ -7,6 +7,7 @@ import cn.objectspace.common.util.SerializeUtil;
 import cn.objectspace.componentcenter.dao.ComponentDao;
 import cn.objectspace.componentcenter.pojo.dto.CloudServerDto;
 import cn.objectspace.componentcenter.pojo.dto.ServerDetailDto;
+import cn.objectspace.componentcenter.pojo.dto.ServerResumeDto;
 import cn.objectspace.componentcenter.pojo.dto.daemon.CpuDto;
 import cn.objectspace.componentcenter.pojo.dto.daemon.DiskDto;
 import cn.objectspace.componentcenter.pojo.dto.daemon.NetDto;
@@ -107,7 +108,7 @@ public class ServerServiceImpl implements ServerService {
         }
         String serverIp = serverInfoDto.getIp();
         Integer serverUser = serverInfoDto.getServerUser();
-       // System.out.println("key1:"+serverUser+":"+serverIp);
+        // System.out.println("key1:"+serverUser+":"+serverIp);
         //hmget返回的是List<String> 不能使用==null判空
         if(redisUtil.hmget(ConstantPool.ComponentCenter.MONITOR_SERVER_MAP,serverUser+":"+serverIp).contains(null)){
             //如果redis服务器监控列表中 没有get到该服务器，那么说明这个服务器是第一次注册，那么一定要往服务器注册表中插入该服务器信息
@@ -183,6 +184,71 @@ public class ServerServiceImpl implements ServerService {
         }
 
         return true;
-
     }
+
+    @Override
+    public List<ServerResumeDto> getServerResumes(Integer userId) {
+        if (userId == null) {
+            logger.error("userId不能为空");
+            return null;
+        }
+        List<ServerResumeDto> serverResumeDtos = null;
+        List<String> serverIpList = componentDao.queryServerIpByUserId(userId);
+        if (serverIpList != null) {
+            serverResumeDtos = new ArrayList<>();
+            for (String serverIp : serverIpList) {
+                ServerResumeDto serverResumeDto = new ServerResumeDto();
+                List<String> onlineStatus = redisUtil.hmget(ConstantPool.ComponentCenter.MONITOR_SERVER_MAP, userId + ":" + serverIp);
+                if (ConstantPool.ComponentCenter.SERVER_ONLINE.equals(onlineStatus.get(0))) {
+                    //在线
+                    serverResumeDto.setOnlineStatus(true);
+                } else {
+                    //如果不在线，那么直接将所有数据封装为0
+                    serverResumeDto.setOnlineStatus(false);
+                    serverResumeDto.setCpuUsedPercent(0.0);
+                    serverResumeDto.setDiskUsedPercent(0.0);
+                    serverResumeDto.setMemUsedPercent(0.0);
+                    serverResumeDto.setRecPackageTotal(0L);
+                    serverResumeDto.setRecPackageTotal(0L);
+                    serverResumeDtos.add(serverResumeDto);
+                    continue;
+                }
+                ServerInfoDto serverInfoDto = (ServerInfoDto) SerializeUtil.unSerialize(redisUtil.get(SerializeUtil.serialize(userId + ":" + serverIp)));
+                Double memUsedPercent = serverInfoDto.getMemUsed().doubleValue() / serverInfoDto.getMemTotal().doubleValue();
+                Double swapUsedPercent = serverInfoDto.getSwapUsedPercent();
+                double cpuUsedTotal = 0;
+                //CPU
+                for (CpuDto cpuDto : serverInfoDto.getCpuList()) {
+                    cpuUsedTotal += cpuDto.getSystemUsed() + cpuDto.getUserUsed();
+                }
+                Double cpuUsedPercent = cpuUsedTotal / serverInfoDto.getCpuList().size();
+                double diskUsedTotal = 0;
+                //DISK
+                for (DiskDto diskDto : serverInfoDto.getDiskList()) {
+                    diskUsedTotal += diskDto.getUsePercent();
+                }
+                Double diskUsedPercent = diskUsedTotal / serverInfoDto.getDiskList().size();
+                Long sendPackageTotal = 0L;
+                Long recPackageTotal = 0L;
+                //NET
+                for (NetDto netDto : serverInfoDto.getNetList()) {
+                    sendPackageTotal += netDto.getTxPackets();
+                    recPackageTotal += netDto.getRxPackets();
+                }
+                serverResumeDto.setMemUsedPercent(memUsedPercent);
+                serverResumeDto.setSwapUsedPercent(swapUsedPercent);
+                serverResumeDto.setDiskUsedPercent(diskUsedPercent);
+                serverResumeDto.setCpuUsedPercent(cpuUsedPercent);
+                serverResumeDto.setSendPackageTotal(sendPackageTotal);
+                serverResumeDto.setRecPackageTotal(recPackageTotal);
+                serverResumeDtos.add(serverResumeDto);
+            }
+        } else {
+            //服务器列表为空
+            logger.info("该用户没有正在监控的服务器");
+            return null;
+        }
+        return serverResumeDtos;
+    }
+
 }
