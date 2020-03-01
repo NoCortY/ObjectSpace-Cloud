@@ -16,6 +16,7 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-websocket</artifactId>
         </dependency>
+        <!-- 自动化运维平台核心依赖包 -->
         <dependency>
             <groupId>cn.objectspace</groupId>
             <artifactId>common</artifactId>

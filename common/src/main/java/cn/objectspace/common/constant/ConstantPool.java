@@ -203,5 +203,10 @@ public class ConstantPool {
          */
         public static final String SESSION_USER_ID_KEY = "CCUserId";
 
+        /**
+         * WebSocket用户
+         */
+        //public static final String WEBSOCKET_ONLINE_USER_ID = "WSUserId";
+
     }
 }
