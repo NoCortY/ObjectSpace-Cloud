@@ -15,7 +15,6 @@ import org.springframework.stereotype.Component;
 import javax.servlet.*;
 import javax.servlet.annotation.WebFilter;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
 import java.io.IOException;
 
 @Component
@@ -62,7 +61,6 @@ public class ACFilter implements Filter {
             //headers.put(HttpHeaders.COOKIE,cookieList);
             logger.info("携带token访问授权接口...");
            // HttpEntity httpEntity = new HttpEntity(headers);
-            System.out.println(((HttpServletRequest) request).getSession().getAttribute(ConstantPool.ComponentCenter.SESSION_USER_ID_KEY));
             responseMap = restUtil.getRestTemplate().postForObject(ConstantPool.Shiro.AC_APPLICATION_NAME+"/AC/authorization/"+ConstantPool.ComponentCenter.APPLICATION_ID+"/"+token,null,ResponseMap.class);
             //responseMap = restUtil.getRestTemplate().postForEntity(ConstantPool.Shiro.AC_APPLICATION_NAME+"/AC/authorization/"+ConstantPool.ComponentCenter.APPLICATION_ID,httpEntity,ResponseMap.class);
             if(responseMap.getData()!=null){
@@ -70,7 +68,6 @@ public class ACFilter implements Filter {
                 System.out.println(objectMapper.writeValueAsString(responseMap.getData()));
                 URPDto urpDto =  objectMapper.readValue(objectMapper.writeValueAsString(responseMap.getData()),URPDto.class);
                 ((HttpServletRequest) request).getSession().setAttribute(ConstantPool.ComponentCenter.SESSION_USER_ID_KEY,urpDto.getUserId());
-                HttpSession session = ((HttpServletRequest) request).getSession();
                 //用户授权信息存入redis，下次不用再访问AC
                 redisUtil.set(SerializeUtil.serialize(ConstantPool.ComponentCenter.URPDTO_REDIS_KEY_CC+urpDto.getUserId()),SerializeUtil.serialize(urpDto),3600);
                 //放行

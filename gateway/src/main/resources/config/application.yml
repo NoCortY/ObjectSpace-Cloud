@@ -1,0 +1,54 @@
+server:
+  port: 7000
+spring:
+  application:
+    name: CloudGateway
+  # 开启 Gateway 服务注册中心服务发现
+  cloud:
+    gateway:
+      discovery:
+        locator:
+          enabled: true
+      routes:
+        - id: ObjectService-AC
+          uri: lb://ObjectService-AC
+          predicates:
+            - Path=/ObjectCloud/AuthCenter/**
+          filters:
+            - StripPrefix=2
+            - AddResponseHeader=X-Response-Default-Foo, Default-Bar
+        - id: ObjectService-LC
+          uri: lb://ObjectService-LC
+          predicates:
+            - Path=/ObjectCloud/LogCenter/**
+          filters:
+            - StripPrefix=2
+            - AddResponseHeader=X-Response-Default-Foo, Default-Bar
+        - id: ObjectService-CC
+          uri: lb://ObjectService-CC
+          predicates:
+            - Path=/ObjectCloud/ComCenter/**
+          filters:
+            - StripPrefix=2
+            - AddResponseHeader=X-Response-Default-Foo, Default-Bar
+        - id: WebSocket
+          uri: lb://ObjectService-CC/componentWS
+          predicates:
+            - Path=/ObjectCloud/ComCenter/componentWS
+#服务注册配置
+eureka:
+  client:
+    #将客户端注册进注册中心
+    service-url:
+      #单机版注册
+      defaultZone: http://127.0.0.1:7001/eureka/
+  instance:
+    #注册中心的链接名（右侧Status）
+    instance-id: ${spring.application.name}:${server.port}
+    #点到链接名左下角出现IP提示
+    prefer-ip-address: true
+ribbon:
+  ReadTimeout: 60000
+  ConnectTimeout: 60000
+  #ReadTimeout: 1000000000
+  #ConnectTimeout: 1000000000

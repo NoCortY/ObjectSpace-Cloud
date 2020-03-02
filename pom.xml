@@ -15,6 +15,7 @@
         <module>common</module>
         <module>logcenter</module>
         <module>componentcenter</module>
+        <module>gateway</module>
     </modules>
     <packaging>pom</packaging>
     <properties>
