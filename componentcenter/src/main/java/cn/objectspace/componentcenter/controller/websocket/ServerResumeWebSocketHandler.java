@@ -1,15 +1,50 @@
-package cn.objectspace.componentcenter.config;
+package cn.objectspace.componentcenter.controller.websocket;
 
 import cn.objectspace.common.constant.ConstantPool;
+import cn.objectspace.componentcenter.pojo.dto.ServerResumeDto;
+import cn.objectspace.componentcenter.service.ServerService;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 import org.springframework.web.socket.*;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
-public class CCWebSocketHandler implements WebSocketHandler {
-    public static Map<String, Object> sessionMap = new ConcurrentHashMap<>();
+@Component
+//@Scope("prototype")
+public class ServerResumeWebSocketHandler implements WebSocketHandler {
 
+    @Autowired
+    private ServerService serverService;
+
+    private static Logger logger = LoggerFactory.getLogger(ServerResumeWebSocketHandler.class);
+    //用户session缓存
+    private static Map<String, Object> sessionMap = new ConcurrentHashMap<>();
+
+    public static Set<String> sessionMapKeySet() {
+        if (!sessionMap.isEmpty())
+            return sessionMap.keySet();
+        else
+            return null;
+    }
+
+    public static int sessionMapSize() {
+        return sessionMap.size();
+    }
+
+    public static Object sessionMapGet(String key) {
+        return sessionMap.get(key);
+    }
+
+    public static boolean sessionMapIsEmpty() {
+        return sessionMap.isEmpty();
+    }
     /**
      * @Description: WebSocket连接创建后调用
      * @Param: [webSocketSession]
@@ -21,7 +56,12 @@ public class CCWebSocketHandler implements WebSocketHandler {
     public void afterConnectionEstablished(WebSocketSession webSocketSession) throws Exception {
         Integer userId = (Integer) webSocketSession.getAttributes().get(ConstantPool.ComponentCenter.SESSION_USER_ID_KEY);
         sessionMap.put(String.valueOf(userId), webSocketSession);
-
+        logger.info("用户:{},与服务器管理中心建立websocket连接", userId);
+        logger.info("开始获取服务器概要信息...");
+        List<ServerResumeDto> serverResumes = serverService.getServerResumes(userId);
+        ObjectMapper objectMapper = new ObjectMapper();
+        String serverResumeJson = objectMapper.writeValueAsString(serverResumes);
+        senMessage(userId, serverResumeJson);
     }
 
     /**
@@ -35,7 +75,7 @@ public class CCWebSocketHandler implements WebSocketHandler {
     public void handleMessage(WebSocketSession webSocketSession, WebSocketMessage<?> webSocketMessage) throws Exception {
 
         if (webSocketMessage instanceof TextMessage) {
-
+            logger.info("用户:{},发送消息:{}", webSocketSession.getAttributes().get(ConstantPool.ComponentCenter.SESSION_USER_ID_KEY), webSocketMessage.toString());
         } else if (webSocketMessage instanceof BinaryMessage) {
 
         } else if (webSocketMessage instanceof PongMessage) {
@@ -55,6 +95,7 @@ public class CCWebSocketHandler implements WebSocketHandler {
     @Override
     public void handleTransportError(WebSocketSession webSocketSession, Throwable throwable) throws Exception {
         sessionMap.remove(webSocketSession.getAttributes().get(ConstantPool.ComponentCenter.SESSION_USER_ID_KEY));
+        logger.info("");
     }
 
     /**
@@ -66,7 +107,10 @@ public class CCWebSocketHandler implements WebSocketHandler {
      */
     @Override
     public void afterConnectionClosed(WebSocketSession webSocketSession, CloseStatus closeStatus) throws Exception {
-        sessionMap.remove(webSocketSession.getAttributes().get(ConstantPool.ComponentCenter.SESSION_USER_ID_KEY));
+        Integer userId = (Integer) webSocketSession.getAttributes().get(ConstantPool.ComponentCenter.SESSION_USER_ID_KEY);
+        sessionMap.remove(String.valueOf(userId));
+        logger.info("用户:{},断开连接", userId);
+
     }
 
 
@@ -82,8 +126,8 @@ public class CCWebSocketHandler implements WebSocketHandler {
      * @Author: NoCortY
      * @Date: 2020/3/1
      */
-    public void senMessage(String userId, String message) throws IOException {
-        WebSocketSession session = (WebSocketSession) sessionMap.get(userId);
+    public static void senMessage(Integer userId, String message) throws IOException {
+        WebSocketSession session = (WebSocketSession) sessionMap.get(String.valueOf(userId));
         session.sendMessage(new TextMessage(message));
     }
 }

@@ -21,7 +21,7 @@ public class WebSocketInterceptor implements HandshakeInterceptor {
     public boolean beforeHandshake(ServerHttpRequest serverHttpRequest, ServerHttpResponse serverHttpResponse, WebSocketHandler webSocketHandler, Map<String, Object> map) throws Exception {
         if (serverHttpRequest instanceof ServletServerHttpRequest) {
             ServletServerHttpRequest request = (ServletServerHttpRequest) serverHttpRequest;
-            // 获取请求路径携带的参数
+            // 获取session中的用户id，放到websocket session中。
             Integer userId = (Integer) request.getServletRequest().getSession().getAttribute(ConstantPool.ComponentCenter.SESSION_USER_ID_KEY);
             map.put(ConstantPool.ComponentCenter.SESSION_USER_ID_KEY, userId);
             return true;

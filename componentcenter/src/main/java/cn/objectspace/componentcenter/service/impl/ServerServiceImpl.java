@@ -199,7 +199,9 @@ public class ServerServiceImpl implements ServerService {
             for (String serverIp : serverIpList) {
                 ServerResumeDto serverResumeDto = new ServerResumeDto();
                 List<String> onlineStatus = redisUtil.hmget(ConstantPool.ComponentCenter.MONITOR_SERVER_MAP, userId + ":" + serverIp);
-                if (ConstantPool.ComponentCenter.SERVER_ONLINE.equals(onlineStatus.get(0))) {
+
+                byte[] serverInfoBytes = redisUtil.get(SerializeUtil.serialize(userId + ":" + serverIp));
+                if (ConstantPool.ComponentCenter.SERVER_ONLINE.equals(onlineStatus.get(0)) && serverInfoBytes != null && serverInfoBytes.length > 0) {
                     //在线
                     serverResumeDto.setOnlineStatus(true);
                 } else {
@@ -208,12 +210,13 @@ public class ServerServiceImpl implements ServerService {
                     serverResumeDto.setCpuUsedPercent(0.0);
                     serverResumeDto.setDiskUsedPercent(0.0);
                     serverResumeDto.setMemUsedPercent(0.0);
-                    serverResumeDto.setRecPackageTotal(0L);
+                    serverResumeDto.setSwapUsedPercent(0.0);
+                    serverResumeDto.setSendPackageTotal(0L);
                     serverResumeDto.setRecPackageTotal(0L);
                     serverResumeDtos.add(serverResumeDto);
                     continue;
                 }
-                ServerInfoDto serverInfoDto = (ServerInfoDto) SerializeUtil.unSerialize(redisUtil.get(SerializeUtil.serialize(userId + ":" + serverIp)));
+                ServerInfoDto serverInfoDto = (ServerInfoDto) SerializeUtil.unSerialize(serverInfoBytes);
                 Double memUsedPercent = serverInfoDto.getMemUsed().doubleValue() / serverInfoDto.getMemTotal().doubleValue();
                 Double swapUsedPercent = serverInfoDto.getSwapUsedPercent();
                 double cpuUsedTotal = 0;

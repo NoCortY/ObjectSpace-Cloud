@@ -585,7 +585,7 @@ public class RedisUtil{
      * @Author: NoCortY
      * @Date: 2019/10/4
      */
-    public List<String> hmget(String mapName,String... keys) {
+    public List<String> hmget(String mapName, String... keys) {
         Jedis jedis = null;
         try {
             jedis = jedisPool.getResource();
@@ -597,6 +597,29 @@ public class RedisUtil{
         }finally {
             if(jedis!=null)
                 jedis.close();
+        }
+    }
+
+    /**
+     * @Description: 获取hash中所有的key
+     * @Param: [mapName]
+     * @return: java.util.Set<java.lang.String>
+     * @Author: NoCortY
+     * @Date: 2020/3/2
+     */
+    public Set<String> hkeys(String mapName) {
+        Jedis jedis = null;
+        try {
+            jedis = jedisPool.getResource();
+            return jedis.hkeys(mapName);
+        } catch (Exception e) {
+            logger.error("hkeys异常");
+            logger.error("异常信息:{}", e.getMessage());
+            return null;
+        } finally {
+            if (jedis != null) {
+                jedis.close();
+            }
         }
     }
     /**

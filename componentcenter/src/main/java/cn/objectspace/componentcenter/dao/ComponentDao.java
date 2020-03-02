@@ -102,4 +102,7 @@ public interface ComponentDao {
 
     public List<String> queryServerIpByUserId(@Param("userId") Integer userId);
 
+
+    public List<CloudServer> queryRegisteredServer();
+
 }
