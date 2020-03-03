@@ -32,9 +32,9 @@ spring:
             - StripPrefix=2
             - AddResponseHeader=X-Response-Default-Foo, Default-Bar
         - id: WebSocket
-          uri: lb://ObjectService-CC/componentWS
+          uri: lb://ObjectService-CC/serverResumeWS
           predicates:
-            - Path=/ObjectCloud/ComCenter/componentWS
+            - Path=/ObjectCloud/ComCenter/serverResumeWS
 #服务注册配置
 eureka:
   client:

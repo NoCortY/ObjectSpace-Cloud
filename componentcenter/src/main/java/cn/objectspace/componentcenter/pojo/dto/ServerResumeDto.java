@@ -9,6 +9,8 @@ import java.io.Serializable;
  */
 public class ServerResumeDto implements Serializable {
     private static final long serialVersionUID = -7276110951378523716L;
+    //服务器IP
+    private String serverIp;
     //CPU使用率
     private Double cpuUsedPercent;
     //内存使用率
@@ -24,6 +26,15 @@ public class ServerResumeDto implements Serializable {
     private Long recPackageTotal;
 
     private Boolean onlineStatus;
+
+
+    public String getServerIp() {
+        return serverIp;
+    }
+
+    public void setServerIp(String serverIp) {
+        this.serverIp = serverIp;
+    }
 
     public Boolean getOnlineStatus() {
         return onlineStatus;

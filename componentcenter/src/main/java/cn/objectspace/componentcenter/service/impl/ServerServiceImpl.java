@@ -200,6 +200,7 @@ public class ServerServiceImpl implements ServerService {
                 ServerResumeDto serverResumeDto = new ServerResumeDto();
                 List<String> onlineStatus = redisUtil.hmget(ConstantPool.ComponentCenter.MONITOR_SERVER_MAP, userId + ":" + serverIp);
 
+                serverResumeDto.setServerIp(serverIp);
                 byte[] serverInfoBytes = redisUtil.get(SerializeUtil.serialize(userId + ":" + serverIp));
                 if (ConstantPool.ComponentCenter.SERVER_ONLINE.equals(onlineStatus.get(0)) && serverInfoBytes != null && serverInfoBytes.length > 0) {
                     //在线
@@ -252,6 +253,21 @@ public class ServerServiceImpl implements ServerService {
             return null;
         }
         return serverResumeDtos;
+    }
+
+    @Override
+    public Integer getServerCount() {
+        Integer count = null;
+
+        try {
+            count = componentDao.queryServerCount();
+        } catch (Exception e) {
+            logger.error("获取托管服务器数量异常");
+            logger.error("异常信息:{}", e.getMessage());
+            return null;
+        }
+        return count;
+
     }
 
 }

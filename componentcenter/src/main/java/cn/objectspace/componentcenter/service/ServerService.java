@@ -59,5 +59,21 @@ public interface ServerService {
      */
     public boolean ping(ServerInfoDto serverInfoDto);
 
+    /**
+     * @Description: 获取某个用户名下服务器概要信息
+     * @Param:
+     * @return:
+     * @Author: NoCortY
+     * @Date: 2020/3/3
+     */
     public List<ServerResumeDto> getServerResumes(Integer userId);
+
+    /**
+     * @Description: 获取系统托管的所有服务器数量
+     * @Param:
+     * @return:
+     * @Author: NoCortY
+     * @Date: 2020/3/3
+     */
+    public Integer getServerCount();
 }

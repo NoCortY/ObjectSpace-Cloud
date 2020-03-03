@@ -47,6 +47,10 @@
             <result column="net_mask" property="netMask"/>
         </collection>
     </resultMap>
+
+    <select id="queryServerCount" resultType="java.lang.Integer">
+        SELECT COUNT(*) as server_count FROM cloud_server
+    </select>
     <select id="queryRegisteredServer" resultType="CloudServer">
         SELECT server_ip,server_user
         FROM cloud_server

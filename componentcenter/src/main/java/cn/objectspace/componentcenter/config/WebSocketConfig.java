@@ -28,7 +28,7 @@ public class WebSocketConfig implements WebSocketConfigurer {
     public void registerWebSocketHandlers(WebSocketHandlerRegistry webSocketHandlerRegistry) {
         //socket通道
         //指定处理器和路径
-        webSocketHandlerRegistry.addHandler(serverResumeWebSocketHandler, "/serverGeneralWS")
+        webSocketHandlerRegistry.addHandler(serverResumeWebSocketHandler, "/serverResumeWS")
                 //自定义拦截器
                 .addInterceptors(new WebSocketInterceptor())
                 //允许跨域

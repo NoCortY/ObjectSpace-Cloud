@@ -99,10 +99,35 @@ public interface ComponentDao {
      */
     public ServerDetailDto queryDetailOfServerByUserIdAndServerIp(@Param("serverIp") String serverIp,@Param("userId") Integer userId);
 
-
+    /**
+     * @Description: 通过用户id查询所有服务器的IP
+     * @Param:
+     * @return:
+     * @Author: NoCortY
+     * @Date: 2020/3/3
+     */
     public List<String> queryServerIpByUserId(@Param("userId") Integer userId);
 
 
+    /**
+     * @Description: 查询已经注册的服务器列表。
+     * @Param:
+     * @return:
+     * @Author: NoCortY
+     * @Date: 2020/3/3
+     */
     public List<CloudServer> queryRegisteredServer();
+
+
+    /**
+     * @Description: 查询服务器数量
+     * @Param:
+     * @return:
+     * @Author: NoCortY
+     * @Date: 2020/3/3
+     */
+    public Integer queryServerCount();
+
+
 
 }

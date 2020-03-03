@@ -130,4 +130,20 @@ public class ServerController {
         }
         return responseMap;
     }
+
+    @SaveLog(applicationId = ConstantPool.ComponentCenter.APPLICATION_ID)
+    @GetMapping("/serverCount")
+    public ResponseMap<Integer> serverCount() {
+        ResponseMap<Integer> responseMap = new ResponseMap<>();
+        Integer count = serverService.getServerCount();
+        if (count == null) {
+            responseMap.setCode(ConstantPool.Common.REQUEST_FAILURE_CODE);
+            responseMap.setMessage(ConstantPool.Common.REQUEST_FAILURE_MESSAGE);
+        } else {
+            responseMap.setCode(ConstantPool.Common.REQUEST_SUCCESS_CODE);
+            responseMap.setMessage(ConstantPool.Common.REQUEST_SUCCESS_MESSAGE);
+            responseMap.setData(count);
+        }
+        return responseMap;
+    }
 }
