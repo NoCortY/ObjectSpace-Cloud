@@ -47,7 +47,19 @@
             <result column="net_mask" property="netMask"/>
         </collection>
     </resultMap>
+    <resultMap id="cpuRecordGroupDto" type="cpuRecordGroupDto">
+        <id column="cpu_id" property="cpuId"/>
+        <collection property="cpuRecordDtoList" ofType="CpuRecordDto">
+            <id column="record_time" property="recordTime"/>
+            <result column="user_used" property="userUsed"/>
+            <result column="system_used" property="systemUsed"/>
+            <result column="combine" property="combine"/>
+        </collection>
+    </resultMap>
 
+    <select id="queryCpuRuntimeRecord" resultMap="cpuRecordGroupDto">
+       select * from cloud_cpu_info_now where record_time between #{startTime} and #{endTime}
+    </select>
     <select id="queryServerCount" resultType="java.lang.Integer">
         SELECT COUNT(*) as server_count FROM cloud_server
     </select>

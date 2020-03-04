@@ -4,6 +4,7 @@ import cn.objectspace.common.constant.ConstantPool;
 import cn.objectspace.common.util.PageUtil;
 import cn.objectspace.common.util.RedisUtil;
 import cn.objectspace.common.util.SerializeUtil;
+import cn.objectspace.common.util.TimeUtil;
 import cn.objectspace.componentcenter.dao.ComponentDao;
 import cn.objectspace.componentcenter.pojo.dto.CloudServerDto;
 import cn.objectspace.componentcenter.pojo.dto.ServerDetailDto;
@@ -12,6 +13,7 @@ import cn.objectspace.componentcenter.pojo.dto.daemon.CpuDto;
 import cn.objectspace.componentcenter.pojo.dto.daemon.DiskDto;
 import cn.objectspace.componentcenter.pojo.dto.daemon.NetDto;
 import cn.objectspace.componentcenter.pojo.dto.daemon.ServerInfoDto;
+import cn.objectspace.componentcenter.pojo.dto.record.CpuRecordGroupDto;
 import cn.objectspace.componentcenter.pojo.entity.CloudServer;
 import cn.objectspace.componentcenter.service.ServerService;
 import org.apache.commons.lang.StringUtils;
@@ -268,6 +270,32 @@ public class ServerServiceImpl implements ServerService {
         }
         return count;
 
+    }
+
+    /**
+     * @Description: 查询一段时间CPU运行状况
+     * @Param: [userId, serverIp, intervalMinutes]
+     * @return: cn.objectspace.componentcenter.pojo.dto.record.CpuRecordGroupDto
+     * @Author: NoCortY
+     * @Date: 2020/3/4
+     */
+    @Override
+    public List<CpuRecordGroupDto> getRuntimeCpuRecord(Integer userId, String serverIp, Long intervalMinutes) {
+        if (userId == null || StringUtils.isBlank(serverIp)) {
+            logger.info("用户名和服务器IP为必填项");
+            return null;
+        }
+        Date startTime = new Date(System.currentTimeMillis() - TimeUtil.minuteToMillisecond(intervalMinutes));
+        Date endTime = new Date();
+
+        List<CpuRecordGroupDto> cpuRecordGroupDtos = null;
+        try {
+            cpuRecordGroupDtos = componentDao.queryCpuRuntimeRecord(userId, serverIp, startTime, endTime);
+        } catch (Exception e) {
+            logger.error("查询cpu间隔时间运行情况异常");
+            logger.error("异常信息:{}", e.getMessage());
+        }
+        return cpuRecordGroupDtos;
     }
 
 }

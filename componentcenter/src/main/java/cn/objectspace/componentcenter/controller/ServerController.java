@@ -8,6 +8,7 @@ import cn.objectspace.componentcenter.pojo.dto.CloudServerDto;
 import cn.objectspace.componentcenter.pojo.dto.ServerDetailDto;
 import cn.objectspace.componentcenter.pojo.dto.ServerResumeDto;
 import cn.objectspace.componentcenter.pojo.dto.daemon.ServerInfoDto;
+import cn.objectspace.componentcenter.pojo.dto.record.CpuRecordGroupDto;
 import cn.objectspace.componentcenter.pojo.entity.CloudServer;
 import cn.objectspace.componentcenter.service.ServerService;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -143,6 +144,23 @@ public class ServerController {
             responseMap.setCode(ConstantPool.Common.REQUEST_SUCCESS_CODE);
             responseMap.setMessage(ConstantPool.Common.REQUEST_SUCCESS_MESSAGE);
             responseMap.setData(count);
+        }
+        return responseMap;
+    }
+
+    @SaveLog(applicationId = ConstantPool.ComponentCenter.APPLICATION_ID)
+    @GetMapping("/runtimeCpuRecord/{serverIp}/{intervalMinute}")
+    public ResponseMap<List<CpuRecordGroupDto>> runtimeCpuRecord(@PathVariable String serverIp, @PathVariable Long intervalMinute, HttpServletRequest request) {
+        ResponseMap<List<CpuRecordGroupDto>> responseMap = new ResponseMap<>();
+        Integer userId = (Integer) request.getSession().getAttribute(ConstantPool.ComponentCenter.SESSION_USER_ID_KEY);
+        List<CpuRecordGroupDto> cpuRecordGroupDtoList = serverService.getRuntimeCpuRecord(userId, serverIp, intervalMinute);
+        if (cpuRecordGroupDtoList == null || cpuRecordGroupDtoList.isEmpty()) {
+            responseMap.setCode(ConstantPool.Common.REQUEST_FAILURE_CODE);
+            responseMap.setMessage(ConstantPool.Common.REQUEST_FAILURE_MESSAGE);
+        } else {
+            responseMap.setCode(ConstantPool.Common.REQUEST_SUCCESS_CODE);
+            responseMap.setMessage(ConstantPool.Common.REQUEST_SUCCESS_MESSAGE);
+            responseMap.setData(cpuRecordGroupDtoList);
         }
         return responseMap;
     }

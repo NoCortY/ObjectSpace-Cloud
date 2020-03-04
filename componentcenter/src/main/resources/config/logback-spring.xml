@@ -10,7 +10,7 @@
     <!-- 文件保留时间 -->
     <property name="log.maxHistory" value="30" />
     <!-- 日志存储路径 -->
-    <property name="log.filePath" value="AClogs/" />
+    <property name="log.filePath" value="CClogs/"/>
     <!-- 日志的显式格式 -->
     <property name="log.pattern"
               value="%d{yyyy-MM-dd HH:mm:ss} ▎[%thread] ▎%-5level ▎%logger{50} ▎%msg%n"/>

@@ -6,17 +6,19 @@ import cn.objectspace.componentcenter.pojo.dto.daemon.CpuDto;
 import cn.objectspace.componentcenter.pojo.dto.daemon.DiskDto;
 import cn.objectspace.componentcenter.pojo.dto.daemon.NetDto;
 import cn.objectspace.componentcenter.pojo.dto.daemon.ServerInfoDto;
+import cn.objectspace.componentcenter.pojo.dto.record.CpuRecordGroupDto;
 import cn.objectspace.componentcenter.pojo.entity.CloudServer;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
+import java.util.Date;
 import java.util.List;
 
 /**
-* @Description: 组件注册
-* @Author: NoCortY
-* @Date: 2020/1/15
-*/
+ * @Description: 组件注册
+ * @Author: NoCortY
+ * @Date: 2020/1/15
+ */
 @Mapper
 public interface ComponentDao {
     /**
@@ -27,6 +29,7 @@ public interface ComponentDao {
      * @Date: 2020/1/15
      */
     public Integer insertCloudServer(CloudServer cloudServer);
+
     /**
      * @Description: 用户 查询自己名下的所有服务器
      * @Param:
@@ -35,14 +38,15 @@ public interface ComponentDao {
      * @Date: 2020/2/6
      */
     public List<CloudServerDto> queryServerByUserId(@Param("userId") Integer userId, @Param("startItem") Integer startItem, @Param("limit") Integer limit);
+
     /**
      * @Description: 自己名下的服务器个数
      * @Param:
-     * @return: 
+     * @return:
      * @Author: NoCortY
      * @Date: 2020/2/14
      */
-    public Integer queryCountOfServerByUserId(@Param("userId")Integer userId);
+    public Integer queryCountOfServerByUserId(@Param("userId") Integer userId);
 
     /**
      * @Description: 根据用户ID和服务器IP来查询服务器
@@ -97,7 +101,7 @@ public interface ComponentDao {
      * @Author: NoCortY
      * @Date: 2020/2/14
      */
-    public ServerDetailDto queryDetailOfServerByUserIdAndServerIp(@Param("serverIp") String serverIp,@Param("userId") Integer userId);
+    public ServerDetailDto queryDetailOfServerByUserIdAndServerIp(@Param("serverIp") String serverIp, @Param("userId") Integer userId);
 
     /**
      * @Description: 通过用户id查询所有服务器的IP
@@ -129,5 +133,14 @@ public interface ComponentDao {
     public Integer queryServerCount();
 
 
+    /**
+     * @Description: 按照时间段，查询CPU负载记录
+     * @Param:
+     * @return:
+     * @Author: NoCortY
+     * @Date: 2020/3/4
+     */
+    public List<CpuRecordGroupDto> queryCpuRuntimeRecord(@Param("userId") Integer userId, @Param("serverIp") String serverIp,
+                                                         @Param("startTime") Date startTime, @Param("endTime") Date endTime);
 
 }
