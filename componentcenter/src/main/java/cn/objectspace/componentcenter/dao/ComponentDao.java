@@ -7,6 +7,7 @@ import cn.objectspace.componentcenter.pojo.dto.daemon.DiskDto;
 import cn.objectspace.componentcenter.pojo.dto.daemon.NetDto;
 import cn.objectspace.componentcenter.pojo.dto.daemon.ServerInfoDto;
 import cn.objectspace.componentcenter.pojo.dto.record.CpuRecordGroupDto;
+import cn.objectspace.componentcenter.pojo.dto.record.DiskRecordGroupDto;
 import cn.objectspace.componentcenter.pojo.entity.CloudServer;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
@@ -143,4 +144,14 @@ public interface ComponentDao {
     public List<CpuRecordGroupDto> queryCpuRuntimeRecord(@Param("userId") Integer userId, @Param("serverIp") String serverIp,
                                                          @Param("startTime") Date startTime, @Param("endTime") Date endTime);
 
+
+    /**
+     * @Description: 按照时间段，查询硬盘读写记录
+     * @Param:
+     * @return:
+     * @Author: NoCortY
+     * @Date: 2020/3/5
+     */
+    public List<DiskRecordGroupDto> queryDiskRuntimeRecord(@Param("userId") Integer userId, @Param("serverIp") String serverIp,
+                                                           @Param("startTime") Date startTime, @Param("endTime") Date endTime);
 }

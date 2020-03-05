@@ -47,7 +47,7 @@
             <result column="net_mask" property="netMask"/>
         </collection>
     </resultMap>
-    <resultMap id="cpuRecordGroupDto" type="cpuRecordGroupDto">
+    <resultMap id="cpuRecordGroupDto" type="CpuRecordGroupDto">
         <id column="cpu_id" property="cpuId"/>
         <collection property="cpuRecordDtoList" ofType="CpuRecordDto">
             <id column="record_time" property="recordTime"/>
@@ -56,9 +56,19 @@
             <result column="combine" property="combine"/>
         </collection>
     </resultMap>
-
+    <resultMap id="diskRecordGroupDto" type="DiskRecordGroupDto">
+        <id column="disk_name" property="diskName"/>
+        <collection property="diskRecordDtoList" ofType="DiskRecordDto">
+            <id column="record_time" property="recordTime"/>
+            <result column="read_rate" property="readRate"/>
+            <result column="write_rate" property="writeRate"/>
+        </collection>
+    </resultMap>
+    <select id="queryDiskRuntimeRecord" resultMap="diskRecordGroupDto">
+        SELECT disk_name,record_time,read_rate,write_rate FROM cloud_disk_info_now WHERE disk_server_user = #{userId} AND disk_server_ip = #{serverIp} AND record_time BETWEEN #{startTime} AND #{endTime}
+    </select>
     <select id="queryCpuRuntimeRecord" resultMap="cpuRecordGroupDto">
-       select * from cloud_cpu_info_now where record_time between #{startTime} and #{endTime}
+       SELECT cpu_id,record_time,user_used,system_used,combine FROM cloud_cpu_info_now WHERE cpu_server_user=#{userId} AND cpu_server_ip = #{serverIp} AND record_time BETWEEN #{startTime} AND #{endTime}
     </select>
     <select id="queryServerCount" resultType="java.lang.Integer">
         SELECT COUNT(*) as server_count FROM cloud_server
@@ -312,6 +322,8 @@
                     use_percent,
                     read_disk,
                     write_disk,
+        read_rate,
+        write_rate,
                     record_time)
             VALUES
 
@@ -327,6 +339,8 @@
                     #{disk.usePercent},
                     #{disk.readDisk},
                     #{disk.writeDisk},
+            #{disk.readRate},
+            #{disk.writeRate},
                     #{disk.recordTime})
         </foreach>
     </insert>

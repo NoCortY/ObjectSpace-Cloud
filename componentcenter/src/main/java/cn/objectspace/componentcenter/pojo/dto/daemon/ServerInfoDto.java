@@ -58,7 +58,7 @@ public class ServerInfoDto implements Serializable {
     //NetDto
     private List<NetDto> netList;
 
-    @JsonFormat(pattern = "yyyy-MM-dd hh:mm")
+    @JsonFormat(pattern = "yyyy-MM-dd hh:mm", timezone = "GMT+8")
     private Date recordTime;
 
     public Integer getServerUser() {

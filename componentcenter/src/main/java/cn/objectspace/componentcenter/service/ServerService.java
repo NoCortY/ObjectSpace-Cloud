@@ -5,6 +5,7 @@ import cn.objectspace.componentcenter.pojo.dto.ServerDetailDto;
 import cn.objectspace.componentcenter.pojo.dto.ServerResumeDto;
 import cn.objectspace.componentcenter.pojo.dto.daemon.ServerInfoDto;
 import cn.objectspace.componentcenter.pojo.dto.record.CpuRecordGroupDto;
+import cn.objectspace.componentcenter.pojo.dto.record.DiskRecordGroupDto;
 import cn.objectspace.componentcenter.pojo.entity.CloudServer;
 
 import java.util.List;
@@ -86,4 +87,13 @@ public interface ServerService {
      * @Date: 2020/3/4
      */
     public List<CpuRecordGroupDto> getRuntimeCpuRecord(Integer userId, String serverIp, Long intervalMinutes);
+
+    /**
+     * @Description: 查询一段时间内硬盘读写状况
+     * @Param:
+     * @return:
+     * @Author: NoCortY
+     * @Date: 2020/3/5
+     */
+    public List<DiskRecordGroupDto> getRuntimeDiskRecord(Integer userId, String serverIp, Long intervalMinutes);
 }

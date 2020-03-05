@@ -1,5 +1,7 @@
 package cn.objectspace.componentcenter.pojo.dto.record;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+
 import java.io.Serializable;
 import java.util.Date;
 
@@ -13,6 +15,7 @@ public class CpuRecordDto implements Serializable {
     private Double userUsed;
     private Double systemUsed;
     private Double combine;
+    @JsonFormat(pattern = "HH:mm:ss", timezone = "GMT+8")
     private Date recordTime;
 
 

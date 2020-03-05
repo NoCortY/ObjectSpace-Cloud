@@ -14,6 +14,7 @@ import cn.objectspace.componentcenter.pojo.dto.daemon.DiskDto;
 import cn.objectspace.componentcenter.pojo.dto.daemon.NetDto;
 import cn.objectspace.componentcenter.pojo.dto.daemon.ServerInfoDto;
 import cn.objectspace.componentcenter.pojo.dto.record.CpuRecordGroupDto;
+import cn.objectspace.componentcenter.pojo.dto.record.DiskRecordGroupDto;
 import cn.objectspace.componentcenter.pojo.entity.CloudServer;
 import cn.objectspace.componentcenter.service.ServerService;
 import org.apache.commons.lang.StringUtils;
@@ -281,7 +282,7 @@ public class ServerServiceImpl implements ServerService {
      */
     @Override
     public List<CpuRecordGroupDto> getRuntimeCpuRecord(Integer userId, String serverIp, Long intervalMinutes) {
-        if (userId == null || StringUtils.isBlank(serverIp)) {
+        if (userId == null || StringUtils.isBlank(serverIp) || "undefined".equals(serverIp)) {
             logger.info("用户名和服务器IP为必填项");
             return null;
         }
@@ -296,6 +297,25 @@ public class ServerServiceImpl implements ServerService {
             logger.error("异常信息:{}", e.getMessage());
         }
         return cpuRecordGroupDtos;
+    }
+
+    @Override
+    public List<DiskRecordGroupDto> getRuntimeDiskRecord(Integer userId, String serverIp, Long intervalMinutes) {
+        if (userId == null || StringUtils.isBlank(serverIp) || "undefined".equals(serverIp)) {
+            logger.info("用户名和服务器IP为必填项");
+            return null;
+        }
+        Date startTime = new Date(System.currentTimeMillis() - TimeUtil.minuteToMillisecond(intervalMinutes));
+        Date endTime = new Date();
+
+        List<DiskRecordGroupDto> diskRecordGroupDtos = null;
+        try {
+            diskRecordGroupDtos = componentDao.queryDiskRuntimeRecord(userId, serverIp, startTime, endTime);
+        } catch (Exception e) {
+            logger.error("查询硬盘间隔时间运行情况异常");
+            logger.error("异常信息:{}", e.getMessage());
+        }
+        return diskRecordGroupDtos;
     }
 
 }

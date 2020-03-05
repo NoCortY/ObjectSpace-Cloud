@@ -38,7 +38,7 @@ public class NetDto implements Serializable {
     private Long rxDropped;
     //发送丢包数
     private Long txDropped;
-    @JsonFormat(pattern = "yyyy-MM-dd hh:mm")
+    @JsonFormat(pattern = "yyyy-MM-dd hh:mm", timezone = "GMT+8")
     private Date recordTime;
 
     public String getNetServerIp() {
