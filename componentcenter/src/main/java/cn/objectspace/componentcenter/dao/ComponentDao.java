@@ -8,6 +8,7 @@ import cn.objectspace.componentcenter.pojo.dto.daemon.NetDto;
 import cn.objectspace.componentcenter.pojo.dto.daemon.ServerInfoDto;
 import cn.objectspace.componentcenter.pojo.dto.record.CpuRecordGroupDto;
 import cn.objectspace.componentcenter.pojo.dto.record.DiskRecordGroupDto;
+import cn.objectspace.componentcenter.pojo.dto.record.MemRecordDto;
 import cn.objectspace.componentcenter.pojo.entity.CloudServer;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
@@ -154,4 +155,14 @@ public interface ComponentDao {
      */
     public List<DiskRecordGroupDto> queryDiskRuntimeRecord(@Param("userId") Integer userId, @Param("serverIp") String serverIp,
                                                            @Param("startTime") Date startTime, @Param("endTime") Date endTime);
+
+    /**
+     * @Description: 按照时间段 查询内存使用记录
+     * @Param:
+     * @return:
+     * @Author: NoCortY
+     * @Date: 2020/3/6
+     */
+    public List<MemRecordDto> queryMemRuntimeRecord(@Param("userId") Integer userId, @Param("serverIp") String serverIp,
+                                                    @Param("startTime") Date startTime, @Param("endTime") Date endTime);
 }

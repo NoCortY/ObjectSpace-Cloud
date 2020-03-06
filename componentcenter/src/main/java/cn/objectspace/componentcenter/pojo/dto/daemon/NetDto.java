@@ -38,6 +38,10 @@ public class NetDto implements Serializable {
     private Long rxDropped;
     //发送丢包数
     private Long txDropped;
+    //上传速率
+    private Double txRate;
+    //下载速率
+    private Double rxRate;
     @JsonFormat(pattern = "yyyy-MM-dd hh:mm", timezone = "GMT+8")
     private Date recordTime;
 
@@ -153,6 +157,21 @@ public class NetDto implements Serializable {
         this.recordTime = recordTime;
     }
 
+    public Double getTxRate() {
+        return txRate;
+    }
+
+    public void setTxRate(Double txRate) {
+        this.txRate = txRate;
+    }
+
+    public Double getRxRate() {
+        return rxRate;
+    }
+
+    public void setRxRate(Double rxRate) {
+        this.rxRate = rxRate;
+    }
 
     @Override
     public String toString() {

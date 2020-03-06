@@ -12,7 +12,7 @@ import java.util.Date;
  */
 public class DiskRecordDto implements Serializable {
     private static final long serialVersionUID = 8549910409851032858L;
-    @JsonFormat(pattern = "yyyy-MM-dd hh:mm", timezone = "GMT+8")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm", timezone = "GMT+8")
     private Date recordTime;
     private Double readRate;
     private Double writeRate;

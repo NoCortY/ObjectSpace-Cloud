@@ -10,6 +10,7 @@ import cn.objectspace.componentcenter.pojo.dto.ServerResumeDto;
 import cn.objectspace.componentcenter.pojo.dto.daemon.ServerInfoDto;
 import cn.objectspace.componentcenter.pojo.dto.record.CpuRecordGroupDto;
 import cn.objectspace.componentcenter.pojo.dto.record.DiskRecordGroupDto;
+import cn.objectspace.componentcenter.pojo.dto.record.MemRecordDto;
 import cn.objectspace.componentcenter.pojo.entity.CloudServer;
 import cn.objectspace.componentcenter.service.ServerService;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -178,6 +179,23 @@ public class ServerController {
             responseMap.setCode(ConstantPool.Common.REQUEST_SUCCESS_CODE);
             responseMap.setMessage(ConstantPool.Common.REQUEST_SUCCESS_MESSAGE);
             responseMap.setData(diskRecordGroupDtoList);
+        }
+        return responseMap;
+    }
+
+    @SaveLog(applicationId = ConstantPool.ComponentCenter.APPLICATION_ID)
+    @GetMapping("/runtimeMemRecord/{serverIp}/{intervalMinute}")
+    public ResponseMap<List<MemRecordDto>> runtimeMemRecord(@PathVariable String serverIp, @PathVariable Long intervalMinute, HttpServletRequest request) {
+        ResponseMap<List<MemRecordDto>> responseMap = new ResponseMap<>();
+        Integer userId = (Integer) request.getSession().getAttribute(ConstantPool.ComponentCenter.SESSION_USER_ID_KEY);
+        List<MemRecordDto> memRecordDtoList = serverService.getRuntimeMemRecord(userId, serverIp, intervalMinute);
+        if (memRecordDtoList == null || memRecordDtoList.isEmpty()) {
+            responseMap.setCode(ConstantPool.Common.REQUEST_FAILURE_CODE);
+            responseMap.setMessage(ConstantPool.Common.REQUEST_FAILURE_MESSAGE);
+        } else {
+            responseMap.setCode(ConstantPool.Common.REQUEST_SUCCESS_CODE);
+            responseMap.setMessage(ConstantPool.Common.REQUEST_SUCCESS_MESSAGE);
+            responseMap.setData(memRecordDtoList);
         }
         return responseMap;
     }

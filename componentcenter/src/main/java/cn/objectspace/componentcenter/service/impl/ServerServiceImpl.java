@@ -15,6 +15,7 @@ import cn.objectspace.componentcenter.pojo.dto.daemon.NetDto;
 import cn.objectspace.componentcenter.pojo.dto.daemon.ServerInfoDto;
 import cn.objectspace.componentcenter.pojo.dto.record.CpuRecordGroupDto;
 import cn.objectspace.componentcenter.pojo.dto.record.DiskRecordGroupDto;
+import cn.objectspace.componentcenter.pojo.dto.record.MemRecordDto;
 import cn.objectspace.componentcenter.pojo.entity.CloudServer;
 import cn.objectspace.componentcenter.service.ServerService;
 import org.apache.commons.lang.StringUtils;
@@ -221,7 +222,7 @@ public class ServerServiceImpl implements ServerService {
                     continue;
                 }
                 ServerInfoDto serverInfoDto = (ServerInfoDto) SerializeUtil.unSerialize(serverInfoBytes);
-                Double memUsedPercent = serverInfoDto.getMemUsed().doubleValue() / serverInfoDto.getMemTotal().doubleValue();
+                Double memUsedPercent = serverInfoDto.getMemUsedPercent();
                 Double swapUsedPercent = serverInfoDto.getSwapUsedPercent();
                 double cpuUsedTotal = 0;
                 //CPU
@@ -316,6 +317,25 @@ public class ServerServiceImpl implements ServerService {
             logger.error("异常信息:{}", e.getMessage());
         }
         return diskRecordGroupDtos;
+    }
+
+    @Override
+    public List<MemRecordDto> getRuntimeMemRecord(Integer userId, String serverIp, Long intervalMinutes) {
+        if (userId == null || StringUtils.isBlank(serverIp) || "undefined".equals(serverIp)) {
+            logger.info("用户名和服务器IP为必填项");
+            return null;
+        }
+        Date startTime = new Date(System.currentTimeMillis() - TimeUtil.minuteToMillisecond(intervalMinutes));
+        Date endTime = new Date();
+
+        List<MemRecordDto> memRecordDtos = null;
+        try {
+            memRecordDtos = componentDao.queryMemRuntimeRecord(userId, serverIp, startTime, endTime);
+        } catch (Exception e) {
+            logger.error("查询硬盘间隔时间运行情况异常");
+            logger.error("异常信息:{}", e.getMessage());
+        }
+        return memRecordDtos;
     }
 
 }

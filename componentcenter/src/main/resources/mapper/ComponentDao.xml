@@ -64,6 +64,9 @@
             <result column="write_rate" property="writeRate"/>
         </collection>
     </resultMap>
+    <select id="queryMemRuntimeRecord" resultType="MemRecordDto">
+        SELECT record_time,mem_used_percent,swap_used_percent FROM cloud_server_info_now WHERE server_user = #{userId} AND ip = #{serverIp} AND record_time BETWEEN #{startTime} AND #{endTime}
+    </select>
     <select id="queryDiskRuntimeRecord" resultMap="diskRecordGroupDto">
         SELECT disk_name,record_time,read_rate,write_rate FROM cloud_disk_info_now WHERE disk_server_user = #{userId} AND disk_server_ip = #{serverIp} AND record_time BETWEEN #{startTime} AND #{endTime}
     </select>
@@ -218,6 +221,9 @@
             <if test="memFree!=null">
                 mem_free,
             </if>
+            <if test="memUsedPercent!=null">
+                mem_used_percent,
+            </if>
             <if test="swapTotal!=null">
                 swap_total,
             </if>
@@ -262,6 +268,9 @@
             </if>
             <if test="memFree!=null">
                 #{memFree},
+            </if>
+            <if test="memUsedPercent!=null">
+                #{memUsedPercent},
             </if>
             <if test="swapTotal!=null">
                 #{swapTotal},
@@ -359,6 +368,8 @@
                     tx_errors,
                     rx_dropped,
                     tx_dropped,
+        rx_rate,
+        tx_rate,
                     record_time)
             VALUES
 
@@ -377,6 +388,8 @@
             #{net.txErrors},
             #{net.rxDropped},
             #{net.txDropped},
+            #{net.rxRate},
+            #{net.txRate},
             #{net.recordTime}
             )
         </foreach>
