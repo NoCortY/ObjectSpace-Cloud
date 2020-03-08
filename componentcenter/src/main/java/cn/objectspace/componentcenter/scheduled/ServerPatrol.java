@@ -62,7 +62,7 @@ public class ServerPatrol {
             //如果取出来的为空，那么说明有可能redis宕机了，为了保险起见，去数据库查。
             serverInfoDtos = componentDao.queryRegisteredServer();
             for (CloudServer s : serverInfoDtos) {
-                String key = s.getServerIp() + ":" + s.getServerUser();
+                String key = s.getServerUser() + ":" + s.getServerIp();
                 byte[] bytes = redisUtil.get(SerializeUtil.serialize(key));
                 if (bytes == null || bytes.length <= 0) {
                     //说明已经离线了
@@ -111,6 +111,31 @@ public class ServerPatrol {
                     logger.error("定时发送异常");
                     logger.error("异常信息:{}", e.getMessage());
                 }
+            }
+        }
+    }
+
+    /**
+     * @Description: 维护服务器在线时间 60秒一次
+     * @Param: []
+     * @return: void
+     * @Author: NoCortY
+     * @Date: 2020/3/7
+     */
+    @Async
+    @Scheduled(fixedRate = 60000)
+    public void maintenanceServerTimeKeeping() {
+        logger.info("维护服务器在线时间:" + new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()));
+        Set<String> serverUsers = redisUtil.hkeys(ConstantPool.ComponentCenter.MONITOR_SERVER_MAP);
+        for (String serverUser : serverUsers) {
+            List<String> serverStatus = redisUtil.hmget(ConstantPool.ComponentCenter.MONITOR_SERVER_MAP, serverUser);
+            if (!serverStatus.contains(null) && ConstantPool.ComponentCenter.SERVER_ONLINE.equals(serverStatus.get(0))) {
+                //如果在线
+                //那么维护该服务器在线时间
+                redisUtil.incr(ConstantPool.ComponentCenter.SERVER_TIME_KEEPING_KEY + serverUser);
+            } else if (!serverStatus.contains(null) && ConstantPool.ComponentCenter.SERVER_OFFLINE.equals(serverStatus.get(0))) {
+                //如果不在线，那么直接从缓存中删除这个key
+                redisUtil.del(ConstantPool.ComponentCenter.SERVER_TIME_KEEPING_KEY + serverUser);
             }
         }
     }

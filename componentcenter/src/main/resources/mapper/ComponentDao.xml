@@ -64,6 +64,17 @@
             <result column="write_rate" property="writeRate"/>
         </collection>
     </resultMap>
+    <resultMap id="netRecordGroupDto" type="NetRecordGroupDto">
+        <id column="net_name" property="netName"/>
+        <collection property="netRecordDtoList" ofType="NetRecordDto">
+            <id column="record_time" property="recordTime"/>
+            <result column="rx_rate" property="rxRate"/>
+            <result column="tx_rate" property="txRate"/>
+        </collection>
+    </resultMap>
+    <select id="queryNetRuntimeRecord" resultMap="netRecordGroupDto">
+        SELECT record_time,net_name,rx_rate,tx_rate FROM cloud_net_info_now WHERE net_server_user = ${userId} AND net_server_ip = #{serverIp} AND record_time BETWEEN #{startTime} AND #{endTime}
+    </select>
     <select id="queryMemRuntimeRecord" resultType="MemRecordDto">
         SELECT record_time,mem_used_percent,swap_used_percent FROM cloud_server_info_now WHERE server_user = #{userId} AND ip = #{serverIp} AND record_time BETWEEN #{startTime} AND #{endTime}
     </select>
@@ -187,7 +198,7 @@
                                      ON c.cpu_server_ip = d.disk_server_ip and c.cpu_server_user = d.disk_server_user and c.record_time = d.record_time
                                      LEFT JOIN cloud_net_info_now net
                                      ON d.disk_server_ip = net.net_server_ip and d.disk_server_user = net.net_server_user and d.record_time = net.record_time,
-                                     (select (max(record_time)) as max_record_time from cloud_server_info_now) mt
+                                     (select (max(record_time)) as max_record_time from cloud_server_info_now cs where cs.server_user=#{userId} and cs.ip=#{serverIp}) mt
         WHERE s.ip = #{serverIp} and s.record_time = mt.max_record_time and s.server_user = #{userId};
 
     </select>

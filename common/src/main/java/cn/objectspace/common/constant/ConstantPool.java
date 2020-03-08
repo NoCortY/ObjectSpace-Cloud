@@ -202,6 +202,20 @@ public class ConstantPool {
          * ComponentCenter保存用户Id的key
          */
         public static final String SESSION_USER_ID_KEY = "CCUserId";
+        /**
+         * 服务器在线时长Map
+         */
+        public static final String SERVER_TIME_KEEPING_KEY = "server_time_keeping:";
+
+        /**
+         * webssh 连接操作
+         */
+        public static final String WEBSSH_OPERATE_CONNECT = "connect";
+
+        /**
+         * webssh 发送指令操作
+         */
+        public static final String WEBSSH_OPERATE_COMMAND = "command";
 
         /**
          * WebSocket用户

@@ -7,6 +7,7 @@ import cn.objectspace.componentcenter.pojo.dto.daemon.ServerInfoDto;
 import cn.objectspace.componentcenter.pojo.dto.record.CpuRecordGroupDto;
 import cn.objectspace.componentcenter.pojo.dto.record.DiskRecordGroupDto;
 import cn.objectspace.componentcenter.pojo.dto.record.MemRecordDto;
+import cn.objectspace.componentcenter.pojo.dto.record.NetRecordGroupDto;
 import cn.objectspace.componentcenter.pojo.entity.CloudServer;
 
 import java.util.List;
@@ -106,4 +107,13 @@ public interface ServerService {
      * @Date: 2020/3/6
      */
     public List<MemRecordDto> getRuntimeMemRecord(Integer userId, String serverIp, Long intervalMinutes);
+
+    /**
+     * @Description: 查询一段时间内的网卡使用情况
+     * @Param:
+     * @return:
+     * @Author: NoCortY
+     * @Date: 2020/3/7
+     */
+    public List<NetRecordGroupDto> getRuntimeNetRecord(Integer userId, String serverIp, Long intervalMinutes);
 }

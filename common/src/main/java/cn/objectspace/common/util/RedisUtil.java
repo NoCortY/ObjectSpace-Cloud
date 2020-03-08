@@ -28,6 +28,21 @@ public class RedisUtil{
         this.jedisPool = jedisPool;
     }
 
+    public Long incr(String key) {
+        Jedis jedis = null;
+        try {
+            jedis = jedisPool.getResource();
+            return jedis.incr(key);
+        } catch (Exception e) {
+            logger.error("redis incr执行异常");
+            logger.error("一场信息:{}", e.getMessage());
+            return null;
+        } finally {
+            if (jedis != null)
+                jedis.close();
+        }
+    }
+
     /**
      * @Description: redis设置分布式锁
      * @Param: [key, value]

@@ -2,6 +2,7 @@ package cn.objectspace.componentcenter.config;
 
 
 import cn.objectspace.componentcenter.controller.websocket.ServerResumeWebSocketHandler;
+import cn.objectspace.componentcenter.controller.websocket.WebSSHWebSocketHandler;
 import cn.objectspace.componentcenter.filter.WebSocketInterceptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
@@ -24,6 +25,8 @@ public class WebSocketConfig implements WebSocketConfigurer {
     }*/
     @Autowired
     ServerResumeWebSocketHandler serverResumeWebSocketHandler;
+    @Autowired
+    WebSSHWebSocketHandler webSSHWebSocketHandler;
     @Override
     public void registerWebSocketHandlers(WebSocketHandlerRegistry webSocketHandlerRegistry) {
         //socket通道
@@ -32,6 +35,9 @@ public class WebSocketConfig implements WebSocketConfigurer {
                 //自定义拦截器
                 .addInterceptors(new WebSocketInterceptor())
                 //允许跨域
+                .setAllowedOrigins("*");
+        webSocketHandlerRegistry.addHandler(webSSHWebSocketHandler, "webSSHWS")
+                .addInterceptors(new WebSocketInterceptor())
                 .setAllowedOrigins("*");
         // sockJs通道
         webSocketHandlerRegistry.addHandler(serverResumeWebSocketHandler, "/serverGeneralSJ")

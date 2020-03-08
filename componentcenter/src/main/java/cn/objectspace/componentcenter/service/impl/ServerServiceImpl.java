@@ -16,6 +16,7 @@ import cn.objectspace.componentcenter.pojo.dto.daemon.ServerInfoDto;
 import cn.objectspace.componentcenter.pojo.dto.record.CpuRecordGroupDto;
 import cn.objectspace.componentcenter.pojo.dto.record.DiskRecordGroupDto;
 import cn.objectspace.componentcenter.pojo.dto.record.MemRecordDto;
+import cn.objectspace.componentcenter.pojo.dto.record.NetRecordGroupDto;
 import cn.objectspace.componentcenter.pojo.entity.CloudServer;
 import cn.objectspace.componentcenter.service.ServerService;
 import org.apache.commons.lang.StringUtils;
@@ -36,7 +37,7 @@ public class ServerServiceImpl implements ServerService {
     ComponentDao componentDao;
     @Autowired
     RedisUtil redisUtil;
-    Logger logger = LoggerFactory.getLogger(ServerServiceImpl.class);
+    private Logger logger = LoggerFactory.getLogger(ServerServiceImpl.class);
     @Override
     public boolean registerServer(CloudServer cloudServer) {
         if(cloudServer==null||cloudServer.getServerIp()==null||cloudServer.getServerIp().length()==0) return false;
@@ -336,6 +337,32 @@ public class ServerServiceImpl implements ServerService {
             logger.error("异常信息:{}", e.getMessage());
         }
         return memRecordDtos;
+    }
+
+    /**
+     * @Description: 查询网卡运行时记录
+     * @Param: [userId, serverIp, intervalMinutes]
+     * @return: java.util.List<cn.objectspace.componentcenter.pojo.dto.record.NetRecordGroupDto>
+     * @Author: NoCortY
+     * @Date: 2020/3/7
+     */
+    @Override
+    public List<NetRecordGroupDto> getRuntimeNetRecord(Integer userId, String serverIp, Long intervalMinutes) {
+        if (userId == null || StringUtils.isBlank(serverIp) || "undefined".equals(serverIp)) {
+            logger.info("用户名和服务器IP为必填项");
+            return null;
+        }
+        Date startTime = new Date(System.currentTimeMillis() - TimeUtil.minuteToMillisecond(intervalMinutes));
+        Date endTime = new Date();
+
+        List<NetRecordGroupDto> netRecordGroupDtos = null;
+        try {
+            netRecordGroupDtos = componentDao.queryNetRuntimeRecord(userId, serverIp, startTime, endTime);
+        } catch (Exception e) {
+            logger.error("查询硬盘间隔时间运行情况异常");
+            logger.error("异常信息:{}", e.getMessage());
+        }
+        return netRecordGroupDtos;
     }
 
 }
