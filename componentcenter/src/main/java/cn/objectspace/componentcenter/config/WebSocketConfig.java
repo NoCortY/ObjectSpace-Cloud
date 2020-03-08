@@ -36,7 +36,7 @@ public class WebSocketConfig implements WebSocketConfigurer {
                 .addInterceptors(new WebSocketInterceptor())
                 //允许跨域
                 .setAllowedOrigins("*");
-        webSocketHandlerRegistry.addHandler(webSSHWebSocketHandler, "webSSHWS")
+        webSocketHandlerRegistry.addHandler(webSSHWebSocketHandler, "/webSSHWS")
                 .addInterceptors(new WebSocketInterceptor())
                 .setAllowedOrigins("*");
         // sockJs通道

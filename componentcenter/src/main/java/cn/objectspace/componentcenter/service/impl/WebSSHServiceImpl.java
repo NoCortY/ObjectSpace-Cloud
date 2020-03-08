@@ -165,13 +165,15 @@ public class WebSSHServiceImpl implements WebSSHService {
             //循环读取
             byte[] buffer = new byte[1024];
             int i = 0;
+            //如果没有数据来，线程会一直阻塞在这个地方等待数据。
             while ((i = inputStream.read(buffer)) != -1) {
                 sendMessage(webSocketSession, Arrays.copyOfRange(buffer, 0, i));
             }
 
         } finally {
-            //关闭会话
+            //断开连接后关闭会话
             session.disconnect();
+            channel.disconnect();
             if (inputStream != null) {
                 inputStream.close();
             }
