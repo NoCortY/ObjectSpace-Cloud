@@ -1,5 +1,7 @@
 package cn.objectspace.componentcenter.service;
 
+import cn.objectspace.common.pojo.entity.ResponseMap;
+import cn.objectspace.componentcenter.pojo.ServerSSHDto;
 import cn.objectspace.componentcenter.pojo.dto.CloudServerDto;
 import cn.objectspace.componentcenter.pojo.dto.ServerDetailDto;
 import cn.objectspace.componentcenter.pojo.dto.ServerResumeDto;
@@ -116,4 +118,11 @@ public interface ServerService {
      * @Date: 2020/3/7
      */
     public List<NetRecordGroupDto> getRuntimeNetRecord(Integer userId, String serverIp, Long intervalMinutes);
+
+    /**
+     * @Description: 获取SSH连接列表
+     * @Author: NoCortY
+     * @Date: 2020/3/9
+     */
+    public ResponseMap<List<ServerSSHDto>> getServerSSHList(Integer userId, Integer page, Integer limit);
 }

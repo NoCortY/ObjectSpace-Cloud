@@ -64,7 +64,7 @@
             <result column="write_rate" property="writeRate"/>
         </collection>
     </resultMap>
-    <resultMap id="netRecordGroupDto" type="NetRecordGroupDto">
+    <resultMap id="NetRecordGroupDto" type="NetRecordGroupDto">
         <id column="net_name" property="netName"/>
         <collection property="netRecordDtoList" ofType="NetRecordDto">
             <id column="record_time" property="recordTime"/>
@@ -72,7 +72,13 @@
             <result column="tx_rate" property="txRate"/>
         </collection>
     </resultMap>
-    <select id="queryNetRuntimeRecord" resultMap="netRecordGroupDto">
+    <select id="queryCountLinuxServerSSHByUserId" resultType="java.lang.Integer">
+        SELECT COUNT(server_ip) FROM cloud_server WHERE server_user =#{userId} and server_os_type = 'Linux';
+    </select>
+    <select id="queryLinuxServerSSHByUserId" resultType="ServerSSHDto">
+        SELECT server_ip,server_os_type,server_os_version,server_desc FROM cloud_server WHERE server_user = #{userId} and server_os_type='Linux' limit #{startItem},#{limit};
+    </select>
+    <select id="queryNetRuntimeRecord" resultMap="NetRecordGroupDto">
         SELECT record_time,net_name,rx_rate,tx_rate FROM cloud_net_info_now WHERE net_server_user = ${userId} AND net_server_ip = #{serverIp} AND record_time BETWEEN #{startTime} AND #{endTime}
     </select>
     <select id="queryMemRuntimeRecord" resultType="MemRecordDto">

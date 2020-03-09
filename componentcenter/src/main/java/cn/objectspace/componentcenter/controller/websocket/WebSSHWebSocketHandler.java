@@ -43,7 +43,7 @@ public class WebSSHWebSocketHandler implements WebSocketHandler {
     @Override
     public void handleMessage(WebSocketSession webSocketSession, WebSocketMessage<?> webSocketMessage) throws Exception {
         if (webSocketMessage instanceof TextMessage) {
-            logger.info("用户:{},发送命令:{}", webSocketSession.getAttributes().get(ConstantPool.ComponentCenter.SESSION_USER_ID_KEY), webSocketMessage.toString());
+            //logger.info("用户:{},发送命令:{}", webSocketSession.getAttributes().get(ConstantPool.ComponentCenter.SESSION_USER_ID_KEY), webSocketMessage.toString());
             webSSHService.recvHandle(((TextMessage) webSocketMessage).getPayload(), webSocketSession);
         } else if (webSocketMessage instanceof BinaryMessage) {
 

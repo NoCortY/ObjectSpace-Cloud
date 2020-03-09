@@ -1,6 +1,8 @@
 package cn.objectspace.componentcenter.service.impl;
 
 import cn.objectspace.common.constant.ConstantPool;
+import cn.objectspace.common.pojo.entity.ResponseMap;
+import cn.objectspace.common.util.Base64Util;
 import cn.objectspace.componentcenter.pojo.dto.WebSSHDataDto;
 import cn.objectspace.componentcenter.pojo.entity.CloudSSH;
 import cn.objectspace.componentcenter.service.WebSSHService;
@@ -89,6 +91,17 @@ public class WebSSHServiceImpl implements WebSSHService {
                     } catch (JSchException | IOException e) {
                         logger.error("webssh连接异常");
                         logger.error("异常信息:{}", e.getMessage());
+                        //构造一个用户名或密码不正确的JSON
+                        ResponseMap<String> responseMap = new ResponseMap<>();
+                        responseMap.setCode(ConstantPool.Common.REQUEST_FAILURE_CODE);
+                        responseMap.setMessage("用户名或密码错误");
+                        try {
+                            String resJson = new ObjectMapper().writeValueAsString(responseMap);
+                            session.sendMessage(new TextMessage(resJson));
+                        } catch (IOException ex) {
+                            logger.error("返回用户名密码错误异常");
+                            logger.error("异常信息:{}", ex.getMessage());
+                        }
                         close(session);
                     }
                 }
@@ -113,7 +126,7 @@ public class WebSSHServiceImpl implements WebSSHService {
 
     @Override
     public void sendMessage(WebSocketSession session, byte[] buffer) throws IOException {
-        session.sendMessage(new TextMessage(buffer));
+        session.sendMessage(new TextMessage(Base64Util.encode(buffer)));
     }
 
     @Override

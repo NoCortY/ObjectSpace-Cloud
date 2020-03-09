@@ -1,11 +1,13 @@
 package cn.objectspace.componentcenter.service.impl;
 
 import cn.objectspace.common.constant.ConstantPool;
+import cn.objectspace.common.pojo.entity.ResponseMap;
 import cn.objectspace.common.util.PageUtil;
 import cn.objectspace.common.util.RedisUtil;
 import cn.objectspace.common.util.SerializeUtil;
 import cn.objectspace.common.util.TimeUtil;
 import cn.objectspace.componentcenter.dao.ComponentDao;
+import cn.objectspace.componentcenter.pojo.ServerSSHDto;
 import cn.objectspace.componentcenter.pojo.dto.CloudServerDto;
 import cn.objectspace.componentcenter.pojo.dto.ServerDetailDto;
 import cn.objectspace.componentcenter.pojo.dto.ServerResumeDto;
@@ -363,6 +365,47 @@ public class ServerServiceImpl implements ServerService {
             logger.error("异常信息:{}", e.getMessage());
         }
         return netRecordGroupDtos;
+    }
+
+    /**
+     * @Description: 获取SSH连接列表
+     * @Param: [userId]
+     * @return: java.util.List<cn.objectspace.componentcenter.pojo.ServerSSHDto>
+     * @Author: NoCortY
+     * @Date: 2020/3/9
+     */
+    @Override
+    public ResponseMap<List<ServerSSHDto>> getServerSSHList(Integer userId, Integer page, Integer limit) {
+        if (userId == null) {
+            logger.info("用户id为必填项");
+            return null;
+        }
+        Integer startItem = PageUtil.getRowIndex(page, limit);
+        ResponseMap<List<ServerSSHDto>> responseMap = new ResponseMap<>();
+        List<ServerSSHDto> serverSSHDtos = null;
+        try {
+            serverSSHDtos = componentDao.queryLinuxServerSSHByUserId(userId, startItem, limit);
+            if (serverSSHDtos != null) {
+                for (ServerSSHDto serverSSH : serverSSHDtos) {
+                    //这里有可能get出来的是空，由于Redis有可能宕机
+                    //但是暂做标记，测试后处理
+                    List<String> status = redisUtil.hmget(ConstantPool.ComponentCenter.MONITOR_SERVER_MAP, userId + ":" + serverSSH.getServerIp());
+                    if (ConstantPool.ComponentCenter.SERVER_ONLINE.equals(status.get(0))) {
+                        serverSSH.setServerStatus("在线");
+                    } else {
+                        serverSSH.setServerStatus("离线");
+                    }
+                }
+            }
+            responseMap.setData(serverSSHDtos);
+            responseMap.setCount(componentDao.queryCountLinuxServerSSHByUserId(userId));
+        } catch (Exception e) {
+            logger.error("获取服务器SSH列表异常");
+            logger.error("异常信息:" + e.getMessage());
+            return null;
+        }
+
+        return responseMap;
     }
 
 }

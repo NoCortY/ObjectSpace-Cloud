@@ -10,6 +10,9 @@ public class CloudServer implements Serializable {
     private String serverOsVersion;
     private Boolean isMonitor;
     private Integer serverUser;
+    private String sshUser;
+    private String sshPassword;
+    private String sshPort;
 
     public String getServerIp() {
         return serverIp;
@@ -57,6 +60,30 @@ public class CloudServer implements Serializable {
 
     public void setServerUser(Integer serverUser) {
         this.serverUser = serverUser;
+    }
+
+    public String getSshUser() {
+        return sshUser;
+    }
+
+    public void setSshUser(String sshUser) {
+        this.sshUser = sshUser;
+    }
+
+    public String getSshPassword() {
+        return sshPassword;
+    }
+
+    public void setSshPassword(String sshPassword) {
+        this.sshPassword = sshPassword;
+    }
+
+    public String getSshPort() {
+        return sshPort;
+    }
+
+    public void setSshPort(String sshPort) {
+        this.sshPort = sshPort;
     }
 
     @Override

@@ -1,5 +1,6 @@
 package cn.objectspace.componentcenter.dao;
 
+import cn.objectspace.componentcenter.pojo.ServerSSHDto;
 import cn.objectspace.componentcenter.pojo.dto.CloudServerDto;
 import cn.objectspace.componentcenter.pojo.dto.ServerDetailDto;
 import cn.objectspace.componentcenter.pojo.dto.daemon.CpuDto;
@@ -177,4 +178,22 @@ public interface ComponentDao {
      */
     public List<NetRecordGroupDto> queryNetRuntimeRecord(@Param("userId") Integer userId, @Param("serverIp") String serverIp,
                                                          @Param("startTime") Date startTime, @Param("endTime") Date endTime);
+
+    /**
+     * @Description: 查询linux终端SSH连接信息
+     * @Param:
+     * @return:
+     * @Author: NoCortY
+     * @Date: 2020/3/9
+     */
+    public List<ServerSSHDto> queryLinuxServerSSHByUserId(@Param("userId") Integer userId, @Param("startItem") Integer startItem, @Param("limit") Integer limit);
+
+    /**
+     * @Description: 查询linux终端SSH连接信息的数量
+     * @Param:
+     * @return:
+     * @Author: NoCortY
+     * @Date: 2020/3/9
+     */
+    public Integer queryCountLinuxServerSSHByUserId(@Param("userId") Integer userId);
 }
