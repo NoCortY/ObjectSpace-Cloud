@@ -4,10 +4,10 @@ import cn.objectspace.common.annotation.SaveLog;
 import cn.objectspace.common.constant.ConstantPool;
 import cn.objectspace.common.pojo.entity.ResponseMap;
 import cn.objectspace.common.util.HttpRequestUtil;
-import cn.objectspace.componentcenter.pojo.ServerSSHDto;
 import cn.objectspace.componentcenter.pojo.dto.CloudServerDto;
 import cn.objectspace.componentcenter.pojo.dto.ServerDetailDto;
 import cn.objectspace.componentcenter.pojo.dto.ServerResumeDto;
+import cn.objectspace.componentcenter.pojo.dto.ServerSSHDto;
 import cn.objectspace.componentcenter.pojo.dto.daemon.ServerInfoDto;
 import cn.objectspace.componentcenter.pojo.dto.record.CpuRecordGroupDto;
 import cn.objectspace.componentcenter.pojo.dto.record.DiskRecordGroupDto;
@@ -231,6 +231,23 @@ public class ServerController {
         } else {
             responseMap.setCode(ConstantPool.Common.REQUEST_SUCCESS_CODE);
             responseMap.setMessage(ConstantPool.Common.REQUEST_SUCCESS_MESSAGE);
+        }
+        return responseMap;
+    }
+
+    @SaveLog(applicationId = ConstantPool.ComponentCenter.APPLICATION_ID)
+    @PostMapping("/sshInfoUpdate")
+    public ResponseMap<Integer> sshInfoUpdate(@RequestBody CloudServer cloudServer, HttpServletRequest request) {
+        ResponseMap<Integer> responseMap = new ResponseMap<>();
+        cloudServer.setServerUser((Integer) request.getSession().getAttribute(ConstantPool.ComponentCenter.SESSION_USER_ID_KEY));
+        Integer effectiveNum = serverService.renewServerSSHInfo(cloudServer);
+        if (effectiveNum == null) {
+            responseMap.setCode(ConstantPool.Common.REQUEST_FAILURE_CODE);
+            responseMap.setMessage(ConstantPool.Common.REQUEST_FAILURE_MESSAGE);
+        } else {
+            responseMap.setCode(ConstantPool.Common.REQUEST_SUCCESS_CODE);
+            responseMap.setMessage(ConstantPool.Common.REQUEST_SUCCESS_MESSAGE);
+            responseMap.setData(effectiveNum);
         }
         return responseMap;
     }

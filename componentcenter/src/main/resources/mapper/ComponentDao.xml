@@ -72,11 +72,31 @@
             <result column="tx_rate" property="txRate"/>
         </collection>
     </resultMap>
+
+    <select id="queryServerSSHInfoByUserIdAndServerIp" resultType="ServerSSHInfoDto">
+        SELECT ssh_user,ssh_password,ssh_port FROM cloud_server WHERE server_ip = #{serverIp} and server_user =#{userId}
+    </select>
+    <update id="updateSSHInfo" parameterType="CloudServer">
+        UPDATE
+        cloud_server
+        SET
+        <trim suffixOverrides=",">
+            ssh_user = #{sshUser},
+            ssh_password = #{sshPassword},
+            ssh_port = #{sshPort},
+            <if test="serverDesc!=null and serverDesc!=''">
+                server_desc=#{serverDesc}
+            </if>
+        </trim>
+        <where>
+            server_ip = #{serverIp} and server_user = #{serverUser}
+        </where>
+    </update>
     <select id="queryCountLinuxServerSSHByUserId" resultType="java.lang.Integer">
         SELECT COUNT(server_ip) FROM cloud_server WHERE server_user =#{userId} and server_os_type = 'Linux';
     </select>
     <select id="queryLinuxServerSSHByUserId" resultType="ServerSSHDto">
-        SELECT server_ip,server_os_type,server_os_version,server_desc FROM cloud_server WHERE server_user = #{userId} and server_os_type='Linux' limit #{startItem},#{limit};
+            SELECT server_ip,server_os_type,server_os_version,server_desc FROM cloud_server WHERE server_user = #{userId} and server_os_type='Linux' limit #{startItem},#{limit};
     </select>
     <select id="queryNetRuntimeRecord" resultMap="NetRecordGroupDto">
         SELECT record_time,net_name,rx_rate,tx_rate FROM cloud_net_info_now WHERE net_server_user = ${userId} AND net_server_ip = #{serverIp} AND record_time BETWEEN #{startTime} AND #{endTime}

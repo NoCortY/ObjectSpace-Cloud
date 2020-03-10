@@ -3,6 +3,8 @@ package cn.objectspace.componentcenter.service.impl;
 import cn.objectspace.common.constant.ConstantPool;
 import cn.objectspace.common.pojo.entity.ResponseMap;
 import cn.objectspace.common.util.Base64Util;
+import cn.objectspace.componentcenter.dao.ComponentDao;
+import cn.objectspace.componentcenter.pojo.dto.ServerSSHInfoDto;
 import cn.objectspace.componentcenter.pojo.dto.WebSSHDataDto;
 import cn.objectspace.componentcenter.pojo.entity.CloudSSH;
 import cn.objectspace.componentcenter.service.WebSSHService;
@@ -13,6 +15,7 @@ import com.jcraft.jsch.JSchException;
 import com.jcraft.jsch.Session;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
@@ -40,6 +43,9 @@ public class WebSSHServiceImpl implements WebSSHService {
     private Logger logger = LoggerFactory.getLogger(WebSSHServiceImpl.class);
     //线程池
     private ExecutorService executorService = Executors.newCachedThreadPool();
+
+    @Autowired
+    private ComponentDao componentDao;
 
     /**
      * @Description: 初始化连接
@@ -77,8 +83,30 @@ public class WebSSHServiceImpl implements WebSSHService {
             logger.error("异常信息:{}", e.getMessage());
             return;
         }
+        //获取userid
         String userId = String.valueOf(session.getAttributes().get(ConstantPool.ComponentCenter.SESSION_USER_ID_KEY));
         if (ConstantPool.ComponentCenter.WEBSSH_OPERATE_CONNECT.equals(webSSHData.getOperate())) {
+            //从数据库中获取该服务器的账号密码
+            ServerSSHInfoDto serverSSHInfoDto = componentDao.queryServerSSHInfoByUserIdAndServerIp(Integer.valueOf(userId), webSSHData.getHost());
+            if (serverSSHInfoDto == null) {
+                logger.info("服务器:{}没有注册", webSSHData.getHost());
+                //构造一个用户名或密码不正确的JSON
+            /*ResponseMap<String> responseMap = new ResponseMap<>();
+            responseMap.setCode(ConstantPool.Common.REQUEST_FAILURE_CODE);
+            responseMap.setMessage("请先设置用户名密码");
+            try {
+                String resJson = new ObjectMapper().writeValueAsString(responseMap);
+                session.sendMessage(new TextMessage(resJson));
+            } catch (IOException ex) {
+                logger.error("返回用户名密码错误异常");
+                logger.error("异常信息:{}", ex.getMessage());
+            }*/
+                return;
+            }
+            //set获取到的密码
+            webSSHData.setUsername(serverSSHInfoDto.getSshUser());
+            webSSHData.setPassword(serverSSHInfoDto.getSshPassword());
+            webSSHData.setPort(Integer.valueOf(serverSSHInfoDto.getSshPort()));
             //找到ssh连接对象
             CloudSSH cloudSSH = (CloudSSH) sshMap.get(userId);
             //启动线程异步处理
@@ -94,7 +122,7 @@ public class WebSSHServiceImpl implements WebSSHService {
                         //构造一个用户名或密码不正确的JSON
                         ResponseMap<String> responseMap = new ResponseMap<>();
                         responseMap.setCode(ConstantPool.Common.REQUEST_FAILURE_CODE);
-                        responseMap.setMessage("用户名或密码错误");
+                        responseMap.setMessage("连接异常，用户名或密码错误");
                         try {
                             String resJson = new ObjectMapper().writeValueAsString(responseMap);
                             session.sendMessage(new TextMessage(resJson));

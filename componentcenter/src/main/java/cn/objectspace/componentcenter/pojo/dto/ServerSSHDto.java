@@ -1,4 +1,4 @@
-package cn.objectspace.componentcenter.pojo;
+package cn.objectspace.componentcenter.pojo.dto;
 
 import java.io.Serializable;
 
@@ -13,6 +13,7 @@ public class ServerSSHDto implements Serializable {
     private String serverOsType;
     private String serverOsVersion;
     private String serverStatus;
+    private String serverDesc;
 
     public String getServerIp() {
         return serverIp;
@@ -44,6 +45,14 @@ public class ServerSSHDto implements Serializable {
 
     public void setServerStatus(String serverStatus) {
         this.serverStatus = serverStatus;
+    }
+
+    public String getServerDesc() {
+        return serverDesc;
+    }
+
+    public void setServerDesc(String serverDesc) {
+        this.serverDesc = serverDesc;
     }
 
     @Override

@@ -36,7 +36,9 @@ public class WebSSHDataDto {
     }
 
     public void setPort(Integer port) {
-        this.port = port;
+        if (port != null) {
+            this.port = port;
+        }
     }
 
     public String getUsername() {

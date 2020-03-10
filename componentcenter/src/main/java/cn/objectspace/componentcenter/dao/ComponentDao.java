@@ -1,8 +1,9 @@
 package cn.objectspace.componentcenter.dao;
 
-import cn.objectspace.componentcenter.pojo.ServerSSHDto;
 import cn.objectspace.componentcenter.pojo.dto.CloudServerDto;
 import cn.objectspace.componentcenter.pojo.dto.ServerDetailDto;
+import cn.objectspace.componentcenter.pojo.dto.ServerSSHDto;
+import cn.objectspace.componentcenter.pojo.dto.ServerSSHInfoDto;
 import cn.objectspace.componentcenter.pojo.dto.daemon.CpuDto;
 import cn.objectspace.componentcenter.pojo.dto.daemon.DiskDto;
 import cn.objectspace.componentcenter.pojo.dto.daemon.NetDto;
@@ -196,4 +197,22 @@ public interface ComponentDao {
      * @Date: 2020/3/9
      */
     public Integer queryCountLinuxServerSSHByUserId(@Param("userId") Integer userId);
+
+    /**
+     * @Description: 更新服务器SSH有关信息
+     * @Param:
+     * @return:
+     * @Author: NoCortY
+     * @Date: 2020/3/10
+     */
+    public Integer updateSSHInfo(CloudServer cloudServer);
+
+    /**
+     * @Description: 查询服务器连接所需的SSH信息
+     * @Param:
+     * @return:
+     * @Author: NoCortY
+     * @Date: 2020/3/10
+     */
+    public ServerSSHInfoDto queryServerSSHInfoByUserIdAndServerIp(@Param("userId") Integer userId, @Param("serverIp") String serverIp);
 }

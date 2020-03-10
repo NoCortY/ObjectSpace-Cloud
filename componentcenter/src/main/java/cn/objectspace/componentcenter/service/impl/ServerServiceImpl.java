@@ -7,10 +7,10 @@ import cn.objectspace.common.util.RedisUtil;
 import cn.objectspace.common.util.SerializeUtil;
 import cn.objectspace.common.util.TimeUtil;
 import cn.objectspace.componentcenter.dao.ComponentDao;
-import cn.objectspace.componentcenter.pojo.ServerSSHDto;
 import cn.objectspace.componentcenter.pojo.dto.CloudServerDto;
 import cn.objectspace.componentcenter.pojo.dto.ServerDetailDto;
 import cn.objectspace.componentcenter.pojo.dto.ServerResumeDto;
+import cn.objectspace.componentcenter.pojo.dto.ServerSSHDto;
 import cn.objectspace.componentcenter.pojo.dto.daemon.CpuDto;
 import cn.objectspace.componentcenter.pojo.dto.daemon.DiskDto;
 import cn.objectspace.componentcenter.pojo.dto.daemon.NetDto;
@@ -370,7 +370,7 @@ public class ServerServiceImpl implements ServerService {
     /**
      * @Description: 获取SSH连接列表
      * @Param: [userId]
-     * @return: java.util.List<cn.objectspace.componentcenter.pojo.ServerSSHDto>
+     * @return: java.util.List<cn.objectspace.componentcenter.pojo.dto.ServerSSHDto>
      * @Author: NoCortY
      * @Date: 2020/3/9
      */
@@ -406,6 +406,34 @@ public class ServerServiceImpl implements ServerService {
         }
 
         return responseMap;
+    }
+
+    /**
+     * @Description: 更新SSH连接信息
+     * @Param: [cloudServer]
+     * @return: java.lang.Integer
+     * @Author: NoCortY
+     * @Date: 2020/3/10
+     */
+    @Override
+    public Integer renewServerSSHInfo(CloudServer cloudServer) {
+        if (cloudServer == null || StringUtils.isBlank(cloudServer.getServerIp()) || cloudServer.getServerUser() == null || StringUtils.isBlank(cloudServer.getSshUser()) || StringUtils.isBlank(cloudServer.getSshPassword())) {
+            logger.info("缺少必填项");
+            return null;
+        }
+        if (StringUtils.isBlank(cloudServer.getSshPort())) {
+            logger.info("设置默认端口号为22");
+            cloudServer.setSshPort("22");
+        }
+        Integer effectiveNum = null;
+        try {
+            effectiveNum = componentDao.updateSSHInfo(cloudServer);
+        } catch (Exception e) {
+            logger.error("更新SSH信息异常");
+            logger.error("异常信息:{}", e.getMessage());
+            return null;
+        }
+        return effectiveNum;
     }
 
 }
