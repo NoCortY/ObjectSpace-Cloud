@@ -33,7 +33,7 @@ public interface WebSSHService {
      * @Param:
      * @return:
      * @Author: NoCortY
-     * @Date: 2020/3/7
+     * @Date: 2020/3/8
      */
     public void sendMessage(WebSocketSession session, byte[] buffer) throws IOException;
 
