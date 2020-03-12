@@ -42,7 +42,7 @@ public interface WebSSHService {
      * @Param:
      * @return:
      * @Author: NoCortY
-     * @Date: 2020/3/7
+     * @Date: 2020/3/8
      */
     public void close(WebSocketSession session);
 }
