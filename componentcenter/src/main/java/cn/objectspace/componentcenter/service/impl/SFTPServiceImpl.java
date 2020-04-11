@@ -1,14 +1,19 @@
 package cn.objectspace.componentcenter.service.impl;
 
+import cn.objectspace.componentcenter.dao.ComponentDao;
 import cn.objectspace.componentcenter.pojo.dto.LinuxFile;
+import cn.objectspace.componentcenter.pojo.dto.ServerSSHInfoDto;
 import cn.objectspace.componentcenter.pojo.dto.WebSSHDataDto;
 import cn.objectspace.componentcenter.service.SFTPService;
 import com.jcraft.jsch.*;
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.commons.CommonsMultipartFile;
 
+import javax.servlet.ServletOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -23,6 +28,8 @@ import java.util.Vector;
  */
 @Service
 public class SFTPServiceImpl implements SFTPService {
+    @Autowired
+    private ComponentDao componentDao;
 
     private Logger logger = LoggerFactory.getLogger(WebSSHServiceImpl.class);
 
@@ -36,8 +43,9 @@ public class SFTPServiceImpl implements SFTPService {
             logger.error("无法连接该服务器");
             throw new Exception("无法连接该服务器");
         }
+        ServerSSHInfoDto serverSSHInfoDto = componentDao.queryServerSSHInfoByUserIdAndServerIp(Integer.valueOf(userId), webSSHDataDto.getHost());
         //设置密码
-        session.setPassword(webSSHDataDto.getPassword());
+        session.setPassword(serverSSHInfoDto.getSshPassword());
 
         //设置第一次登陆的时候提示，可选值：(ask | yes | no)
         session.setConfig("StrictHostKeyChecking", "no");
@@ -67,10 +75,9 @@ public class SFTPServiceImpl implements SFTPService {
         List<LinuxFile> linuxFileList = new LinkedList<>();
         try {
             channelSftp.cd(path);
-            Vector files = channelSftp.ls(path);
-            for (Object file : files) {
-                file = (String) file;
-                String[] s = ((String) file).split(" ");
+            Vector<ChannelSftp.LsEntry> files = channelSftp.ls(path);
+            for (ChannelSftp.LsEntry file : files) {
+                String[] s = file.getLongname().split(" ");
                 LinuxFile linuxFile = new LinuxFile();
                 linuxFile.setTypeAndPower(s[0]);
                 linuxFile.setLinkOrDirNum(s[1]);
@@ -91,11 +98,15 @@ public class SFTPServiceImpl implements SFTPService {
 
     @Override
     public boolean uploadFile(Session session, String targetPath, CommonsMultipartFile uploadFile) {
+        if (session == null || StringUtils.isBlank(targetPath)) {
+            logger.info("不能为null");
+            return false;
+        }
         Channel channel = null;
         //打开stfp通道
         try {
             channel = session.openChannel("sftp");
-            channel.connect(1000);
+            channel.connect();
         } catch (JSchException e) {
             logger.error("sftp channel创建失败");
             logger.error("异常信息:{}", e.getMessage());
@@ -142,38 +153,41 @@ public class SFTPServiceImpl implements SFTPService {
     }
 
     @Override
-    public InputStream downloadFile(Session session, String filePath, String fileName) {
+    public boolean downloadFile(Session session, String filePath, String fileName, ServletOutputStream outputStream) {
+        if (session == null || StringUtils.isBlank(filePath) || StringUtils.isBlank(fileName)) {
+            logger.info("不能为null");
+            return false;
+        }
         Channel channel = null;
         //打开stfp通道
         try {
             channel = session.openChannel("sftp");
-            channel.connect(1000);
+            channel.connect();
         } catch (JSchException e) {
             logger.error("sftp channel创建失败");
             logger.error("异常信息:{}", e.getMessage());
-            return null;
+            return false;
         }
 
 
         ChannelSftp channelSftp = (ChannelSftp) channel;
         InputStream inputStream = null;
         try {
+
             channelSftp.cd(filePath);
-            inputStream = channelSftp.get(fileName);
+            /*Vector v = channelSftp.ls(filePath);
+            for(int i=0;i<v.size();i++){
+                System.out.println(v.get(i));
+            }*/
+            channelSftp.get(fileName, outputStream);
 
             logger.info("获取该文件下载流成功");
-            return inputStream;
+            return true;
         } catch (SftpException e) {
-            logger.error("上传文件异常");
+            logger.error("下载文件异常");
             logger.error("异常信息:{}", e.getMessage());
-            return null;
+            return false;
         } finally {
-            try {
-                if (inputStream != null)
-                    inputStream.close();
-            } catch (IOException e) {
-                logger.error("流关闭异常,异常信息:{}", e.getMessage());
-            }
 
             session.disconnect();
             channel.disconnect();

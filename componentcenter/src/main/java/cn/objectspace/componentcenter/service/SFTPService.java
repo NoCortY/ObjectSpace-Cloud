@@ -5,7 +5,7 @@ import cn.objectspace.componentcenter.pojo.dto.WebSSHDataDto;
 import com.jcraft.jsch.Session;
 import org.springframework.web.multipart.commons.CommonsMultipartFile;
 
-import java.io.InputStream;
+import javax.servlet.ServletOutputStream;
 import java.util.List;
 
 /**
@@ -49,5 +49,5 @@ public interface SFTPService {
      * @Author: NoCortY
      * @Date: 2020/4/10
      */
-    public InputStream downloadFile(Session session, String filePath, String fileName);
+    public boolean downloadFile(Session session, String filePath, String fileName, ServletOutputStream outputStream);
 }

@@ -4,24 +4,30 @@ import cn.objectspace.common.annotation.SaveLog;
 import cn.objectspace.common.constant.ConstantPool;
 import cn.objectspace.common.pojo.entity.ResponseMap;
 import cn.objectspace.common.util.HttpRequestUtil;
-import cn.objectspace.componentcenter.pojo.dto.CloudServerDto;
-import cn.objectspace.componentcenter.pojo.dto.ServerDetailDto;
-import cn.objectspace.componentcenter.pojo.dto.ServerResumeDto;
-import cn.objectspace.componentcenter.pojo.dto.ServerSSHDto;
+import cn.objectspace.componentcenter.pojo.dto.*;
 import cn.objectspace.componentcenter.pojo.dto.daemon.ServerInfoDto;
 import cn.objectspace.componentcenter.pojo.dto.record.CpuRecordGroupDto;
 import cn.objectspace.componentcenter.pojo.dto.record.DiskRecordGroupDto;
 import cn.objectspace.componentcenter.pojo.dto.record.MemRecordDto;
 import cn.objectspace.componentcenter.pojo.dto.record.NetRecordGroupDto;
 import cn.objectspace.componentcenter.pojo.entity.CloudServer;
+import cn.objectspace.componentcenter.service.SFTPService;
 import cn.objectspace.componentcenter.service.ServerService;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.jcraft.jsch.Session;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartHttpServletRequest;
+import org.springframework.web.multipart.commons.CommonsMultipartFile;
+import org.springframework.web.multipart.commons.CommonsMultipartResolver;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
+import java.io.IOException;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -31,6 +37,8 @@ import java.util.regex.Pattern;
 public class ServerController {
     @Autowired
     ServerService serverService;
+    @Autowired
+    SFTPService sftpService;
     Logger logger = LoggerFactory.getLogger(ServerController.class);
     @SaveLog(applicationId = ConstantPool.ComponentCenter.APPLICATION_ID)
     @PostMapping("/register")
@@ -251,4 +259,90 @@ public class ServerController {
         }
         return responseMap;
     }
+
+    @SaveLog(applicationId = ConstantPool.ComponentCenter.APPLICATION_ID)
+    @PostMapping("/uploadFile/{serverIp}/{username}")
+    public ResponseMap<String> uploadFile(HttpServletRequest request, @PathVariable String serverIp, @PathVariable String username) {
+        ResponseMap<String> responseMap = new ResponseMap<>();
+        CommonsMultipartFile uploadFile = null;
+        //创建文件接收器
+        CommonsMultipartResolver commonsMultipartResolver = new CommonsMultipartResolver(request.getSession().getServletContext());
+        if (commonsMultipartResolver.isMultipart(request)) {
+            MultipartHttpServletRequest multipartHttpServletRequest = (MultipartHttpServletRequest) request;
+            uploadFile = (CommonsMultipartFile) multipartHttpServletRequest.getFile("uploadFile");
+        }
+        WebSSHDataDto webSSHData = new WebSSHDataDto();
+        webSSHData.setHost(serverIp);
+        webSSHData.setUsername(username);
+        Session session = null;
+        try {
+            session = sftpService.initConnection(String.valueOf(request.getSession().getAttribute(ConstantPool.ComponentCenter.SESSION_USER_ID_KEY)), webSSHData);
+        } catch (Exception e) {
+            logger.error("创建sftp连接失败");
+            logger.error("异常信息:{}", e.getMessage());
+            responseMap.setCode(ConstantPool.Common.REQUEST_FAILURE_CODE);
+            responseMap.setMessage(ConstantPool.Common.REQUEST_FAILURE_MESSAGE);
+            responseMap.setData(ConstantPool.Common.RES_NOT_DATA);
+            return responseMap;
+        }
+        if (sftpService.uploadFile(session, HttpRequestUtil.getStringParameter(request, "uploadPath"), uploadFile)) {
+            //如果上传成功了
+            responseMap.setCode(ConstantPool.Common.REQUEST_SUCCESS_CODE);
+            responseMap.setMessage(ConstantPool.Common.REQUEST_SUCCESS_MESSAGE);
+            responseMap.setData(ConstantPool.Common.RES_NOT_DATA);
+        } else {
+            responseMap.setCode(ConstantPool.Common.REQUEST_FAILURE_CODE);
+            responseMap.setMessage(ConstantPool.Common.REQUEST_FAILURE_MESSAGE);
+            responseMap.setData(ConstantPool.Common.RES_NOT_DATA);
+        }
+
+        return responseMap;
+    }
+
+    @SaveLog(applicationId = ConstantPool.ComponentCenter.APPLICATION_ID)
+    @PostMapping("/downloadFile/{serverIp}/{username}")
+    public void downloadFile(HttpServletRequest request, HttpServletResponse response, @PathVariable String serverIp, @PathVariable String username) {
+        WebSSHDataDto webSSHData = new WebSSHDataDto();
+        webSSHData.setHost(serverIp);
+        webSSHData.setUsername(username);
+        //创建连接
+        Session session = null;
+        try {
+            session = sftpService.initConnection(String.valueOf(request.getSession().getAttribute(ConstantPool.ComponentCenter.SESSION_USER_ID_KEY)), webSSHData);
+        } catch (Exception e) {
+            logger.error("创建sftp连接失败");
+            logger.error("异常信息:{}", e.getMessage());
+        }
+        try {
+            if (!sftpService.downloadFile(session, HttpRequestUtil.getStringParameter(request, "downloadPath"), HttpRequestUtil.getStringParameter(request, "downloadFileName"), response.getOutputStream())) {
+                logger.info("获取文件失败");
+            }
+        } catch (IOException e) {
+            logger.error("下载文件异常");
+            logger.error("异常信息:{}", e.getMessage());
+            return;
+        }
+        BufferedInputStream bis = null;
+        BufferedOutputStream bos = null;
+        try {
+            bos = new BufferedOutputStream(response.getOutputStream());
+            bos.flush();
+        } catch (IOException e) {
+            logger.error("流转换失败");
+            logger.error("异常信息:" + e.getMessage());
+        } finally {
+            try {
+                if (bis != null)
+                    bis.close();
+                if (bos != null) {
+                    bos.close();
+                }
+            } catch (IOException e) {
+                logger.error("关闭流失败");
+                logger.error("异常信息:" + e.getMessage());
+            }
+        }
+    }
+
+
 }
