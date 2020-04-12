@@ -261,8 +261,8 @@ public class ServerController {
     }
 
     @SaveLog(applicationId = ConstantPool.ComponentCenter.APPLICATION_ID)
-    @PostMapping("/uploadFile/{serverIp}/{username}")
-    public ResponseMap<String> uploadFile(HttpServletRequest request, @PathVariable String serverIp, @PathVariable String username) {
+    @PostMapping("/uploadFile/{serverIp}")
+    public ResponseMap<String> uploadFile(HttpServletRequest request, @PathVariable String serverIp) {
         ResponseMap<String> responseMap = new ResponseMap<>();
         CommonsMultipartFile uploadFile = null;
         //创建文件接收器
@@ -273,7 +273,6 @@ public class ServerController {
         }
         WebSSHDataDto webSSHData = new WebSSHDataDto();
         webSSHData.setHost(serverIp);
-        webSSHData.setUsername(username);
         Session session = null;
         try {
             session = sftpService.initConnection(String.valueOf(request.getSession().getAttribute(ConstantPool.ComponentCenter.SESSION_USER_ID_KEY)), webSSHData);
@@ -300,11 +299,10 @@ public class ServerController {
     }
 
     @SaveLog(applicationId = ConstantPool.ComponentCenter.APPLICATION_ID)
-    @PostMapping("/downloadFile/{serverIp}/{username}")
-    public void downloadFile(HttpServletRequest request, HttpServletResponse response, @PathVariable String serverIp, @PathVariable String username) {
+    @PostMapping("/downloadFile/{serverIp}")
+    public void downloadFile(HttpServletRequest request, HttpServletResponse response, @PathVariable String serverIp) {
         WebSSHDataDto webSSHData = new WebSSHDataDto();
         webSSHData.setHost(serverIp);
-        webSSHData.setUsername(username);
         //创建连接
         Session session = null;
         try {
@@ -344,5 +342,37 @@ public class ServerController {
         }
     }
 
+    @SaveLog(applicationId = ConstantPool.ComponentCenter.APPLICATION_ID)
+    @GetMapping("/ls")
+    public ResponseMap<List<LinuxFile>> ls(HttpServletRequest request) {
+        String path = HttpRequestUtil.getStringParameter(request, "path");
+        String serverIp = HttpRequestUtil.getStringParameter(request, "serverIp");
+        WebSSHDataDto webSSHData = new WebSSHDataDto();
+        webSSHData.setHost(serverIp);
+        ResponseMap<List<LinuxFile>> responseMap = new ResponseMap<>();
+        List<LinuxFile> linuxFileList = null;
+        Session session = null;
+        try {
+            session = sftpService.initConnection(String.valueOf(request.getSession().getAttribute(ConstantPool.ComponentCenter.SESSION_USER_ID_KEY)), webSSHData);
+        } catch (Exception e) {
+            logger.error("创建sftp连接失败");
+            logger.error("异常信息:{}", e.getMessage());
+            responseMap.setCode(ConstantPool.Common.REQUEST_FAILURE_CODE);
+            responseMap.setMessage(ConstantPool.Common.REQUEST_FAILURE_MESSAGE);
+            responseMap.setData(null);
+        }
+        linuxFileList = sftpService.ls(session, path);
+        if (linuxFileList == null) {
+            responseMap.setCode(ConstantPool.Common.REQUEST_FAILURE_CODE);
+            responseMap.setMessage(ConstantPool.Common.REQUEST_FAILURE_MESSAGE);
+            responseMap.setData(null);
+        } else {
+            responseMap.setCode(ConstantPool.Common.REQUEST_SUCCESS_CODE);
+            responseMap.setMessage(ConstantPool.Common.REQUEST_SUCCESS_MESSAGE);
+            responseMap.setData(linuxFileList);
+            responseMap.setCount(linuxFileList.size());
+        }
+        return responseMap;
+    }
 
 }

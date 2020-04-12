@@ -6,8 +6,10 @@ package cn.objectspace.componentcenter.pojo.dto;
  * @Date: 2020/4/11
  */
 public class LinuxFile {
-    //文件类型和权限
-    private String typeAndPower;
+    //文件类型
+    private String type;
+    //权限
+    private String power;
     //文件连接数和子目录数
     private String linkOrDirNum;
     //文件所属用户
@@ -21,12 +23,20 @@ public class LinuxFile {
     //文件名
     private String fileName;
 
-    public String getTypeAndPower() {
-        return typeAndPower;
+    public String getType() {
+        return type;
     }
 
-    public void setTypeAndPower(String typeAndPower) {
-        this.typeAndPower = typeAndPower;
+    public void setType(String type) {
+        this.type = type;
+    }
+
+    public String getPower() {
+        return power;
+    }
+
+    public void setPower(String power) {
+        this.power = power;
     }
 
     public String getLinkOrDirNum() {
