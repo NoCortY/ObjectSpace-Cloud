@@ -18,10 +18,7 @@ import javax.servlet.ServletOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Vector;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -49,7 +46,8 @@ public class SFTPServiceImpl implements SFTPService {
             SessionLease sessionLease = sessionMap.get(sessionCacheKey);
             //首先检查是否过期
             if (System.currentTimeMillis() <= sessionLease.getExpireTimeMillis()) {
-                //如果没有过期，那么就返回
+                //如果没有过期，那么就返回，同时给这个缓存中的过期时间续约
+                sessionLease.setExpireTimeMillis(System.currentTimeMillis() + 10 * 60 * 1000);
                 return sessionLease.getSession();
             } else {
                 //断开连接
@@ -76,7 +74,7 @@ public class SFTPServiceImpl implements SFTPService {
         //加入缓存
         SessionLease sessionLease = new SessionLease();
         //过期时间为30min
-        sessionLease.setExpireTimeMillis(System.currentTimeMillis() + 30 * 60 * 1000);
+        sessionLease.setExpireTimeMillis(System.currentTimeMillis() + 10 * 60 * 1000);
         sessionLease.setSession(session);
         sessionMap.put(sessionCacheKey, sessionLease);
         //返回session
@@ -130,7 +128,7 @@ public class SFTPServiceImpl implements SFTPService {
     }
 
     @Override
-    public boolean uploadFile(Session session, String targetPath, CommonsMultipartFile uploadFile) {
+    public synchronized boolean uploadFile(Session session, String targetPath, CommonsMultipartFile uploadFile) {
         if (session == null || StringUtils.isBlank(targetPath)) {
             logger.info("不能为null");
             return false;
@@ -161,7 +159,7 @@ public class SFTPServiceImpl implements SFTPService {
                 outStream.write(b, 0, n);
             }
 
-            logger.info("上传文件到{}成功", session.getHost());
+            logger.info("上传文件到{}成功,路径:{}", session.getHost(), targetPath);
 
             return true;
         } catch (SftpException | IOException e) {
@@ -205,12 +203,11 @@ public class SFTPServiceImpl implements SFTPService {
         InputStream inputStream = null;
         try {
 
-            channelSftp.cd(filePath);
             /*Vector v = channelSftp.ls(filePath);
             for(int i=0;i<v.size();i++){
                 System.out.println(v.get(i));
             }*/
-            channelSftp.get(fileName, outputStream);
+            channelSftp.get(filePath + fileName, outputStream);
 
             logger.info("获取该文件下载流成功");
             return true;
@@ -220,6 +217,157 @@ public class SFTPServiceImpl implements SFTPService {
             return false;
         } finally {
             channel.disconnect();
+        }
+    }
+
+    @Override
+    public synchronized boolean removeFile(Session session, String filePath, String fileName) {
+        if (session == null || StringUtils.isBlank(filePath) || StringUtils.isBlank(fileName)) {
+            logger.info("不能为null");
+            return false;
+        }
+        Channel channel = null;
+        //打开stfp通道
+        try {
+            channel = session.openChannel("sftp");
+            channel.connect();
+        } catch (JSchException e) {
+            logger.error("sftp channel创建失败");
+            logger.error("异常信息:{}", e.getMessage());
+            return false;
+        }
+
+
+        ChannelSftp channelSftp = (ChannelSftp) channel;
+        try {
+            //移动到文件目录
+            channelSftp.cd(filePath);
+
+            //删除文件
+            channelSftp.rm(fileName);
+
+            logger.info("删除{}成功", filePath + fileName);
+            return true;
+        } catch (SftpException e) {
+            logger.error("删除文件异常");
+            logger.error("异常信息:{}", e.getMessage());
+            return false;
+        } finally {
+            channel.disconnect();
+        }
+    }
+
+    /**
+     * @Description: 删除目录
+     * @Param:
+     * @return:
+     * @Author: NoCortY
+     * @Date: 2020/4/13
+     */
+    @Override
+    public synchronized boolean removeDir(Session session, String filePath) {
+        if (session == null || StringUtils.isBlank(filePath)) {
+            logger.info("不能为空");
+            return false;
+        }
+        //要删除的空文件夹集合
+        List<String> toBeDeleteEmptyDirContainer = new ArrayList<>();
+        Channel channel = null;
+        //打开stfp通道
+        try {
+            channel = session.openChannel("sftp");
+            channel.connect();
+        } catch (JSchException e) {
+            logger.error("sftp channel创建失败");
+            logger.error("异常信息:{}", e.getMessage());
+            return false;
+        }
+        ChannelSftp channelSftp = (ChannelSftp) channel;
+        try {
+            if (isDirectory(channelSftp, filePath)) {
+                //那么使用递归删除
+                if (rm(channelSftp, filePath, toBeDeleteEmptyDirContainer)) {
+                    //如果递归删除成功,那么就循环遍历删除集合中的内容
+                    for (int i = toBeDeleteEmptyDirContainer.size() - 1; i >= 0; --i) {
+                        channelSftp.rmdir(toBeDeleteEmptyDirContainer.get(i));
+                    }
+                }
+
+            } else {
+                //移动到文件目录
+                channelSftp.rm(filePath);
+                logger.info("删除{}成功", filePath);
+                return true;
+            }
+        } catch (SftpException e) {
+            logger.error("删除文件夹失败");
+            return false;
+        } finally {
+            channel.disconnect();
+        }
+        return true;
+    }
+
+    /**
+     * @Description: 递归删除，用于删除目录，先删除文件夹中的东西，然后统一删除文件夹
+     * @Param: [channelSftp, filePath,toBeDeleteEmptyDirContainer(要删除的空文件夹集合)]
+     * @return: boolean
+     * @Author: NoCortY
+     * @Date: 2020/4/13
+     */
+    private boolean rm(ChannelSftp channelSftp, String filePath, List<String> toBeDeleteEmptyDirContainer) throws SftpException {
+        if (channelSftp == null) {
+            logger.error("channelSftp为空");
+            return false;
+        }
+        if (!isDirectory(channelSftp, filePath)) {
+            //如果不是文件夹,那么直接调用rm删除
+            channelSftp.rm(filePath);
+            return true;
+        }
+        Vector<ChannelSftp.LsEntry> ls = channelSftp.ls(filePath);
+        if (isDirectory(channelSftp, filePath) && ls.size() == 2) {
+            //如果是文件夹，且文件夹内没有任何文件（只有.和..）
+            //那么直接使用rmdir删除即可
+            channelSftp.rmdir(filePath);
+            return true;
+        }
+
+        //如果是文件夹且里面有文件，则先加入空文件夹集合中，删除其中的文件
+        toBeDeleteEmptyDirContainer.add(filePath);
+
+        for (ChannelSftp.LsEntry entry : ls) {
+            //如果里面存在文件，那么就需要以依次遍历
+            //如果遇到.或者..那么不处理
+            if ("..".equals(entry.getFilename()) || ".".equals(entry.getFilename()))
+                continue;
+            String fp = filePath + "/" + entry.getFilename();
+            if (isDirectory(channelSftp, fp)) {
+                //如果文件夹中的这个文件是文件夹，则递归进入
+                rm(channelSftp, fp, toBeDeleteEmptyDirContainer);
+            } else {
+                //如果文件夹中的这个文件不是文件夹，而是文件，则直接删除
+                channelSftp.rm(fp);
+            }
+        }
+        return true;
+    }
+
+    /**
+     * @Description: 判断是否是目录
+     * @Param: [path]
+     * @return: boolean
+     * @Author: NoCortY
+     * @Date: 2020/4/13
+     */
+    private boolean isDirectory(ChannelSftp channelSftp, String path) {
+        try {
+            channelSftp.cd(path);
+            //如果可以cd进去，就是文件夹
+            return true;
+        } catch (SftpException e) {
+            //否则就不是文件夹
+            return false;
         }
     }
 }

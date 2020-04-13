@@ -50,4 +50,22 @@ public interface SFTPService {
      * @Date: 2020/4/10
      */
     public boolean downloadFile(Session session, String filePath, String fileName, ServletOutputStream outputStream);
+
+    /**
+     * @Description: 删除文件
+     * @Param:
+     * @return:
+     * @Author: NoCortY
+     * @Date: 2020/4/13
+     */
+    public boolean removeFile(Session session, String filePath, String fileName);
+
+    /**
+     * @Description: 删除目录
+     * @Param:
+     * @return:
+     * @Author: NoCortY
+     * @Date: 2020/4/13
+     */
+    public boolean removeDir(Session session, String filePath);
 }

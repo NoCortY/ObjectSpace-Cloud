@@ -18,6 +18,7 @@ import com.jcraft.jsch.Session;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 import org.springframework.web.multipart.commons.CommonsMultipartFile;
@@ -299,8 +300,8 @@ public class ServerController {
     }
 
     @SaveLog(applicationId = ConstantPool.ComponentCenter.APPLICATION_ID)
-    @PostMapping("/downloadFile/{serverIp}")
-    public void downloadFile(HttpServletRequest request, HttpServletResponse response, @PathVariable String serverIp) {
+    @GetMapping("/downloadFile/{serverIp}/{downloadFileName}")
+    public void downloadFile(HttpServletRequest request, HttpServletResponse response, @PathVariable String serverIp, @PathVariable String downloadFileName) {
         WebSSHDataDto webSSHData = new WebSSHDataDto();
         webSSHData.setHost(serverIp);
         //创建连接
@@ -312,7 +313,7 @@ public class ServerController {
             logger.error("异常信息:{}", e.getMessage());
         }
         try {
-            if (!sftpService.downloadFile(session, HttpRequestUtil.getStringParameter(request, "downloadPath"), HttpRequestUtil.getStringParameter(request, "downloadFileName"), response.getOutputStream())) {
+            if (!sftpService.downloadFile(session, HttpRequestUtil.getStringParameter(request, "downloadPath"), downloadFileName, response.getOutputStream())) {
                 logger.info("获取文件失败");
             }
         } catch (IOException e) {
@@ -322,8 +323,13 @@ public class ServerController {
         }
         BufferedInputStream bis = null;
         BufferedOutputStream bos = null;
+        HttpHeaders headers = new HttpHeaders();
+        response.setCharacterEncoding("utf-8");
+        response.setContentType("application/x-download; charset=UTF-8");
+        headers.add("Content-Disposition", "attchement;filename=" + downloadFileName);
         try {
             bos = new BufferedOutputStream(response.getOutputStream());
+            bos.write(1);
             bos.flush();
         } catch (IOException e) {
             logger.error("流转换失败");
@@ -375,4 +381,63 @@ public class ServerController {
         return responseMap;
     }
 
+    @SaveLog(applicationId = ConstantPool.ComponentCenter.APPLICATION_ID)
+    @PostMapping("/removeFile/{serverIp}")
+    public ResponseMap<String> removeFile(@PathVariable String serverIp, HttpServletRequest request) {
+        String filePath = HttpRequestUtil.getStringParameter(request, "filePath");
+        String fileName = HttpRequestUtil.getStringParameter(request, "fileName");
+        ResponseMap<String> responseMap = new ResponseMap<>();
+        WebSSHDataDto webSSHData = new WebSSHDataDto();
+        webSSHData.setHost(serverIp);
+        Session session = null;
+        try {
+            session = sftpService.initConnection(String.valueOf(request.getSession().getAttribute(ConstantPool.ComponentCenter.SESSION_USER_ID_KEY)), webSSHData);
+        } catch (Exception e) {
+            logger.error("创建sftp连接失败");
+            logger.error("异常信息:{}", e.getMessage());
+            responseMap.setCode(ConstantPool.Common.REQUEST_FAILURE_CODE);
+            responseMap.setMessage(ConstantPool.Common.REQUEST_FAILURE_MESSAGE);
+            responseMap.setData(null);
+        }
+        if (sftpService.removeFile(session, filePath, fileName)) {
+            responseMap.setCode(ConstantPool.Common.REQUEST_SUCCESS_CODE);
+            responseMap.setMessage(ConstantPool.Common.REQUEST_SUCCESS_MESSAGE);
+            responseMap.setData(ConstantPool.Common.RES_NOT_DATA);
+        } else {
+            responseMap.setCode(ConstantPool.Common.REQUEST_FAILURE_CODE);
+            responseMap.setMessage(ConstantPool.Common.REQUEST_FAILURE_MESSAGE);
+            responseMap.setData(ConstantPool.Common.RES_NOT_DATA);
+        }
+        return responseMap;
+    }
+
+    @SaveLog(applicationId = ConstantPool.ComponentCenter.APPLICATION_ID)
+    @PostMapping("/removeDir/{serverIp}")
+    public ResponseMap<String> removeDir(@PathVariable String serverIp, HttpServletRequest request) {
+        //文件夹路径由文件基础路径和文件夹名称组成
+        String filePath = HttpRequestUtil.getStringParameter(request, "filePath") + HttpRequestUtil.getStringParameter(request, "fileName");
+        ResponseMap<String> responseMap = new ResponseMap<>();
+        WebSSHDataDto webSSHData = new WebSSHDataDto();
+        webSSHData.setHost(serverIp);
+        Session session = null;
+        try {
+            session = sftpService.initConnection(String.valueOf(request.getSession().getAttribute(ConstantPool.ComponentCenter.SESSION_USER_ID_KEY)), webSSHData);
+        } catch (Exception e) {
+            logger.error("创建sftp连接失败");
+            logger.error("异常信息:{}", e.getMessage());
+            responseMap.setCode(ConstantPool.Common.REQUEST_FAILURE_CODE);
+            responseMap.setMessage(ConstantPool.Common.REQUEST_FAILURE_MESSAGE);
+            responseMap.setData(null);
+        }
+        if (sftpService.removeDir(session, filePath)) {
+            responseMap.setCode(ConstantPool.Common.REQUEST_SUCCESS_CODE);
+            responseMap.setMessage(ConstantPool.Common.REQUEST_SUCCESS_MESSAGE);
+            responseMap.setData(ConstantPool.Common.RES_NOT_DATA);
+        } else {
+            responseMap.setCode(ConstantPool.Common.REQUEST_FAILURE_CODE);
+            responseMap.setMessage(ConstantPool.Common.REQUEST_FAILURE_MESSAGE);
+            responseMap.setData(ConstantPool.Common.RES_NOT_DATA);
+        }
+        return responseMap;
+    }
 }
