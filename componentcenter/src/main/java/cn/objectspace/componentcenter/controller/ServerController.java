@@ -440,4 +440,100 @@ public class ServerController {
         }
         return responseMap;
     }
+
+    @SaveLog(applicationId = ConstantPool.ComponentCenter.APPLICATION_ID)
+    @PostMapping("/mkdir/{serverIp}")
+    public ResponseMap<String> mkdir(@PathVariable String serverIp, HttpServletRequest request) {
+        String filePath = HttpRequestUtil.getStringParameter(request, "filePath");
+        String dirName = HttpRequestUtil.getStringParameter(request, "dirName");
+
+        ResponseMap<String> responseMap = new ResponseMap<>();
+
+        WebSSHDataDto webSSHData = new WebSSHDataDto();
+        webSSHData.setHost(serverIp);
+        Session session = null;
+        try {
+            session = sftpService.initConnection(String.valueOf(request.getSession().getAttribute(ConstantPool.ComponentCenter.SESSION_USER_ID_KEY)), webSSHData);
+        } catch (Exception e) {
+            logger.error("创建sftp连接失败");
+            logger.error("异常信息:{}", e.getMessage());
+            responseMap.setCode(ConstantPool.Common.REQUEST_FAILURE_CODE);
+            responseMap.setMessage(ConstantPool.Common.REQUEST_FAILURE_MESSAGE);
+            responseMap.setData(ConstantPool.Common.RES_NOT_DATA);
+        }
+
+        if (sftpService.mkdir(session, filePath, dirName)) {
+            responseMap.setCode(ConstantPool.Common.REQUEST_SUCCESS_CODE);
+            responseMap.setMessage(ConstantPool.Common.REQUEST_SUCCESS_MESSAGE);
+        } else {
+            responseMap.setCode(ConstantPool.Common.REQUEST_FAILURE_CODE);
+            responseMap.setMessage(ConstantPool.Common.REQUEST_FAILURE_MESSAGE);
+        }
+        responseMap.setData(ConstantPool.Common.RES_NOT_DATA);
+        return responseMap;
+    }
+
+    @SaveLog(applicationId = ConstantPool.ComponentCenter.APPLICATION_ID)
+    @PostMapping("/chmod/{serverIp}")
+    public ResponseMap<String> chmod(@PathVariable String serverIp, HttpServletRequest request) {
+        String filePath = HttpRequestUtil.getStringParameter(request, "filePath");
+        String fileName = HttpRequestUtil.getStringParameter(request, "fileName");
+        String permission = HttpRequestUtil.getStringParameter(request, "permission");
+
+        ResponseMap<String> responseMap = new ResponseMap<>();
+
+        WebSSHDataDto webSSHData = new WebSSHDataDto();
+        webSSHData.setHost(serverIp);
+        Session session = null;
+        try {
+            session = sftpService.initConnection(String.valueOf(request.getSession().getAttribute(ConstantPool.ComponentCenter.SESSION_USER_ID_KEY)), webSSHData);
+        } catch (Exception e) {
+            logger.error("创建sftp连接失败");
+            logger.error("异常信息:{}", e.getMessage());
+            responseMap.setCode(ConstantPool.Common.REQUEST_FAILURE_CODE);
+            responseMap.setMessage(ConstantPool.Common.REQUEST_FAILURE_MESSAGE);
+            responseMap.setData(ConstantPool.Common.RES_NOT_DATA);
+        }
+
+        if (sftpService.chmod(session, filePath + fileName, permission)) {
+            responseMap.setCode(ConstantPool.Common.REQUEST_SUCCESS_CODE);
+            responseMap.setMessage(ConstantPool.Common.REQUEST_SUCCESS_MESSAGE);
+        } else {
+            responseMap.setCode(ConstantPool.Common.REQUEST_FAILURE_CODE);
+            responseMap.setMessage(ConstantPool.Common.REQUEST_FAILURE_MESSAGE);
+        }
+        responseMap.setData(ConstantPool.Common.RES_NOT_DATA);
+        return responseMap;
+    }
+    /*@SaveLog(applicationId = ConstantPool.ComponentCenter.APPLICATION_ID)
+    @PostMapping("/touch/{serverIp}")
+    public ResponseMap<String> touch(@PathVariable String serverIp,HttpServletRequest request){
+        String filePath = HttpRequestUtil.getStringParameter(request,"filePath");
+        String fileName = HttpRequestUtil.getStringParameter(request,"fileName");
+
+        ResponseMap<String> responseMap = new ResponseMap<>();
+
+        WebSSHDataDto webSSHData = new WebSSHDataDto();
+        webSSHData.setHost(serverIp);
+        Session session = null;
+        try {
+            session = sftpService.initConnection(String.valueOf(request.getSession().getAttribute(ConstantPool.ComponentCenter.SESSION_USER_ID_KEY)), webSSHData);
+        } catch (Exception e) {
+            logger.error("创建sftp连接失败");
+            logger.error("异常信息:{}", e.getMessage());
+            responseMap.setCode(ConstantPool.Common.REQUEST_FAILURE_CODE);
+            responseMap.setMessage(ConstantPool.Common.REQUEST_FAILURE_MESSAGE);
+            responseMap.setData(ConstantPool.Common.RES_NOT_DATA);
+        }
+
+        if(sftpService.touch(session,filePath,fileName)){
+            responseMap.setCode(ConstantPool.Common.REQUEST_SUCCESS_CODE);
+            responseMap.setMessage(ConstantPool.Common.REQUEST_SUCCESS_MESSAGE);
+        }else{
+            responseMap.setCode(ConstantPool.Common.REQUEST_FAILURE_CODE);
+            responseMap.setMessage(ConstantPool.Common.REQUEST_FAILURE_MESSAGE);
+        }
+        responseMap.setData(ConstantPool.Common.RES_NOT_DATA);
+        return responseMap;
+    }*/
 }

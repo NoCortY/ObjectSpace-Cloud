@@ -105,6 +105,9 @@ public class SFTPServiceImpl implements SFTPService {
             channelSftp.cd(path);
             Vector<ChannelSftp.LsEntry> files = channelSftp.ls(path);
             for (ChannelSftp.LsEntry file : files) {
+
+                if (".".equals(file.getFilename()) || "..".equals(file.getFilename())) continue;
+
                 String[] s = file.getLongname().replaceAll("\\s{1,}", " ").split(" ");
                 LinuxFile linuxFile = new LinuxFile();
                 linuxFile.setType(s[0].substring(0, 1));
@@ -133,6 +136,8 @@ public class SFTPServiceImpl implements SFTPService {
             logger.info("不能为null");
             return false;
         }
+        //防止文件名字中带有特殊字符导致上传后无法正常读取
+        String fileName = uploadFile.getOriginalFilename().replace(" ", "_");
         Channel channel = null;
         //打开stfp通道
         try {
@@ -150,7 +155,7 @@ public class SFTPServiceImpl implements SFTPService {
         InputStream inputStream = null;
         try {
             channelSftp.cd(targetPath);
-            outStream = channelSftp.put(uploadFile.getOriginalFilename());
+            outStream = channelSftp.put(fileName);
             inputStream = uploadFile.getInputStream();
             byte b[] = new byte[1024];
             int n;
@@ -307,6 +312,95 @@ public class SFTPServiceImpl implements SFTPService {
         }
         return true;
     }
+
+    @Override
+    public boolean mkdir(Session session, String filePath, String dirName) {
+        if (session == null || StringUtils.isBlank(filePath) || StringUtils.isBlank(dirName)) {
+            logger.info("mkdir某些必要条件缺失");
+            return false;
+        }
+        Channel channel = null;
+        //打开stfp通道
+        try {
+            channel = session.openChannel("sftp");
+            channel.connect();
+        } catch (JSchException e) {
+            logger.error("sftp channel创建失败");
+            logger.error("异常信息:{}", e.getMessage());
+            return false;
+        }
+        ChannelSftp channelSftp = (ChannelSftp) channel;
+        try {
+            channelSftp.mkdir(filePath + dirName);
+        } catch (SftpException e) {
+            logger.error("新建目录异常");
+            logger.error("异常信息:{}", e.getMessage());
+            return false;
+        }
+
+        logger.info("新建目录成功。IP:{} 路径:{}", session.getHost(), filePath + "/" + dirName);
+        return true;
+    }
+
+    @Override
+    public boolean chmod(Session session, String filePath, String permission) {
+        if (session == null || StringUtils.isBlank(filePath)) {
+            logger.info("chmod某些必要条件缺失");
+            return false;
+        }
+        Channel channel = null;
+        //打开stfp通道
+        try {
+            channel = session.openChannel("sftp");
+            channel.connect();
+        } catch (JSchException e) {
+            logger.error("sftp channel创建失败");
+            logger.error("异常信息:{}", e.getMessage());
+            return false;
+        }
+        ChannelSftp channelSftp = (ChannelSftp) channel;
+        try {
+            channelSftp.chmod(Integer.parseInt(permission, 8), filePath);
+        } catch (SftpException e) {
+            logger.error("修改权限异常");
+            logger.error("异常信息:{}", e.getMessage());
+            return false;
+        }
+
+        logger.info("新建目录成功。IP:{} 路径:{}", session.getHost(), filePath + "/" + filePath);
+        return true;
+    }
+
+   /* @Override
+    public boolean touch(Session session, String filePath, String fileName) {
+        if(session==null|| StringUtils.isBlank(filePath)||StringUtils.isBlank(fileName)){
+            logger.info("touch某些必要条件缺失");
+            return false;
+        }
+        Channel channel = null;
+        //打开stfp通道
+        try {
+            channel = session.openChannel("sftp");
+            channel.connect();
+        } catch (JSchException e) {
+            logger.error("sftp channel创建失败");
+            logger.error("异常信息:{}", e.getMessage());
+            return false;
+        }
+        ChannelSftp channelSftp = (ChannelSftp) channel;
+
+        try {
+            //暂无方法可以新建文件
+            channelSftp.
+        } catch (SftpException e) {
+            logger.error("新建空白文件异常");
+            logger.error("异常信息:{}",e.getMessage());
+            return false;
+        }
+
+        logger.info("新建文件成功。IP:{} 路径:{}",session.getHost(),filePath+"/"+fileName);
+        return true;
+    }*/
 
     /**
      * @Description: 递归删除，用于删除目录，先删除文件夹中的东西，然后统一删除文件夹

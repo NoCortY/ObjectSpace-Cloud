@@ -68,4 +68,31 @@ public interface SFTPService {
      * @Date: 2020/4/13
      */
     public boolean removeDir(Session session, String filePath);
+
+    /**
+     * @Description: 新建文件夹
+     * @Param:
+     * @return:
+     * @Author: NoCortY
+     * @Date: 2020/4/14
+     */
+    public boolean mkdir(Session session, String filePath, String dirName);
+
+    /**
+     * @Description: 新建空白文件
+     * @Param:
+     * @return:
+     * @Author: NoCortY
+     * @Date: 2020/4/14
+     */
+    //public boolean touch(Session session,String filePath,String fileName);
+
+    /**
+     * @Description: 修改文件权限
+     * @Param:
+     * @return:
+     * @Author: NoCortY
+     * @Date: 2020/4/14
+     */
+    public boolean chmod(Session session, String filePath, String permission);
 }
