@@ -12,8 +12,11 @@ import cn.objectspace.componentcenter.pojo.dto.record.MemRecordDto;
 import cn.objectspace.componentcenter.pojo.dto.record.NetRecordGroupDto;
 import cn.objectspace.componentcenter.pojo.entity.CloudServer;
 import cn.objectspace.componentcenter.service.SFTPService;
+import cn.objectspace.componentcenter.service.SSHService;
 import cn.objectspace.componentcenter.service.ServerService;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jcraft.jsch.Session;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,7 +32,9 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.IOException;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -40,6 +45,8 @@ public class ServerController {
     ServerService serverService;
     @Autowired
     SFTPService sftpService;
+    @Autowired
+    SSHService sshService;
     Logger logger = LoggerFactory.getLogger(ServerController.class);
     @SaveLog(applicationId = ConstantPool.ComponentCenter.APPLICATION_ID)
     @PostMapping("/register")
@@ -504,6 +511,45 @@ public class ServerController {
         }
         responseMap.setData(ConstantPool.Common.RES_NOT_DATA);
         return responseMap;
+    }
+
+    @SaveLog(applicationId = ConstantPool.ComponentCenter.APPLICATION_ID)
+    @PostMapping("/commandGroup")
+    public ResponseMap<Map<String, String>> commandGroup(HttpServletRequest request) {
+        ResponseMap<Map<String, String>> responseMap = new ResponseMap<>();
+        String command = HttpRequestUtil.getStringParameter(request, "command");
+        ObjectMapper objectMapper = new ObjectMapper();
+        List servers = null;
+        try {
+            //转换list需要用到typeReference
+            servers = objectMapper.readValue(request.getParameter("servers"), new TypeReference<List<String>>() {
+            });
+        } catch (IOException e) {
+            logger.error("JSON转换异常");
+            logger.error("异常信息:{}", e.getMessage());
+            responseMap.setCode(ConstantPool.Common.REQUEST_FAILURE_CODE);
+            responseMap.setMessage(ConstantPool.Common.REQUEST_FAILURE_MESSAGE);
+            return responseMap;
+        }
+        List<Session> sessions = new LinkedList<>();
+        for (Object serverIp : servers) {
+            WebSSHDataDto webSSHDataDto = new WebSSHDataDto();
+            webSSHDataDto.setHost((String) serverIp);
+            try {
+                //将获取的session存入list
+                sessions.add(sshService.initConnection(String.valueOf(request.getSession().getAttribute(ConstantPool.ComponentCenter.SESSION_USER_ID_KEY)), webSSHDataDto));
+            } catch (Exception e) {
+                logger.error("获取{}的session异常", serverIp);
+                logger.error("异常信息:{}", e.getMessage());
+            }
+        }
+        Map<String, String> resMap = sshService.groupCommand(sessions, command);
+        responseMap.setCode(ConstantPool.Common.REQUEST_SUCCESS_CODE);
+        responseMap.setMessage(ConstantPool.Common.REQUEST_SUCCESS_MESSAGE);
+        responseMap.setData(resMap);
+        responseMap.setCount(resMap.size());
+        return responseMap;
+
     }
     /*@SaveLog(applicationId = ConstantPool.ComponentCenter.APPLICATION_ID)
     @PostMapping("/touch/{serverIp}")

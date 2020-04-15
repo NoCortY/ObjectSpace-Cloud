@@ -30,12 +30,16 @@ import java.util.concurrent.ConcurrentHashMap;
 public class SFTPServiceImpl implements SFTPService {
     @Autowired
     private ComponentDao componentDao;
-    private Logger logger = LoggerFactory.getLogger(WebSSHServiceImpl.class);
+    private Logger logger = LoggerFactory.getLogger(SFTPServiceImpl.class);
 
     private static Map<String, SessionLease> sessionMap = new ConcurrentHashMap<>();
     @Override
     public Session initConnection(String userId, WebSSHDataDto webSSHDataDto) throws Exception {
         ServerSSHInfoDto serverSSHInfoDto = componentDao.queryServerSSHInfoByUserIdAndServerIp(Integer.valueOf(userId), webSSHDataDto.getHost());
+        if (serverSSHInfoDto == null) {
+            logger.info("该用户没有该服务器的控制信息");
+            return null;
+        }
         logger.info("stfp连接:IP:{},用户名:{}", webSSHDataDto.getHost(), serverSSHInfoDto.getSshUser());
         long l = System.currentTimeMillis();
         String sessionCacheKey = userId + ":" + webSSHDataDto.getHost();
