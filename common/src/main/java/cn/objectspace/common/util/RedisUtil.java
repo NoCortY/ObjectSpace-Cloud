@@ -28,6 +28,21 @@ public class RedisUtil{
         this.jedisPool = jedisPool;
     }
 
+    public Long expire(byte[] key, int seconds) {
+        Jedis jedis = null;
+        try {
+            jedis = jedisPool.getResource();
+            return jedis.expire(key, seconds);
+        } catch (Exception e) {
+            logger.error("redis设置过期时间异常");
+            logger.error("异常信息:{}", e.getMessage());
+            return null;
+        } finally {
+            if (jedis != null)
+                jedis.close();
+        }
+    }
+
     public Long incr(String key) {
         Jedis jedis = null;
         try {

@@ -215,7 +215,7 @@ public class ACServiceImpl implements ACService {
                 String token = TokenUtil.getInstance().generateTokeCode();
                 session.setAttribute(token,SerializeUtil.serialize(cloudUser));
                 //续约
-                redisUtil.set(SerializeUtil.serialize(token), SerializeUtil.serialize(cloudUser), 15);
+                redisUtil.set(SerializeUtil.serialize(token), SerializeUtil.serialize(cloudUser), 30);
                 authDto = new AuthDto(ConstantPool.Shiro.AC_SUCCESS_CODE,ConstantPool.Shiro.AC_SUCCESS_MESSAGE,cloudUser.getUserEmail(),token,null);
                 return authDto;
             }
@@ -224,7 +224,9 @@ public class ACServiceImpl implements ACService {
             String token = TokenUtil.getInstance().generateTokeCode();
             //token有效期15秒，用完即作废，暂时方案。正常应该是访问AC服务也会消耗token(暂时并存)
             //如果外部服务没有进行消费的token，直接通过销毁程序进行删除
-            redisUtil.set(SerializeUtil.serialize(token),SerializeUtil.serialize(cloudUser),15);
+            redisUtil.set(SerializeUtil.serialize(token), SerializeUtil.serialize(cloudUser), 30);
+            //每次认证都需要续约一次，保证用户在使用期间不会断开
+            redisUtil.expire(SerializeUtil.serialize(uuid), 1800);
             authDto = new AuthDto(ConstantPool.Shiro.AC_SUCCESS_CODE,ConstantPool.Shiro.AC_SUCCESS_MESSAGE,cloudUser.getUserEmail(),token,null);
             return authDto;
         }

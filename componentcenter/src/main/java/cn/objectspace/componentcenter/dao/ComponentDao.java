@@ -1,9 +1,6 @@
 package cn.objectspace.componentcenter.dao;
 
-import cn.objectspace.componentcenter.pojo.dto.CloudServerDto;
-import cn.objectspace.componentcenter.pojo.dto.ServerDetailDto;
-import cn.objectspace.componentcenter.pojo.dto.ServerSSHDto;
-import cn.objectspace.componentcenter.pojo.dto.ServerSSHInfoDto;
+import cn.objectspace.componentcenter.pojo.dto.*;
 import cn.objectspace.componentcenter.pojo.dto.daemon.CpuDto;
 import cn.objectspace.componentcenter.pojo.dto.daemon.DiskDto;
 import cn.objectspace.componentcenter.pojo.dto.daemon.NetDto;
@@ -13,6 +10,8 @@ import cn.objectspace.componentcenter.pojo.dto.record.DiskRecordGroupDto;
 import cn.objectspace.componentcenter.pojo.dto.record.MemRecordDto;
 import cn.objectspace.componentcenter.pojo.dto.record.NetRecordGroupDto;
 import cn.objectspace.componentcenter.pojo.entity.CloudServer;
+import cn.objectspace.componentcenter.pojo.entity.CloudServerCommandExecuteRecord;
+import cn.objectspace.componentcenter.pojo.entity.SimpleCommand;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
@@ -215,4 +214,41 @@ public interface ComponentDao {
      * @Date: 2020/3/10
      */
     public ServerSSHInfoDto queryServerSSHInfoByUserIdAndServerIp(@Param("userId") Integer userId, @Param("serverIp") String serverIp);
+
+
+    /**
+     * @Description: 记录服务器执行命令
+     * @Param:
+     * @return:
+     * @Author: NoCortY
+     * @Date: 2020/4/16
+     */
+    public Integer insertExecuteCommandRecord(List<CloudServerCommandExecuteRecord> cloudServerCommandExecuteRecords);
+
+    /**
+     * @Description: 通过用户id查找服务器执行命令记录
+     * @Param:
+     * @return:
+     * @Author: NoCortY
+     * @Date: 2020/4/16
+     */
+    public List<CloudServerCommandExecuteRecordDto> queryServerCommandExecuteRecordByUserId(@Param("userId") Integer userId);
+
+    /**
+     * @Description: 查询常用命令
+     * @Param:
+     * @return:
+     * @Author: NoCortY
+     * @Date: 2020/4/16
+     */
+    public List<SimpleCommandDto> querySimpleCommandList(@Param("userId") Integer userId);
+
+    /**
+     * @Description: 插入常用命令
+     * @Param:
+     * @return:
+     * @Author: NoCortY
+     * @Date: 2020/4/16
+     */
+    public Integer insertSimpleCommand(SimpleCommand simpleCommand);
 }

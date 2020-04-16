@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.web.bind.annotation.*;
 
+import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
@@ -39,6 +40,10 @@ public class LogController {
     @PostMapping("/recordLog")
     public void recordLog(@RequestBody Log log){
     	SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        //修改时间为yyyy-MM-dd HH:mm:ss格式
+        Date operateDate = log.getOperateDate();
+        Timestamp timeStamp = new Timestamp(operateDate.getTime());
+        log.setOperateDate(timeStamp);
         logger.info("====================================日志入库===================================");
         try {
         	if(logService.addLog(log)) logger.info("{}:   操作日志入库成功!  ",sdf.format(new Date()));

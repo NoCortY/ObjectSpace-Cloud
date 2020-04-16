@@ -34,7 +34,6 @@ import java.io.BufferedOutputStream;
 import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -75,6 +74,13 @@ public class ServerController {
         return responseMap;
     }
 
+    /**
+     * @Description: 获取本人的服务器列表
+     * @Param: [request]
+     * @return: cn.objectspace.common.pojo.entity.ResponseMap<java.util.List < cn.objectspace.componentcenter.pojo.dto.CloudServerDto>>
+     * @Author: NoCortY
+     * @Date: 2020/4/15
+     */
     @SaveLog(applicationId = ConstantPool.ComponentCenter.APPLICATION_ID)
     @GetMapping("/listMyselfServer")
     public ResponseMap<List<CloudServerDto>> listMyselfServer(HttpServletRequest request) throws JsonProcessingException {
@@ -515,8 +521,8 @@ public class ServerController {
 
     @SaveLog(applicationId = ConstantPool.ComponentCenter.APPLICATION_ID)
     @PostMapping("/commandGroup")
-    public ResponseMap<Map<String, String>> commandGroup(HttpServletRequest request) {
-        ResponseMap<Map<String, String>> responseMap = new ResponseMap<>();
+    public ResponseMap<List<ExecuteCommandReturnDto>> commandGroup(HttpServletRequest request) {
+        ResponseMap<List<ExecuteCommandReturnDto>> responseMap = new ResponseMap<>();
         String command = HttpRequestUtil.getStringParameter(request, "command");
         ObjectMapper objectMapper = new ObjectMapper();
         List servers = null;
@@ -532,25 +538,90 @@ public class ServerController {
             return responseMap;
         }
         List<Session> sessions = new LinkedList<>();
+        Integer userId = (Integer) request.getSession().getAttribute(ConstantPool.ComponentCenter.SESSION_USER_ID_KEY);
         for (Object serverIp : servers) {
             WebSSHDataDto webSSHDataDto = new WebSSHDataDto();
             webSSHDataDto.setHost((String) serverIp);
             try {
                 //将获取的session存入list
-                sessions.add(sshService.initConnection(String.valueOf(request.getSession().getAttribute(ConstantPool.ComponentCenter.SESSION_USER_ID_KEY)), webSSHDataDto));
+                sessions.add(sshService.initConnection(String.valueOf(userId), webSSHDataDto));
             } catch (Exception e) {
                 logger.error("获取{}的session异常", serverIp);
                 logger.error("异常信息:{}", e.getMessage());
             }
         }
-        Map<String, String> resMap = sshService.groupCommand(sessions, command);
+        List<ExecuteCommandReturnDto> executeCommandReturnDtos = sshService.groupCommand(sessions, command, userId);
         responseMap.setCode(ConstantPool.Common.REQUEST_SUCCESS_CODE);
         responseMap.setMessage(ConstantPool.Common.REQUEST_SUCCESS_MESSAGE);
-        responseMap.setData(resMap);
-        responseMap.setCount(resMap.size());
+        responseMap.setData(executeCommandReturnDtos);
+        responseMap.setCount(executeCommandReturnDtos.size());
         return responseMap;
 
     }
+
+    @SaveLog(applicationId = ConstantPool.ComponentCenter.APPLICATION_ID)
+    @GetMapping("/serverCommandExecuteRecord")
+    public ResponseMap<List<CloudServerCommandExecuteRecordDto>> serverCommandExecuteRecord(HttpServletRequest request) {
+        Integer userId = (Integer) request.getSession().getAttribute(ConstantPool.ComponentCenter.SESSION_USER_ID_KEY);
+        ResponseMap<List<CloudServerCommandExecuteRecordDto>> responseMap = new ResponseMap<>();
+
+        List<CloudServerCommandExecuteRecordDto> cloudServerCommandExecuteRecordDtoList = sshService.getServerCommandExecuteRecord(userId);
+
+        if (cloudServerCommandExecuteRecordDtoList != null) {
+            responseMap.setCode(ConstantPool.Common.REQUEST_SUCCESS_CODE);
+            responseMap.setMessage(ConstantPool.Common.REQUEST_SUCCESS_MESSAGE);
+            responseMap.setData(cloudServerCommandExecuteRecordDtoList);
+            responseMap.setCount(cloudServerCommandExecuteRecordDtoList.size());
+        } else {
+            responseMap.setCode(ConstantPool.Common.REQUEST_FAILURE_CODE);
+            responseMap.setMessage(ConstantPool.Common.REQUEST_FAILURE_MESSAGE);
+        }
+        return responseMap;
+    }
+
+    @SaveLog(applicationId = ConstantPool.ComponentCenter.APPLICATION_ID)
+    @GetMapping("/simpleCommand")
+    public ResponseMap<List<SimpleCommandDto>> simpleCommand(HttpServletRequest request) {
+        Integer userId = (Integer) request.getSession().getAttribute(ConstantPool.ComponentCenter.SESSION_USER_ID_KEY);
+        ResponseMap<List<SimpleCommandDto>> responseMap = new ResponseMap<>();
+        List<SimpleCommandDto> simpleCommandDtos = sshService.getSimpleCommands(userId);
+
+        if (simpleCommandDtos != null) {
+            responseMap.setCode(ConstantPool.Common.REQUEST_SUCCESS_CODE);
+            responseMap.setMessage(ConstantPool.Common.REQUEST_SUCCESS_MESSAGE);
+            responseMap.setData(simpleCommandDtos);
+            responseMap.setCount(simpleCommandDtos.size());
+        } else {
+            responseMap.setCode(ConstantPool.Common.REQUEST_FAILURE_CODE);
+            responseMap.setMessage(ConstantPool.Common.REQUEST_FAILURE_MESSAGE);
+        }
+        return responseMap;
+    }
+
+    @SaveLog(applicationId = ConstantPool.ComponentCenter.APPLICATION_ID)
+    @PostMapping("/addSimpleCommand")
+    public ResponseMap<String> addSimpleCommand(HttpServletRequest request) {
+        Integer userId = (Integer) request.getSession().getAttribute(ConstantPool.ComponentCenter.SESSION_USER_ID_KEY);
+
+        ResponseMap<String> responseMap = new ResponseMap<>();
+
+        String commandName = HttpRequestUtil.getStringParameter(request, "commandName");
+        String commandContent = HttpRequestUtil.getStringParameter(request, "commandContent");
+
+        boolean flag = sshService.addSimpleCommand(commandName, commandContent, userId);
+
+        if (flag) {
+            responseMap.setCode(ConstantPool.Common.REQUEST_SUCCESS_CODE);
+            responseMap.setMessage(ConstantPool.Common.REQUEST_SUCCESS_MESSAGE);
+            responseMap.setData(ConstantPool.Common.RES_NOT_DATA);
+        } else {
+            responseMap.setCode(ConstantPool.Common.REQUEST_FAILURE_CODE);
+            responseMap.setMessage(ConstantPool.Common.REQUEST_FAILURE_MESSAGE);
+        }
+        return responseMap;
+    }
+
+
     /*@SaveLog(applicationId = ConstantPool.ComponentCenter.APPLICATION_ID)
     @PostMapping("/touch/{serverIp}")
     public ResponseMap<String> touch(@PathVariable String serverIp,HttpServletRequest request){

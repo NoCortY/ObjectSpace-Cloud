@@ -6,6 +6,7 @@
     <resultMap id="URPDto" type="URPDto">
         <id column="user_id" property="userId"/>
         <result column="user_email" property="userEmail"/>
+        <result column="user_name" property="userName"/>
         <result column="user_status" property="userStatus"/>
         <collection property="roleList" ofType="CloudRoleDto">
             <id property="roleId" column="role_id"/>
@@ -59,6 +60,7 @@
         SELECT
         cu.user_id,
         cu.user_email,
+        cu.user_name,
         cu.user_status,
         cr.role_id,
         cr.role_name,

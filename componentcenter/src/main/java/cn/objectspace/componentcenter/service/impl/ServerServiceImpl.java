@@ -380,7 +380,16 @@ public class ServerServiceImpl implements ServerService {
             logger.info("用户id为必填项");
             return null;
         }
-        Integer startItem = PageUtil.getRowIndex(page, limit);
+        Integer startItem = null;
+        //为什么要有这个判断？
+        //因为我不想写一个新的方法来给不需要分页的地方使用了
+        //也不想更改controller的参数
+        //所以就让前端直接传-1，代表不需要分页
+        if (page != -1 && limit != -1) {
+            startItem = PageUtil.getRowIndex(page, limit);
+        } else {
+            limit = null;
+        }
         ResponseMap<List<ServerSSHDto>> responseMap = new ResponseMap<>();
         List<ServerSSHDto> serverSSHDtos = null;
         try {

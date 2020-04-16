@@ -72,7 +72,41 @@
             <result column="tx_rate" property="txRate"/>
         </collection>
     </resultMap>
+    <insert id="insertSimpleCommand" parameterType="SimpleCommand">
+        INSERT INTO simple_command(command_name,command_content,create_user_id,create_user_email,create_user_name)
+        VALUES(#{commandName},#{commandContent},#{createUserId},#{createUserEmail},#{createUserName})
+    </insert>
+    <select id="querySimpleCommandList" parameterType="java.lang.Integer" resultType="SimpleCommandDto">
+        SELECT command_name,command_content,create_user_name FROM simple_command WHERE create_user_id=#{userId}
+    </select>
+    <select id="queryServerCommandExecuteRecordByUserId" resultType="CloudServerCommandExecuteRecordDto"
+            parameterType="java.lang.Integer">
+        SELECT
+        server_ip,command,result,execute_user_name,execute_date
+        FROM
+        cloud_server_command_execute_record
+        WHERE
+        execute_user_id = #{userId}
+        ORDER BY
+        execute_date DESC
+    </select>
+    <insert id="insertExecuteCommandRecord">
+        INSERT INTO
+        cloud_server_command_execute_record(server_ip,command,result,execute_user_id,execute_user_email,execute_user_name,execute_date)
+        VALUES
+        <foreach collection="list" index="index" item="record" separator=",">
+            (
+            #{record.serverIp},
+            #{record.command},
+            #{record.result},
+            #{record.executeUserId},
+            #{record.executeUserEmail},
+            #{record.executeUserName},
+            #{record.executeDate}
+            )
+        </foreach>
 
+    </insert>
     <select id="queryServerSSHInfoByUserIdAndServerIp" resultType="ServerSSHInfoDto">
         SELECT ssh_user,ssh_password,ssh_port FROM cloud_server WHERE server_ip = #{serverIp} and server_user =#{userId}
     </select>
@@ -96,7 +130,9 @@
         SELECT COUNT(server_ip) FROM cloud_server WHERE server_user =#{userId} and server_os_type = 'Linux';
     </select>
     <select id="queryLinuxServerSSHByUserId" resultType="ServerSSHDto">
-            SELECT server_ip,server_os_type,server_os_version,server_desc FROM cloud_server WHERE server_user = #{userId} and server_os_type='Linux' limit #{startItem},#{limit};
+        SELECT server_ip,server_os_type,server_os_version,server_desc FROM cloud_server WHERE server_user = #{userId}
+        and server_os_type='Linux'
+        <if test="startItem!=null and limit!=null">limit #{startItem},#{limit};</if>
     </select>
     <select id="queryNetRuntimeRecord" resultMap="NetRecordGroupDto">
         SELECT record_time,net_name,rx_rate,tx_rate FROM cloud_net_info_now WHERE net_server_user = ${userId} AND net_server_ip = #{serverIp} AND record_time BETWEEN #{startTime} AND #{endTime}

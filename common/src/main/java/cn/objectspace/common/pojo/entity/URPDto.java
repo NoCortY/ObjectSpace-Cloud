@@ -13,6 +13,7 @@ public class URPDto implements Serializable {
     /**************用户***************/
     private Integer userId;
     private String userEmail;
+    private String userName;
     private String userStatus;
     /********************************/
 
@@ -30,6 +31,14 @@ public class URPDto implements Serializable {
 
     public void setUserId(Integer userId) {
         this.userId = userId;
+    }
+
+    public String getUserName() {
+        return userName;
+    }
+
+    public void setUserName(String userName) {
+        this.userName = userName;
     }
 
     public String getUserEmail() {

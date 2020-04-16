@@ -1,10 +1,12 @@
 package cn.objectspace.componentcenter.service;
 
+import cn.objectspace.componentcenter.pojo.dto.CloudServerCommandExecuteRecordDto;
+import cn.objectspace.componentcenter.pojo.dto.ExecuteCommandReturnDto;
+import cn.objectspace.componentcenter.pojo.dto.SimpleCommandDto;
 import cn.objectspace.componentcenter.pojo.dto.WebSSHDataDto;
 import com.jcraft.jsch.Session;
 
 import java.util.List;
-import java.util.Map;
 
 /**
  * @Description: 向服务器发送命令
@@ -28,6 +30,32 @@ public interface SSHService {
      * @Author: NoCortY
      * @Date: 2020/4/14
      */
-    public Map<String, String> groupCommand(List<Session> sessions, String command);
+    public List<ExecuteCommandReturnDto> groupCommand(List<Session> sessions, String command, Integer userId);
 
+    /**
+     * @Description: 获取服务器执行命令记录
+     * @Param:
+     * @return:
+     * @Author: NoCortY
+     * @Date: 2020/4/16
+     */
+    public List<CloudServerCommandExecuteRecordDto> getServerCommandExecuteRecord(Integer userId);
+
+    /**
+     * @Description: 获取常用命令集合
+     * @Param:
+     * @return:
+     * @Author: NoCortY
+     * @Date: 2020/4/16
+     */
+    public List<SimpleCommandDto> getSimpleCommands(Integer userId);
+
+    /**
+     * @Description: 新增常用命令
+     * @Param:
+     * @return:
+     * @Author: NoCortY
+     * @Date: 2020/4/16
+     */
+    public boolean addSimpleCommand(String commandName, String commandContent, Integer userId);
 }

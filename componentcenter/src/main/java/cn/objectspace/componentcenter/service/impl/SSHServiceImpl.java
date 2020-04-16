@@ -1,9 +1,13 @@
 package cn.objectspace.componentcenter.service.impl;
 
+import cn.objectspace.common.constant.ConstantPool;
+import cn.objectspace.common.pojo.entity.URPDto;
+import cn.objectspace.common.util.RedisUtil;
+import cn.objectspace.common.util.SerializeUtil;
 import cn.objectspace.componentcenter.dao.ComponentDao;
-import cn.objectspace.componentcenter.pojo.dto.ServerSSHInfoDto;
-import cn.objectspace.componentcenter.pojo.dto.SessionLease;
-import cn.objectspace.componentcenter.pojo.dto.WebSSHDataDto;
+import cn.objectspace.componentcenter.pojo.dto.*;
+import cn.objectspace.componentcenter.pojo.entity.CloudServerCommandExecuteRecord;
+import cn.objectspace.componentcenter.pojo.entity.SimpleCommand;
 import cn.objectspace.componentcenter.service.SSHService;
 import com.jcraft.jsch.*;
 import org.apache.commons.io.IOUtils;
@@ -15,7 +19,9 @@ import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.HashMap;
+import java.sql.Timestamp;
+import java.util.Date;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -29,6 +35,8 @@ import java.util.concurrent.ConcurrentHashMap;
 public class SSHServiceImpl implements SSHService {
     @Autowired
     private ComponentDao componentDao;
+    @Autowired
+    private RedisUtil redisUtil;
     private Logger logger = LoggerFactory.getLogger(SSHServiceImpl.class);
 
     private static Map<String, SessionLease> sessionMap = new ConcurrentHashMap<>();
@@ -101,13 +109,18 @@ public class SSHServiceImpl implements SSHService {
      * @Date: 2020/4/14
      */
     @Override
-    public Map<String, String> groupCommand(List<Session> sessions, String command) {
-        if (sessions == null || StringUtils.isBlank(command)) {
+    public List<ExecuteCommandReturnDto> groupCommand(List<Session> sessions, String command, Integer userId) {
+        if (sessions == null || StringUtils.isBlank(command) || userId == null) {
             logger.info("命令群发有部分入参缺失");
             return null;
         }
-        Map<String, String> res = new HashMap<>();
+        //执行反馈集合
+        List<ExecuteCommandReturnDto> executeCommandReturnDtos = new LinkedList<>();
+        //执行记录集合
+        List<CloudServerCommandExecuteRecord> cloudServerCommandExecuteRecords = new LinkedList<>();
         for (Session session : sessions) {
+            ExecuteCommandReturnDto executeCommandReturnDto = new ExecuteCommandReturnDto();
+            CloudServerCommandExecuteRecord cloudServerCommandExecuteRecord = new CloudServerCommandExecuteRecord();
             Channel channel = null;
             //打开exec通道
             try {
@@ -116,7 +129,10 @@ public class SSHServiceImpl implements SSHService {
             } catch (JSchException e) {
                 logger.error("exec channel创建失败");
                 logger.error("异常信息:{}", e.getMessage());
-                res.put(session.getHost(), "命令发送失败");
+                executeCommandReturnDto.setServerIp(session.getHost());
+                executeCommandReturnDto.setCommand(command);
+                executeCommandReturnDto.setResult("命令执行失败");
+                executeCommandReturnDtos.add(executeCommandReturnDto);
                 continue;
             }
 
@@ -129,7 +145,10 @@ public class SSHServiceImpl implements SSHService {
             } catch (IOException e) {
                 logger.error("获取输入流异常");
                 logger.error("异常信息:{}", e.getMessage());
-                res.put(session.getHost(), "命令发送失败");
+                executeCommandReturnDto.setServerIp(session.getHost());
+                executeCommandReturnDto.setCommand(command);
+                executeCommandReturnDto.setResult("命令执行失败");
+                executeCommandReturnDtos.add(executeCommandReturnDto);
                 continue;
             }
             channelExec.setCommand(command);
@@ -139,22 +158,97 @@ public class SSHServiceImpl implements SSHService {
             } catch (JSchException e) {
                 logger.error("通道连接失败");
                 logger.error("异常信息:{}", e.getMessage());
-                res.put(session.getHost(), "命令发送失败");
+                executeCommandReturnDto.setServerIp(session.getHost());
+                executeCommandReturnDto.setCommand(command);
+                executeCommandReturnDto.setResult("命令执行失败");
+                executeCommandReturnDtos.add(executeCommandReturnDto);
                 continue;
             }
             try {
-                res.put(session.getHost(), IOUtils.toString(inputStream, "utf-8"));
-            } catch (IOException e) {
+                executeCommandReturnDto.setServerIp(session.getHost());
+                executeCommandReturnDto.setCommand(command);
+                //构建执行反馈对象
+                //换行符转换为前端的换行符
+                String result = IOUtils.toString(inputStream, "utf-8");
+                executeCommandReturnDto.setResult(result.replace("\n", "<br>"));
+                executeCommandReturnDtos.add(executeCommandReturnDto);
+                //构建服务器运行记录对象
+                cloudServerCommandExecuteRecord.setCommand(command);
+                Date date = new Date();
+                Timestamp timeStamp = new Timestamp(date.getTime());
+                cloudServerCommandExecuteRecord.setExecuteDate(timeStamp);
+
+                cloudServerCommandExecuteRecord.setResult(result);
+                cloudServerCommandExecuteRecord.setServerIp(session.getHost());
+                URPDto urpDto = (URPDto) SerializeUtil.unSerialize(redisUtil.get(SerializeUtil.serialize(ConstantPool.ComponentCenter.URPDTO_REDIS_KEY_CC + userId)));
+                if (urpDto != null) {
+                    cloudServerCommandExecuteRecord.setExecuteUserId(urpDto.getUserId());
+                    cloudServerCommandExecuteRecord.setExecuteUserName(urpDto.getUserName());
+                    cloudServerCommandExecuteRecord.setExecuteUserEmail(urpDto.getUserEmail());
+                } else {
+                    throw new Exception("权限不足");
+                }
+                cloudServerCommandExecuteRecords.add(cloudServerCommandExecuteRecord);
+            } catch (Exception e) {
                 logger.error("获取运行结果异常");
                 logger.info("异常信息:{}", e.getMessage());
-                res.put(session.getHost(), "命令发送失败");
+                executeCommandReturnDto.setServerIp(session.getHost());
+                executeCommandReturnDto.setCommand(command);
+                executeCommandReturnDto.setResult("命令执行失败");
+                executeCommandReturnDtos.add(executeCommandReturnDto);
             } finally {
                 channelExec.disconnect();
                 channel.disconnect();
             }
         }
+        //进行命令执行数据一次性入库
+        componentDao.insertExecuteCommandRecord(cloudServerCommandExecuteRecords);
+        return executeCommandReturnDtos;
+    }
 
-        return res;
+    @Override
+    public List<CloudServerCommandExecuteRecordDto> getServerCommandExecuteRecord(Integer userId) {
+        if (userId == null) {
+            logger.info("用户id不能为空");
+            return null;
+        }
+        List<CloudServerCommandExecuteRecordDto> cloudServerCommandExecuteRecordDtoList = componentDao.queryServerCommandExecuteRecordByUserId(userId);
+        for (CloudServerCommandExecuteRecordDto cloudServerCommandExecuteRecordDto : cloudServerCommandExecuteRecordDtoList) {
+            String replace = cloudServerCommandExecuteRecordDto.getResult().replace("\n", "<br>");
+            cloudServerCommandExecuteRecordDto.setResult(replace);
+        }
+        return cloudServerCommandExecuteRecordDtoList;
+    }
+
+    @Override
+    public List<SimpleCommandDto> getSimpleCommands(Integer userId) {
+        if (userId == null) {
+            logger.info("用户id不能为空");
+            return null;
+        }
+        return componentDao.querySimpleCommandList(userId);
+    }
+
+    /**
+     * @Description: 新增常用命令
+     * @Param: [commandName, commandContent, userId]
+     * @return: boolean
+     * @Author: NoCortY
+     * @Date: 2020/4/16
+     */
+    @Override
+    public boolean addSimpleCommand(String commandName, String commandContent, Integer userId) {
+        SimpleCommand simpleCommand = new SimpleCommand();
+        URPDto urpDto = (URPDto) SerializeUtil.unSerialize(redisUtil.get(SerializeUtil.serialize(ConstantPool.ComponentCenter.URPDTO_REDIS_KEY_CC + userId)));
+        //urpDto没了说明已经失去了权限
+        if (urpDto == null) return false;
+        simpleCommand.setCommandName(commandName);
+        simpleCommand.setCommandContent(commandContent);
+        simpleCommand.setCreateUserId(userId);
+        simpleCommand.setCreateUserEmail(urpDto.getUserEmail());
+        simpleCommand.setCreateUserName(urpDto.getUserName());
+        Integer effectiveNum = componentDao.insertSimpleCommand(simpleCommand);
+        return effectiveNum > 0;
     }
 
 }

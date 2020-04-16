@@ -1,5 +1,7 @@
 package cn.objectspace.logcenter.pojo.entity;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+
 import java.io.Serializable;
 import java.util.Date;
 
@@ -11,6 +13,7 @@ import java.util.Date;
 public class Log implements Serializable {
     private static final long serialVersionUID = 9210955183098226916L;
     private Integer id;
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date operateDate;
     private String inputParameter;
     private String outputParameter;
