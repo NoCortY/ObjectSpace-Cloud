@@ -9,10 +9,19 @@ import java.io.Serializable;
  */
 public class SimpleCommandDto implements Serializable {
     private static final long serialVersionUID = 4856561028290680738L;
-
+    private Integer id;
     private String commandName;
     private String commandContent;
     private String createUserName;
+
+
+    public Integer getId() {
+        return id;
+    }
+
+    public void setId(Integer id) {
+        this.id = id;
+    }
 
     public String getCommandName() {
         return commandName;

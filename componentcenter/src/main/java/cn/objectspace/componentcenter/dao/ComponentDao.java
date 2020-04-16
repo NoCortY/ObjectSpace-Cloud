@@ -251,4 +251,13 @@ public interface ComponentDao {
      * @Date: 2020/4/16
      */
     public Integer insertSimpleCommand(SimpleCommand simpleCommand);
+
+    /**
+     * @Description: 根据id删除常用命令
+     * @Param:
+     * @return:
+     * @Author: NoCortY
+     * @Date: 2020/4/16
+     */
+    public Integer deleteSimpleCommandById(@Param("id") Integer id, @Param("userId") Integer userId);
 }

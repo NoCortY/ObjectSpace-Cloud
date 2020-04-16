@@ -72,12 +72,17 @@
             <result column="tx_rate" property="txRate"/>
         </collection>
     </resultMap>
+    <delete id="deleteSimpleCommandById" parameterType="java.lang.Integer">
+        DELETE FROM
+        simple_command
+        WHERE id = #{id} and create_user_id = #{userId}
+    </delete>
     <insert id="insertSimpleCommand" parameterType="SimpleCommand">
         INSERT INTO simple_command(command_name,command_content,create_user_id,create_user_email,create_user_name)
         VALUES(#{commandName},#{commandContent},#{createUserId},#{createUserEmail},#{createUserName})
     </insert>
     <select id="querySimpleCommandList" parameterType="java.lang.Integer" resultType="SimpleCommandDto">
-        SELECT command_name,command_content,create_user_name FROM simple_command WHERE create_user_id=#{userId}
+        SELECT id,command_name,command_content,create_user_name FROM simple_command WHERE create_user_id=#{userId}
     </select>
     <select id="queryServerCommandExecuteRecordByUserId" resultType="CloudServerCommandExecuteRecordDto"
             parameterType="java.lang.Integer">

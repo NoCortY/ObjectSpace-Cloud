@@ -251,4 +251,13 @@ public class SSHServiceImpl implements SSHService {
         return effectiveNum > 0;
     }
 
+    @Override
+    public boolean removeSimpleCommand(Integer commandId, Integer userId) {
+        if (commandId == null || userId == null) {
+            logger.info("id不能为空");
+            return false;
+        }
+        return componentDao.deleteSimpleCommandById(commandId, userId) > 0;
+    }
+
 }

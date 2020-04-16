@@ -58,4 +58,14 @@ public interface SSHService {
      * @Date: 2020/4/16
      */
     public boolean addSimpleCommand(String commandName, String commandContent, Integer userId);
+
+
+    /**
+     * @Description: 删除常用命令
+     * @Param:
+     * @return:
+     * @Author: NoCortY
+     * @Date: 2020/4/16
+     */
+    public boolean removeSimpleCommand(Integer commandId, Integer userId);
 }

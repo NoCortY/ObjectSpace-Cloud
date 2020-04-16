@@ -621,6 +621,28 @@ public class ServerController {
         return responseMap;
     }
 
+    @SaveLog(applicationId = ConstantPool.ComponentCenter.APPLICATION_ID)
+    @PostMapping("/removeSimpleCommand")
+    public ResponseMap<String> removeSimpleCommand(HttpServletRequest request) {
+        Integer userId = (Integer) request.getSession().getAttribute(ConstantPool.ComponentCenter.SESSION_USER_ID_KEY);
+
+        Integer commandId = HttpRequestUtil.getIntegerParameter(request, "commandId");
+        ResponseMap<String> responseMap = new ResponseMap<>();
+
+
+        boolean flag = sshService.removeSimpleCommand(commandId, userId);
+
+        if (flag) {
+            responseMap.setCode(ConstantPool.Common.REQUEST_SUCCESS_CODE);
+            responseMap.setMessage(ConstantPool.Common.REQUEST_SUCCESS_MESSAGE);
+            responseMap.setData(ConstantPool.Common.RES_NOT_DATA);
+        } else {
+            responseMap.setCode(ConstantPool.Common.REQUEST_FAILURE_CODE);
+            responseMap.setMessage(ConstantPool.Common.REQUEST_FAILURE_MESSAGE);
+        }
+        return responseMap;
+    }
+
 
     /*@SaveLog(applicationId = ConstantPool.ComponentCenter.APPLICATION_ID)
     @PostMapping("/touch/{serverIp}")
