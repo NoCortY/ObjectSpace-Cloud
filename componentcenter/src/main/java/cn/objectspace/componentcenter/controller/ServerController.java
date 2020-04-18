@@ -34,8 +34,6 @@ import java.io.BufferedOutputStream;
 import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 @RestController
 @RequestMapping("/CC/server")
@@ -49,27 +47,18 @@ public class ServerController {
     Logger logger = LoggerFactory.getLogger(ServerController.class);
     @SaveLog(applicationId = ConstantPool.ComponentCenter.APPLICATION_ID)
     @PostMapping("/register")
-    public ResponseMap<String> register(@RequestBody CloudServer cloudServer){
+    public ResponseMap<String> register(HttpServletRequest request) {
         ResponseMap<String> responseMap = new ResponseMap<>();
-        //正则匹配
-        String pattern = "((2(5[0-5]|[0-4]\\d))|[0-1]?\\d{1,2})(\\.((2(5[0-5]|[0-4]\\d))|[0-1]?\\d{1,2})){3}";
-
-        Pattern r = Pattern.compile(pattern);
-        Matcher m = r.matcher(cloudServer.getServerIp());
-        if(!m.matches()){
-            responseMap.setCode(ConstantPool.Common.REQUEST_FAILURE_CODE);
-            responseMap.setMessage(ConstantPool.ComponentCenter.ERROR_SERVER_IP);
-            responseMap.setData(ConstantPool.Common.RES_NOT_DATA);
-            return responseMap;
-        }
-        if(serverService.registerServer(cloudServer)){
+        Integer userId = (Integer) request.getSession().getAttribute(ConstantPool.ComponentCenter.SESSION_USER_ID_KEY);
+        String installCommand = ConstantPool.ComponentCenter.COMMAND_FOR_DAEMON_INSTALL + String.valueOf(userId);
+        if (userId != null) {
             responseMap.setCode(ConstantPool.Common.REQUEST_SUCCESS_CODE);
             responseMap.setMessage(ConstantPool.ComponentCenter.REGISTER_SERVER_SUCCESS);
-            responseMap.setData(ConstantPool.Common.RES_NOT_DATA);
+            responseMap.setData(installCommand);
         }else{
             responseMap.setCode(ConstantPool.Common.REQUEST_FAILURE_CODE);
             responseMap.setMessage(ConstantPool.ComponentCenter.REGISTER_SERVER_FALURE);
-            responseMap.setData(ConstantPool.Common.RES_NOT_DATA);
+            responseMap.setData("无法获取您专属的指令,请重新登录");
         }
         return responseMap;
     }

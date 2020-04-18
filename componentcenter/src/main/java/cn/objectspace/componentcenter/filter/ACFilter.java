@@ -36,7 +36,7 @@ public class ACFilter implements Filter {
         if("/CC/server/ping".equals(requestURI)){
             //如果是发送心跳的，直接放行即可
             logger.info("访问白名单url");
-            restUtil.getRestTemplate().postForObject(ConstantPool.Shiro.AC_APPLICATION_NAME + "/AC/destroyToken/" + token, null, Void.class);
+            //restUtil.getRestTemplate().postForObject(ConstantPool.Shiro.AC_APPLICATION_NAME + "/AC/destroyToken/" + token, null, Void.class);
             chain.doFilter(request,response);
             return;
         }

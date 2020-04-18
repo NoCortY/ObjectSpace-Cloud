@@ -222,5 +222,10 @@ public class ConstantPool {
          */
         //public static final String WEBSOCKET_ONLINE_USER_ID = "WSUserId";
 
+        /**
+         * 服务器安装守护进程命令
+         */
+        public static final String COMMAND_FOR_DAEMON_INSTALL = "curl download.objectspace.cn/ObjectSpaceDaemon/ObjectSpaceDaemonInstall.sh|bash -s ";
+
     }
 }

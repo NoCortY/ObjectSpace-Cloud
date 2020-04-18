@@ -46,12 +46,14 @@ public class TokenFilter implements GlobalFilter, Ordered {
                 || requestUrl.contains("/captcha/kaptcha.jpg")
                 || requestUrl.contains("/UC/mailVerify")
                 || requestUrl.contains("/swagger-ui.html")
-                || requestUrl.contains("/webjars"))
+                || requestUrl.contains("/webjars")
                 || requestUrl.contains("/swagger-resources")
                 || requestUrl.contains("/v2")
                 || requestUrl.contains("/csrf")
-                || requestUrl.contains("/CC/server/ping")) {
+                || requestUrl.contains("/CC/server/ping"))) {
             //放行白名单
+            System.out.println("访问白名单:" + requestUrl);
+            // System.out.println(request.getHeaders().getAccessControlRequestMethod().toString());
             return chain.filter(exchange);
         }
         MultiValueMap<String, HttpCookie> cookies = request.getCookies();
