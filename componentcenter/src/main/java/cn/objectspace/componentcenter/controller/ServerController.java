@@ -632,6 +632,43 @@ public class ServerController {
         return responseMap;
     }
 
+    @SaveLog(applicationId = ConstantPool.ComponentCenter.APPLICATION_ID)
+    @GetMapping("/serverSimpleStatus")
+    public ResponseMap<ServerSimpleStatusDto> serverSimpleStatus(HttpServletRequest request) {
+        ResponseMap<ServerSimpleStatusDto> responseMap = new ResponseMap<>();
+        Integer userId = (Integer) request.getSession().getAttribute(ConstantPool.ComponentCenter.SESSION_USER_ID_KEY);
+        ServerSimpleStatusDto serverSimpleStatusDto = serverService.getServerSimpleStatus(userId);
+
+        if (serverSimpleStatusDto == null) {
+            responseMap.setCode(ConstantPool.Common.REQUEST_FAILURE_CODE);
+            responseMap.setMessage(ConstantPool.Common.REQUEST_FAILURE_MESSAGE);
+        } else {
+            responseMap.setCode(ConstantPool.Common.REQUEST_SUCCESS_CODE);
+            responseMap.setMessage(ConstantPool.Common.REQUEST_SUCCESS_MESSAGE);
+            responseMap.setData(serverSimpleStatusDto);
+        }
+        return responseMap;
+    }
+
+    @SaveLog(applicationId = ConstantPool.ComponentCenter.APPLICATION_ID)
+    @GetMapping("/serverSimpleSnapshot/{serverIp}")
+    public ResponseMap<ServerSimpleSnapshot> serverSimpleSnapshot(HttpServletRequest request, @PathVariable String serverIp) {
+        ResponseMap<ServerSimpleSnapshot> responseMap = new ResponseMap<>();
+
+        Integer userId = (Integer) request.getSession().getAttribute(ConstantPool.ComponentCenter.SESSION_USER_ID_KEY);
+
+        ServerSimpleSnapshot serverSimpleSnapshot = serverService.getServerSimpleSnapshot(userId, serverIp);
+
+        if (serverSimpleSnapshot == null) {
+            responseMap.setCode(ConstantPool.Common.REQUEST_FAILURE_CODE);
+            responseMap.setMessage(ConstantPool.Common.REQUEST_FAILURE_MESSAGE);
+        } else {
+            responseMap.setCode(ConstantPool.Common.REQUEST_SUCCESS_CODE);
+            responseMap.setMessage(ConstantPool.Common.REQUEST_SUCCESS_MESSAGE);
+            responseMap.setData(serverSimpleSnapshot);
+        }
+        return responseMap;
+    }
 
     /*@SaveLog(applicationId = ConstantPool.ComponentCenter.APPLICATION_ID)
     @PostMapping("/touch/{serverIp}")

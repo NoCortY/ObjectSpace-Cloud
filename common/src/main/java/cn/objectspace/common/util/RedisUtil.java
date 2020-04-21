@@ -28,7 +28,31 @@ public class RedisUtil{
         this.jedisPool = jedisPool;
     }
 
+
+    public Set<byte[]> keys(byte[] pattern) {
+        Jedis jedis = null;
+        try {
+            jedis = jedisPool.getResource();
+            return jedis.keys(pattern);
+        } catch (Exception e) {
+            logger.error("keys byte 异常");
+            logger.error("异常信息:{}", e.getMessage());
+            return null;
+        } finally {
+            if (jedis != null)
+                jedis.close();
+        }
+    }
+
+    /**
+     * @Description: 设置过期时间
+     * @Param: [key, seconds]
+     * @return: java.lang.Long
+     * @Author: NoCortY
+     * @Date: 2020/4/21
+     */
     public Long expire(byte[] key, int seconds) {
+
         Jedis jedis = null;
         try {
             jedis = jedisPool.getResource();

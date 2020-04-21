@@ -227,5 +227,9 @@ public class ConstantPool {
          */
         public static final String COMMAND_FOR_DAEMON_INSTALL = "curl download.objectspace.cn/ObjectSpaceDaemon/ObjectSpaceDaemonInstall.sh|bash -s ";
 
+        /**
+         * 高负载key
+         */
+        public static final String HIGH_OVERLOAD_KEY = "high_overload:";
     }
 }

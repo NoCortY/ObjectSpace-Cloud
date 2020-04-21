@@ -476,6 +476,12 @@
     <select id="queryServerIpByUserId" parameterType="java.lang.Integer" resultType="java.lang.String">
         SELECT server_ip FROM cloud_server WHERE server_user = #{userId}
     </select>
+    <select id="queryLastRecordTimeByUserIdAndServerIp" resultType="java.lang.String">
+        SELECT record_time FROM cloud_server_info_now
+        WHERE server_user = #{userId} and ip=#{serverIp}
+        ORDER BY record_time DESC
+        LIMIT 1
+    </select>
     <!--<insert id="insertComponent">
         INSERT INTO cloud_microservice
         <trim prefix="(" suffix=")" suffixOverrides=",">

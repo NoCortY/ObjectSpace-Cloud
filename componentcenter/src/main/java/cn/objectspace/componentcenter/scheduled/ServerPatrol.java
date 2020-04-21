@@ -105,7 +105,7 @@ public class ServerPatrol {
                 List<ServerResumeDto> serverResumes = serverService.getServerResumes(Integer.valueOf(userId));
                 ObjectMapper objectMapper = new ObjectMapper();
                 try {
-                    String serverResumesJson = serverResumesJson = objectMapper.writeValueAsString(serverResumes);
+                    String serverResumesJson = objectMapper.writeValueAsString(serverResumes);
                     ServerResumeWebSocketHandler.senMessage(Integer.valueOf(userId), serverResumesJson);
                 } catch (IOException e) {
                     logger.error("定时发送异常");

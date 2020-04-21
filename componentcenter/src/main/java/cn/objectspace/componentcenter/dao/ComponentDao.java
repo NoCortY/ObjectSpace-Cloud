@@ -260,4 +260,6 @@ public interface ComponentDao {
      * @Date: 2020/4/16
      */
     public Integer deleteSimpleCommandById(@Param("id") Integer id, @Param("userId") Integer userId);
+
+    public String queryLastRecordTimeByUserIdAndServerIp(@Param("userId") Integer userId, @Param("serverIp") String serverIp);
 }

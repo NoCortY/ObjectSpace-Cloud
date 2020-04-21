@@ -1,10 +1,7 @@
 package cn.objectspace.componentcenter.service;
 
 import cn.objectspace.common.pojo.entity.ResponseMap;
-import cn.objectspace.componentcenter.pojo.dto.CloudServerDto;
-import cn.objectspace.componentcenter.pojo.dto.ServerDetailDto;
-import cn.objectspace.componentcenter.pojo.dto.ServerResumeDto;
-import cn.objectspace.componentcenter.pojo.dto.ServerSSHDto;
+import cn.objectspace.componentcenter.pojo.dto.*;
 import cn.objectspace.componentcenter.pojo.dto.daemon.ServerInfoDto;
 import cn.objectspace.componentcenter.pojo.dto.record.CpuRecordGroupDto;
 import cn.objectspace.componentcenter.pojo.dto.record.DiskRecordGroupDto;
@@ -136,4 +133,20 @@ public interface ServerService {
      * @Date: 2020/3/10
      */
     public Integer renewServerSSHInfo(CloudServer cloudServer);
+
+    /**
+     * @Description: 获取服务器基本状态
+     * @Param:
+     * @return:
+     * @Author: NoCortY
+     * @Date: 2020/4/21
+     */
+    public ServerSimpleStatusDto getServerSimpleStatus(Integer userId);
+
+    /**
+     * @Description: 获取服务器快照简单信息
+     * @Author: NoCortY
+     * @Date: 2020/4/21
+     */
+    public ServerSimpleSnapshot getServerSimpleSnapshot(Integer userId, String serverIp);
 }

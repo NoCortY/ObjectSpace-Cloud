@@ -7,10 +7,7 @@ import cn.objectspace.common.util.RedisUtil;
 import cn.objectspace.common.util.SerializeUtil;
 import cn.objectspace.common.util.TimeUtil;
 import cn.objectspace.componentcenter.dao.ComponentDao;
-import cn.objectspace.componentcenter.pojo.dto.CloudServerDto;
-import cn.objectspace.componentcenter.pojo.dto.ServerDetailDto;
-import cn.objectspace.componentcenter.pojo.dto.ServerResumeDto;
-import cn.objectspace.componentcenter.pojo.dto.ServerSSHDto;
+import cn.objectspace.componentcenter.pojo.dto.*;
 import cn.objectspace.componentcenter.pojo.dto.daemon.CpuDto;
 import cn.objectspace.componentcenter.pojo.dto.daemon.DiskDto;
 import cn.objectspace.componentcenter.pojo.dto.daemon.NetDto;
@@ -29,9 +26,13 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.interceptor.TransactionAspectSupport;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 @Service
 public class ServerServiceImpl implements ServerService {
@@ -40,6 +41,8 @@ public class ServerServiceImpl implements ServerService {
     @Autowired
     RedisUtil redisUtil;
     private Logger logger = LoggerFactory.getLogger(ServerServiceImpl.class);
+
+    private Map<String, Integer> highOverloadMap = new ConcurrentHashMap<>();
     @Override
     public boolean registerServer(CloudServer cloudServer) {
         if(cloudServer==null||cloudServer.getServerIp()==null||cloudServer.getServerIp().length()==0) return false;
@@ -148,10 +151,15 @@ public class ServerServiceImpl implements ServerService {
             redisUtil.hmset(ConstantPool.ComponentCenter.MONITOR_SERVER_MAP,serverUser+":"+serverIp,ConstantPool.ComponentCenter.SERVER_ONLINE);
         }
 
-        //放入redis缓存，过期时间为60s，如果60秒内没有接收到下一次心跳，那么说明这个服务器宕机。
-        redisUtil.set(SerializeUtil.serialize(serverUser+":"+serverIp),SerializeUtil.serialize(serverInfoDto), ConstantPool.ComponentCenter.SERVER_HEARTBEAT_EXTIME);
+
         //设置当前时间
         Date nowDate = new Date();
+
+        //设置记录时间
+        serverInfoDto.setRecordTime(nowDate);
+        //放入redis缓存，过期时间为60s，如果60秒内没有接收到下一次心跳，那么说明这个服务器宕机。
+        redisUtil.set(SerializeUtil.serialize(serverUser+":"+serverIp),SerializeUtil.serialize(serverInfoDto), ConstantPool.ComponentCenter.SERVER_HEARTBEAT_EXTIME);
+
         ArrayList<CpuDto> cpuList = (ArrayList<CpuDto>) serverInfoDto.getCpuList();
         ArrayList<DiskDto> diskList = (ArrayList<DiskDto>) serverInfoDto.getDiskList();
         ArrayList<NetDto> netList = (ArrayList<NetDto>) serverInfoDto.getNetList();
@@ -174,8 +182,6 @@ public class ServerServiceImpl implements ServerService {
             netDto.setNetServerUser(serverUser);
             netDto.setRecordTime(nowDate);
         }
-        //设置记录时间
-        serverInfoDto.setRecordTime(nowDate);
         //记录
         try{
             componentDao.insertServerStateInfo(serverInfoDto);
@@ -201,6 +207,9 @@ public class ServerServiceImpl implements ServerService {
         }
         List<ServerResumeDto> serverResumeDtos = null;
         List<String> serverIpList = componentDao.queryServerIpByUserId(userId);
+
+        //高负载数量
+        Integer highCount = 0;
         if (serverIpList != null) {
             serverResumeDtos = new ArrayList<>();
             for (String serverIp : serverIpList) {
@@ -246,6 +255,10 @@ public class ServerServiceImpl implements ServerService {
                     sendPackageTotal += netDto.getTxPackets();
                     recPackageTotal += netDto.getRxPackets();
                 }
+                //高负载发现
+                if (memUsedPercent > 80.0 || swapUsedPercent > 80.0 || cpuUsedPercent > 0.8) {
+                    highCount++;
+                }
                 serverResumeDto.setMemUsedPercent(memUsedPercent);
                 serverResumeDto.setSwapUsedPercent(swapUsedPercent);
                 serverResumeDto.setDiskUsedPercent(diskUsedPercent);
@@ -254,6 +267,8 @@ public class ServerServiceImpl implements ServerService {
                 serverResumeDto.setRecPackageTotal(recPackageTotal);
                 serverResumeDtos.add(serverResumeDto);
             }
+            highOverloadMap.put(ConstantPool.ComponentCenter.HIGH_OVERLOAD_KEY + userId, highCount);
+
         } else {
             //服务器列表为空
             logger.info("该用户没有正在监控的服务器");
@@ -443,6 +458,75 @@ public class ServerServiceImpl implements ServerService {
             return null;
         }
         return effectiveNum;
+    }
+
+    @Override
+    public ServerSimpleStatusDto getServerSimpleStatus(Integer userId) {
+        List<String> serverIpList = componentDao.queryServerIpByUserId(userId);
+        ServerSimpleStatusDto serverSimpleStatusDto = new ServerSimpleStatusDto();
+        Integer highCount = highOverloadMap.get(ConstantPool.ComponentCenter.HIGH_OVERLOAD_KEY + userId);
+        if (highCount == null) highCount = 0;
+        serverSimpleStatusDto.setHighOverload(0);
+        int down = 0, normal = 0;
+        for (String serverIp : serverIpList) {
+            String key = userId + ":" + serverIp;
+            if (ConstantPool.ComponentCenter.SERVER_ONLINE.equals(redisUtil.hmget(ConstantPool.ComponentCenter.MONITOR_SERVER_MAP, key).get(0))) {
+                normal++;
+            } else {
+                down++;
+            }
+        }
+        //正常运行的数量需要扣除掉高负载数量
+        normal = normal - highCount;
+        serverSimpleStatusDto.setNormalCount(normal);
+        serverSimpleStatusDto.setHighOverload(highCount);
+        serverSimpleStatusDto.setDown(down);
+        return serverSimpleStatusDto;
+    }
+
+    @Override
+    public ServerSimpleSnapshot getServerSimpleSnapshot(Integer userId, String serverIp) {
+        if (userId == null || StringUtils.isBlank(serverIp)) {
+            logger.info("not null");
+            return null;
+        }
+        ServerSimpleSnapshot serverSimpleSnapshot = new ServerSimpleSnapshot();
+        //获取详细信息
+        ServerDetailDto serverDetailDto = componentDao.queryDetailOfServerByUserIdAndServerIp(serverIp, userId);
+        //计算硬盘大小
+        Double diskTotal = 0.0;
+        for (DiskDetailDto diskDetailDto : serverDetailDto.getDiskDetailDtos()) {
+            diskTotal += Double.parseDouble(diskDetailDto.getTotal()) / 1024;
+        }
+        //计算内存大小
+        Double memTotal = Double.valueOf(serverDetailDto.getMemTotal());
+        serverSimpleSnapshot.setDisk(diskTotal / 1024);
+        serverSimpleSnapshot.setMemory(memTotal / 1024 / 1024);
+
+
+        //拿到最后心跳时间
+        ServerInfoDto serverInfoDto = (ServerInfoDto) SerializeUtil.unSerialize(redisUtil.get(SerializeUtil.serialize(userId + ":" + serverIp)));
+        Date lastHeartBeat = new Date();
+        if (serverInfoDto == null) {
+            //如果为null,说明已经down了
+            //那么需要去数据库中拿最后的心跳时间
+            String lastRecordTime = componentDao.queryLastRecordTimeByUserIdAndServerIp(userId, serverIp);
+            SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            try {
+                lastHeartBeat = simpleDateFormat.parse(lastRecordTime);
+            } catch (ParseException e) {
+                logger.error("日期转换失败");
+                logger.error("异常信息:{}", e.getMessage());
+            }
+            serverSimpleSnapshot.setLastHeartBeat(lastHeartBeat);
+            return serverSimpleSnapshot;
+        } else {
+            lastHeartBeat = serverInfoDto.getRecordTime();
+            serverSimpleSnapshot.setLastHeartBeat(lastHeartBeat);
+        }
+        String timeKeeping = redisUtil.get(ConstantPool.ComponentCenter.SERVER_TIME_KEEPING_KEY + userId + ":" + serverIp);
+        serverSimpleSnapshot.setTimeKeeping(Integer.valueOf(timeKeeping));
+        return serverSimpleSnapshot;
     }
 
 }
