@@ -305,8 +305,19 @@ public class ServerServiceImpl implements ServerService {
             logger.info("用户名和服务器IP为必填项");
             return null;
         }
-        Date startTime = new Date(System.currentTimeMillis() - TimeUtil.minuteToMillisecond(intervalMinutes));
-        Date endTime = new Date();
+        String lastRecordTime = componentDao.queryLastRecordTimeByUserIdAndServerIp(userId, serverIp);
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        Date lastHeartBeat = null;
+        try {
+            lastHeartBeat = sdf.parse(lastRecordTime);
+        } catch (ParseException e) {
+            logger.error("日期转换异常");
+            logger.error("异常信息:{}", e.getMessage());
+            lastHeartBeat = new Date();
+        }
+        Date endTime = lastHeartBeat;
+        //时间戳
+        Date startTime = new Date(endTime.getTime() - TimeUtil.minuteToMillisecond(intervalMinutes));
 
         List<CpuRecordGroupDto> cpuRecordGroupDtos = null;
         try {
@@ -324,8 +335,19 @@ public class ServerServiceImpl implements ServerService {
             logger.info("用户名和服务器IP为必填项");
             return null;
         }
-        Date startTime = new Date(System.currentTimeMillis() - TimeUtil.minuteToMillisecond(intervalMinutes));
-        Date endTime = new Date();
+        String lastRecordTime = componentDao.queryLastRecordTimeByUserIdAndServerIp(userId, serverIp);
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        Date lastHeartBeat = null;
+        try {
+            lastHeartBeat = sdf.parse(lastRecordTime);
+        } catch (ParseException e) {
+            logger.error("日期转换异常");
+            logger.error("异常信息:{}", e.getMessage());
+            lastHeartBeat = new Date();
+        }
+        Date endTime = lastHeartBeat;
+        //时间戳
+        Date startTime = new Date(endTime.getTime() - TimeUtil.minuteToMillisecond(intervalMinutes));
 
         List<DiskRecordGroupDto> diskRecordGroupDtos = null;
         try {
@@ -343,8 +365,19 @@ public class ServerServiceImpl implements ServerService {
             logger.info("用户名和服务器IP为必填项");
             return null;
         }
-        Date startTime = new Date(System.currentTimeMillis() - TimeUtil.minuteToMillisecond(intervalMinutes));
-        Date endTime = new Date();
+        String lastRecordTime = componentDao.queryLastRecordTimeByUserIdAndServerIp(userId, serverIp);
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        Date lastHeartBeat = null;
+        try {
+            lastHeartBeat = sdf.parse(lastRecordTime);
+        } catch (ParseException e) {
+            logger.error("日期转换异常");
+            logger.error("异常信息:{}", e.getMessage());
+            lastHeartBeat = new Date();
+        }
+        Date endTime = lastHeartBeat;
+        //时间戳
+        Date startTime = new Date(endTime.getTime() - TimeUtil.minuteToMillisecond(intervalMinutes));
 
         List<MemRecordDto> memRecordDtos = null;
         try {
@@ -369,8 +402,19 @@ public class ServerServiceImpl implements ServerService {
             logger.info("用户名和服务器IP为必填项");
             return null;
         }
-        Date startTime = new Date(System.currentTimeMillis() - TimeUtil.minuteToMillisecond(intervalMinutes));
-        Date endTime = new Date();
+        String lastRecordTime = componentDao.queryLastRecordTimeByUserIdAndServerIp(userId, serverIp);
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        Date lastHeartBeat = null;
+        try {
+            lastHeartBeat = sdf.parse(lastRecordTime);
+        } catch (ParseException e) {
+            logger.error("日期转换异常");
+            logger.error("异常信息:{}", e.getMessage());
+            lastHeartBeat = new Date();
+        }
+        Date endTime = lastHeartBeat;
+        //时间戳
+        Date startTime = new Date(endTime.getTime() - TimeUtil.minuteToMillisecond(intervalMinutes));
 
         List<NetRecordGroupDto> netRecordGroupDtos = null;
         try {
@@ -527,6 +571,30 @@ public class ServerServiceImpl implements ServerService {
         String timeKeeping = redisUtil.get(ConstantPool.ComponentCenter.SERVER_TIME_KEEPING_KEY + userId + ":" + serverIp);
         serverSimpleSnapshot.setTimeKeeping(Integer.valueOf(timeKeeping));
         return serverSimpleSnapshot;
+    }
+
+    /**
+     * @Description: 获取服务器大事记录
+     * @Param: [userId]
+     * @return: java.util.List<cn.objectspace.componentcenter.pojo.dto.ServerRuntimeRecordDto>
+     * @Author: NoCortY
+     * @Date: 2020/4/22
+     */
+    @Override
+    public List<ServerRuntimeRecordDto> getServerRuntimeRecord(Integer userId) {
+
+        if (userId == null) {
+            logger.info("userId不能为空");
+            return null;
+        }
+        List<ServerRuntimeRecordDto> serverRuntimeRecordList = null;
+        try {
+            serverRuntimeRecordList = componentDao.queryServerRuntimeRecords(userId);
+        } catch (Exception e) {
+            logger.error("查询出现异常");
+            logger.error("异常信息:{}", e.getMessage());
+        }
+        return serverRuntimeRecordList;
     }
 
 }

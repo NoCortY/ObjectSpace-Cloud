@@ -149,4 +149,13 @@ public interface ServerService {
      * @Date: 2020/4/21
      */
     public ServerSimpleSnapshot getServerSimpleSnapshot(Integer userId, String serverIp);
+
+    /**
+     * @Description: 获取服务器大事记录
+     * @Param:
+     * @return:
+     * @Author: NoCortY
+     * @Date: 2020/4/22
+     */
+    public List<ServerRuntimeRecordDto> getServerRuntimeRecord(Integer userId);
 }

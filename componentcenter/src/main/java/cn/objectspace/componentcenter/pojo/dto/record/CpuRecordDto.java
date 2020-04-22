@@ -15,7 +15,7 @@ public class CpuRecordDto implements Serializable {
     private Double userUsed;
     private Double systemUsed;
     private Double combine;
-    @JsonFormat(pattern = "HH:mm:ss", timezone = "GMT+8")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date recordTime;
 
 

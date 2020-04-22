@@ -72,6 +72,37 @@
             <result column="tx_rate" property="txRate"/>
         </collection>
     </resultMap>
+    <select id="queryServerRuntimeRecords" parameterType="java.lang.Integer" resultType="ServerRuntimeRecordDto">
+        SELECT server_ip,user_email,server_state,record_time,record_content
+        FROM server_runtime_record
+        WHERE user_id=#{userId}
+    </select>
+    <insert id="insertServerRuntimeRecord" parameterType="ServerRuntimeRecord">
+        INSERT INTO server_runtime_record
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            server_ip,user_id,
+            <if test="userEmail!=null and userEmail!=''">
+                user_email,
+            </if>
+            server_state,
+            record_time,
+            <if test="recordContent!=null and recordContent!=''">
+                record_content
+            </if>
+        </trim>
+        VALUES
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            #{serverIp},#{userId},
+            <if test="userEmail!=null and userEmail!=''">
+                #{userEmail},
+            </if>
+            #{serverState},
+            #{recordTime},
+            <if test="recordContent!=null and recordContent!=''">
+                #{recordContent}
+            </if>
+        </trim>
+    </insert>
     <delete id="deleteSimpleCommandById" parameterType="java.lang.Integer">
         DELETE FROM
         simple_command

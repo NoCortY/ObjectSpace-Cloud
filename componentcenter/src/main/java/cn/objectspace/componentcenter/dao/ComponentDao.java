@@ -11,6 +11,7 @@ import cn.objectspace.componentcenter.pojo.dto.record.MemRecordDto;
 import cn.objectspace.componentcenter.pojo.dto.record.NetRecordGroupDto;
 import cn.objectspace.componentcenter.pojo.entity.CloudServer;
 import cn.objectspace.componentcenter.pojo.entity.CloudServerCommandExecuteRecord;
+import cn.objectspace.componentcenter.pojo.entity.ServerRuntimeRecord;
 import cn.objectspace.componentcenter.pojo.entity.SimpleCommand;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
@@ -261,5 +262,32 @@ public interface ComponentDao {
      */
     public Integer deleteSimpleCommandById(@Param("id") Integer id, @Param("userId") Integer userId);
 
+    /**
+     * @Description: 查询某服务器的最后一次心跳时间
+     * @Param:
+     * @return:
+     * @Author: NoCortY
+     * @Date: 2020/4/22
+     */
     public String queryLastRecordTimeByUserIdAndServerIp(@Param("userId") Integer userId, @Param("serverIp") String serverIp);
+
+
+    /**
+     * @Description: 插入一条服务器宕机、开机、或者其他大事件的记录
+     * @Param:
+     * @return:
+     * @Author: NoCortY
+     * @Date: 2020/4/22
+     */
+    public Integer insertServerRuntimeRecord(ServerRuntimeRecord serverRuntimeRecord);
+
+
+    /**
+     * @Description: 查询服务器运行时大事件记录
+     * @Param:
+     * @return:
+     * @Author: NoCortY
+     * @Date: 2020/4/22
+     */
+    public List<ServerRuntimeRecordDto> queryServerRuntimeRecords(@Param("userId") Integer userId);
 }

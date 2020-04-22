@@ -41,6 +41,7 @@
         WHERE
         parent = #{parentId}
         and role_id = #{roleId}
+        ORDER BY priority ASC
     </select>
     <select id="queryStatic" resultType="MenuDto">
     	SELECT

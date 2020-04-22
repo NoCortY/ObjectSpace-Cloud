@@ -37,14 +37,33 @@ public class ACFilter implements Filter {
             //如果是发送心跳的，直接放行即可
             logger.info("访问白名单url");
             //restUtil.getRestTemplate().postForObject(ConstantPool.Shiro.AC_APPLICATION_NAME + "/AC/destroyToken/" + token, null, Void.class);
+            //每次心跳都续期，维护用户urpDto，不能用，因为session并不能获取值
+            //redisUtil.expire(SerializeUtil.serialize(ConstantPool.ComponentCenter.URPDTO_REDIS_KEY_CC + ((HttpServletRequest) request).getSession().getAttribute(ConstantPool.ComponentCenter.SESSION_USER_ID_KEY)), 1800);
             chain.doFilter(request,response);
             return;
         }
-        if(((HttpServletRequest) request).getSession().getAttribute(ConstantPool.ComponentCenter.SESSION_USER_ID_KEY)!=null){
+        Integer userId = (Integer) ((HttpServletRequest) request).getSession().getAttribute(ConstantPool.ComponentCenter.SESSION_USER_ID_KEY);
+        if (userId != null) {
+            if (redisUtil.get(SerializeUtil.serialize(ConstantPool.ComponentCenter.URPDTO_REDIS_KEY_CC + userId)) == null) {
+                //如果urpdto过期了，那么就需要去重新获取一下，保证这个对象的高可用
+                ResponseMap responseMap = null;
+                responseMap = restUtil.getRestTemplate().postForObject(ConstantPool.Shiro.AC_APPLICATION_NAME + "/AC/authorization/" + ConstantPool.ComponentCenter.APPLICATION_ID + "/" + token, null, ResponseMap.class);
+                //responseMap = restUtil.getRestTemplate().postForEntity(ConstantPool.Shiro.AC_APPLICATION_NAME+"/AC/authorization/"+ConstantPool.ComponentCenter.APPLICATION_ID,httpEntity,ResponseMap.class);
+                if (responseMap.getData() != null) {
+                    ObjectMapper objectMapper = new ObjectMapper();
+                    //System.out.println(objectMapper.writeValueAsString(responseMap.getData()));
+                    URPDto urpDto = objectMapper.readValue(objectMapper.writeValueAsString(responseMap.getData()), URPDto.class);
+                    //用户授权信息存入redis，下次不用再访问AC，不用设置过期时间。
+                    redisUtil.set(SerializeUtil.serialize(ConstantPool.ComponentCenter.URPDTO_REDIS_KEY_CC + urpDto.getUserId()), SerializeUtil.serialize(urpDto));
+                }
+            } else {
+                //销毁没有用到的token
+                restUtil.getRestTemplate().postForObject(ConstantPool.Shiro.AC_APPLICATION_NAME + "/AC/destroyToken/" + token, null, Void.class);
+            }
             logger.info("用户已通过授权，直接放行");
-            restUtil.getRestTemplate().postForObject(ConstantPool.Shiro.AC_APPLICATION_NAME + "/AC/destroyToken/" + token, null, Void.class);
+
             //续期
-            redisUtil.expire(SerializeUtil.serialize(ConstantPool.ComponentCenter.URPDTO_REDIS_KEY_CC + ((HttpServletRequest) request).getSession().getAttribute(ConstantPool.ComponentCenter.SESSION_USER_ID_KEY)), 1800);
+            //redisUtil.expire(SerializeUtil.serialize(ConstantPool.ComponentCenter.URPDTO_REDIS_KEY_CC + ((HttpServletRequest) request).getSession().getAttribute(ConstantPool.ComponentCenter.SESSION_USER_ID_KEY)), 1800);
             chain.doFilter(request,response);
         }else{
             logger.info("该用户第一次访问本服务，进行授权...");
@@ -70,8 +89,8 @@ public class ACFilter implements Filter {
                 //System.out.println(objectMapper.writeValueAsString(responseMap.getData()));
                 URPDto urpDto =  objectMapper.readValue(objectMapper.writeValueAsString(responseMap.getData()),URPDto.class);
                 ((HttpServletRequest) request).getSession().setAttribute(ConstantPool.ComponentCenter.SESSION_USER_ID_KEY,urpDto.getUserId());
-                //用户授权信息存入redis，下次不用再访问AC
-                redisUtil.set(SerializeUtil.serialize(ConstantPool.ComponentCenter.URPDTO_REDIS_KEY_CC + urpDto.getUserId()), SerializeUtil.serialize(urpDto), 1800);
+                //用户授权信息存入redis，下次不用再访问AC，不用设置过期时间。
+                redisUtil.set(SerializeUtil.serialize(ConstantPool.ComponentCenter.URPDTO_REDIS_KEY_CC + urpDto.getUserId()), SerializeUtil.serialize(urpDto));
                 //放行
                 chain.doFilter(request,response);
             }
