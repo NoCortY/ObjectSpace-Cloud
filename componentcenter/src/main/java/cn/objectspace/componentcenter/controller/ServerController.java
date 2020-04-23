@@ -11,6 +11,7 @@ import cn.objectspace.componentcenter.pojo.dto.record.DiskRecordGroupDto;
 import cn.objectspace.componentcenter.pojo.dto.record.MemRecordDto;
 import cn.objectspace.componentcenter.pojo.dto.record.NetRecordGroupDto;
 import cn.objectspace.componentcenter.pojo.entity.CloudServer;
+import cn.objectspace.componentcenter.pojo.entity.FutureTask;
 import cn.objectspace.componentcenter.service.SFTPService;
 import cn.objectspace.componentcenter.service.SSHService;
 import cn.objectspace.componentcenter.service.ServerService;
@@ -685,6 +686,41 @@ public class ServerController {
             responseMap.setCode(ConstantPool.Common.REQUEST_SUCCESS_CODE);
             responseMap.setMessage(ConstantPool.Common.REQUEST_SUCCESS_MESSAGE);
             responseMap.setData(serverRuntimeRecordDtoList);
+        }
+        return responseMap;
+    }
+
+    @SaveLog(applicationId = ConstantPool.ComponentCenter.APPLICATION_ID)
+    @PostMapping("/futureTask")
+    public ResponseMap<String> futureTask(HttpServletRequest request, @RequestBody FutureTask futureTask) {
+        Integer userId = (Integer) request.getSession().getAttribute(ConstantPool.ComponentCenter.SESSION_USER_ID_KEY);
+        ResponseMap<String> responseMap = new ResponseMap<>();
+        if (serverService.addFutureTask(futureTask, userId)) {
+            responseMap.setCode(ConstantPool.Common.REQUEST_SUCCESS_CODE);
+            responseMap.setMessage(ConstantPool.Common.REQUEST_SUCCESS_MESSAGE);
+        } else {
+            responseMap.setCode(ConstantPool.Common.REQUEST_FAILURE_CODE);
+            responseMap.setCode(ConstantPool.Common.REQUEST_FAILURE_MESSAGE);
+        }
+        responseMap.setData(ConstantPool.Common.RES_NOT_DATA);
+        return responseMap;
+    }
+
+    @SaveLog(applicationId = ConstantPool.ComponentCenter.APPLICATION_ID)
+    @GetMapping("/futureTask")
+    public ResponseMap<List<FutureTaskDto>> futureTask(HttpServletRequest request) {
+        Integer userId = (Integer) request.getSession().getAttribute(ConstantPool.ComponentCenter.SESSION_USER_ID_KEY);
+        ResponseMap<List<FutureTaskDto>> responseMap = new ResponseMap<>();
+        Integer page = HttpRequestUtil.getIntegerParameter(request, "page");
+        Integer limit = HttpRequestUtil.getIntegerParameter(request, "limit");
+        List<FutureTaskDto> futureTaskDtos = serverService.getFutureTaskList(userId, page, limit);
+        if (futureTaskDtos == null) {
+            responseMap.setCode(ConstantPool.Common.REQUEST_FAILURE_CODE);
+            responseMap.setMessage(ConstantPool.Common.REQUEST_FAILURE_MESSAGE);
+        } else {
+            responseMap.setCode(ConstantPool.Common.REQUEST_SUCCESS_CODE);
+            responseMap.setMessage(ConstantPool.Common.REQUEST_SUCCESS_MESSAGE);
+            responseMap.setData(futureTaskDtos);
         }
         return responseMap;
     }

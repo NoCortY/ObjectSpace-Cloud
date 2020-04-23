@@ -2,6 +2,7 @@ package cn.objectspace.componentcenter.service.impl;
 
 import cn.objectspace.common.constant.ConstantPool;
 import cn.objectspace.common.pojo.entity.ResponseMap;
+import cn.objectspace.common.pojo.entity.URPDto;
 import cn.objectspace.common.util.PageUtil;
 import cn.objectspace.common.util.RedisUtil;
 import cn.objectspace.common.util.SerializeUtil;
@@ -17,6 +18,7 @@ import cn.objectspace.componentcenter.pojo.dto.record.DiskRecordGroupDto;
 import cn.objectspace.componentcenter.pojo.dto.record.MemRecordDto;
 import cn.objectspace.componentcenter.pojo.dto.record.NetRecordGroupDto;
 import cn.objectspace.componentcenter.pojo.entity.CloudServer;
+import cn.objectspace.componentcenter.pojo.entity.FutureTask;
 import cn.objectspace.componentcenter.service.ServerService;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
@@ -595,6 +597,48 @@ public class ServerServiceImpl implements ServerService {
             logger.error("异常信息:{}", e.getMessage());
         }
         return serverRuntimeRecordList;
+    }
+
+    /**
+     * @Description: 新增计划任务
+     * @Param: [futureTask, userId]
+     * @return: boolean
+     * @Author: NoCortY
+     * @Date: 2020/4/23
+     */
+    @Override
+    public boolean addFutureTask(FutureTask futureTask, Integer userId) {
+        if (futureTask == null || userId == null) {
+            logger.info("用户id或者计划任务对象不能为空");
+            return false;
+        }
+        if (futureTask.getExecuteTime().getTime() < new Date().getTime()) {
+            logger.info("不能计划过去时间的任务");
+            return false;
+        }
+        //获取用户信息
+        URPDto urpDto = (URPDto) SerializeUtil.unSerialize(redisUtil.get(SerializeUtil.serialize(ConstantPool.ComponentCenter.URPDTO_REDIS_KEY_CC + userId)));
+        if (urpDto == null) {
+            logger.info("权限不足");
+            return false;
+        }
+        futureTask.setCreateUserId(userId);
+        futureTask.setCreateUserName(urpDto.getUserName());
+        //设置为未执行
+        futureTask.setExecuted(0);
+        int effectiveNum = componentDao.insertFutureTask(futureTask);
+
+        return effectiveNum > 0;
+    }
+
+    @Override
+    public List<FutureTaskDto> getFutureTaskList(Integer userId, Integer page, Integer limit) {
+        if (userId == null) {
+            logger.info("userId不能为空");
+            return null;
+        }
+        Integer startItem = PageUtil.getRowIndex(page, limit);
+        return componentDao.queryFutureTaskList(userId, startItem, limit);
     }
 
 }

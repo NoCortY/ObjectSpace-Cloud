@@ -9,10 +9,7 @@ import cn.objectspace.componentcenter.pojo.dto.record.CpuRecordGroupDto;
 import cn.objectspace.componentcenter.pojo.dto.record.DiskRecordGroupDto;
 import cn.objectspace.componentcenter.pojo.dto.record.MemRecordDto;
 import cn.objectspace.componentcenter.pojo.dto.record.NetRecordGroupDto;
-import cn.objectspace.componentcenter.pojo.entity.CloudServer;
-import cn.objectspace.componentcenter.pojo.entity.CloudServerCommandExecuteRecord;
-import cn.objectspace.componentcenter.pojo.entity.ServerRuntimeRecord;
-import cn.objectspace.componentcenter.pojo.entity.SimpleCommand;
+import cn.objectspace.componentcenter.pojo.entity.*;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
@@ -290,4 +287,42 @@ public interface ComponentDao {
      * @Date: 2020/4/22
      */
     public List<ServerRuntimeRecordDto> queryServerRuntimeRecords(@Param("userId") Integer userId);
+
+    /**
+     * @Description: 新增一个定时任务
+     * @Param:
+     * @return:
+     * @Author: NoCortY
+     * @Date: 2020/4/23
+     */
+    public Integer insertFutureTask(FutureTask futureTask);
+
+    /**
+     * @Description: 查询将要执行的计划任务列表
+     * @Param:
+     * @return:
+     * @Author: NoCortY
+     * @Date: 2020/4/23
+     */
+    public List<FutureTask> queryFutureTaskForExecute(@Param("executeTime") String executeTime);
+
+    /**
+     * @Description: 更新计划任务执行情况
+     * @Param:
+     * @return:
+     * @Author: NoCortY
+     * @Date: 2020/4/23
+     */
+    public Integer updateFutureTaskExecuted(@Param("executedStatus") Integer executedStatus, @Param("taskId") Integer taskId,
+                                            @Param("executedTime") Date executedTime, @Param("executedDesc") String executedDesc,
+                                            @Param("executedResult") String executedResult);
+
+    /**
+     * @Description: 查询任务列表（分页）
+     * @Param:
+     * @return:
+     * @Author: NoCortY
+     * @Date: 2020/4/23
+     */
+    public List<FutureTaskDto> queryFutureTaskList(@Param("userId") Integer userId, @Param("startItem") Integer startItem, @Param("limit") Integer limit);
 }

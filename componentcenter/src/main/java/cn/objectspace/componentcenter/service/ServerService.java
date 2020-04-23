@@ -8,6 +8,7 @@ import cn.objectspace.componentcenter.pojo.dto.record.DiskRecordGroupDto;
 import cn.objectspace.componentcenter.pojo.dto.record.MemRecordDto;
 import cn.objectspace.componentcenter.pojo.dto.record.NetRecordGroupDto;
 import cn.objectspace.componentcenter.pojo.entity.CloudServer;
+import cn.objectspace.componentcenter.pojo.entity.FutureTask;
 
 import java.util.List;
 
@@ -158,4 +159,22 @@ public interface ServerService {
      * @Date: 2020/4/22
      */
     public List<ServerRuntimeRecordDto> getServerRuntimeRecord(Integer userId);
+
+    /**
+     * @Description: 新增计划任务
+     * @Param:
+     * @return:
+     * @Author: NoCortY
+     * @Date: 2020/4/23
+     */
+    public boolean addFutureTask(FutureTask futureTask, Integer userId);
+
+    /**
+     * @Description: 获取计划任务列表
+     * @Param:
+     * @return:
+     * @Author: NoCortY
+     * @Date: 2020/4/23
+     */
+    public List<FutureTaskDto> getFutureTaskList(Integer userId, Integer page, Integer limit);
 }

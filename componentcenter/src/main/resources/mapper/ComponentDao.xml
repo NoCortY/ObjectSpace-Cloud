@@ -72,6 +72,45 @@
             <result column="tx_rate" property="txRate"/>
         </collection>
     </resultMap>
+    <select id="queryFutureTaskList" resultType="FutureTaskDto">
+        SELECT
+        task_name,is_shell_script,shell_script_path,
+        shell_command,execute_server_ip,
+        execute_time,create_user_name,executed,executed_time,
+        executed_desc,executed_result
+        FROM
+        cloud_future_task
+        WHERE create_user_id = #{userId}
+        <if test="startItem!=null and limit!=null">
+            LIMIT #{startItem},#{limit}
+        </if>
+    </select>
+    <update id="updateFutureTaskExecuted">
+        UPDATE cloud_future_task SET executed = #{executedStatus},executed_time=#{executedTime},executed_desc = #{executedDesc},executed_result=#{executedResult} WHERE id = #{taskId}
+    </update>
+    <select id="queryFutureTaskForExecute" parameterType="java.lang.String" resultType="FutureTask">
+        SELECT * FROM cloud_future_task WHERE execute_time = #{executeTime} and executed=0;
+    </select>
+    <insert id="insertFutureTask" parameterType="FutureTask">
+        INSERT INTO cloud_future_task
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            task_name,is_shell_script,shell_script_path,shell_command,execute_server_ip,create_user_id,
+            <if test="createUserName!=null and createUserName!=''">
+                create_user_name,
+            </if>
+            executed,
+            execute_time
+        </trim>
+        VALUES
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            #{taskName},#{isShellScript},#{shellScriptPath},#{shellCommand},#{executeServerIp},#{createUserId},
+            <if test="createUserName!=null and createUserName!=''">
+                #{createUserName},
+            </if>
+            #{executed},
+            #{executeTime}
+        </trim>
+    </insert>
     <select id="queryServerRuntimeRecords" parameterType="java.lang.Integer" resultType="ServerRuntimeRecordDto">
         SELECT server_ip,user_email,server_state,record_time,record_content
         FROM server_runtime_record
