@@ -714,6 +714,7 @@ public class ServerController {
         Integer page = HttpRequestUtil.getIntegerParameter(request, "page");
         Integer limit = HttpRequestUtil.getIntegerParameter(request, "limit");
         List<FutureTaskDto> futureTaskDtos = serverService.getFutureTaskList(userId, page, limit);
+        Integer count = serverService.getFutureTaskListCount(userId);
         if (futureTaskDtos == null) {
             responseMap.setCode(ConstantPool.Common.REQUEST_FAILURE_CODE);
             responseMap.setMessage(ConstantPool.Common.REQUEST_FAILURE_MESSAGE);
@@ -721,6 +722,7 @@ public class ServerController {
             responseMap.setCode(ConstantPool.Common.REQUEST_SUCCESS_CODE);
             responseMap.setMessage(ConstantPool.Common.REQUEST_SUCCESS_MESSAGE);
             responseMap.setData(futureTaskDtos);
+            responseMap.setCount(count);
         }
         return responseMap;
     }

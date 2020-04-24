@@ -177,4 +177,13 @@ public interface ServerService {
      * @Date: 2020/4/23
      */
     public List<FutureTaskDto> getFutureTaskList(Integer userId, Integer page, Integer limit);
+
+    /**
+     * @Description: 查询计划任务列表数量
+     * @Param:
+     * @return:
+     * @Author: NoCortY
+     * @Date: 2020/4/24
+     */
+    public Integer getFutureTaskListCount(Integer userId);
 }

@@ -641,4 +641,12 @@ public class ServerServiceImpl implements ServerService {
         return componentDao.queryFutureTaskList(userId, startItem, limit);
     }
 
+    @Override
+    public Integer getFutureTaskListCount(Integer userId) {
+        if (userId == null) {
+            return 0;
+        }
+        return componentDao.queryFutureTaskCount(userId);
+    }
+
 }

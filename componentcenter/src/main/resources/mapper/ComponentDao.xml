@@ -72,6 +72,13 @@
             <result column="tx_rate" property="txRate"/>
         </collection>
     </resultMap>
+    <select id="queryFutureTaskCount" resultType="java.lang.Integer">
+        SELECT
+        COUNT(id)
+        FROM
+        cloud_future_task
+        WHERE create_user_id = #{userId}
+    </select>
     <select id="queryFutureTaskList" resultType="FutureTaskDto">
         SELECT
         task_name,is_shell_script,shell_script_path,

@@ -10,7 +10,7 @@ spring:
           #部署时要改成127.0.0.1
           uri: ssh://git@47.98.165.84:/home/git/objectcloud-config.git
           username: git
-          password: Object971103.
+          password: Object980715.
 #服务注册配置
 eureka:
   client:

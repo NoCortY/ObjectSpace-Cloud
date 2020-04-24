@@ -325,4 +325,13 @@ public interface ComponentDao {
      * @Date: 2020/4/23
      */
     public List<FutureTaskDto> queryFutureTaskList(@Param("userId") Integer userId, @Param("startItem") Integer startItem, @Param("limit") Integer limit);
+
+    /**
+     * @Description: 查询任务列表条数
+     * @Param:
+     * @return:
+     * @Author: NoCortY
+     * @Date: 2020/4/24
+     */
+    public Integer queryFutureTaskCount(@Param("userId") Integer userId);
 }
