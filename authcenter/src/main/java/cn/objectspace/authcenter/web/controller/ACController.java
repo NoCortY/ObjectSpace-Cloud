@@ -171,7 +171,6 @@ public class ACController {
     @ApiOperation(value = "Token销毁", notes = "没有使用到的Token及时进行销毁", httpMethod = "POST")
     @ApiImplicitParam(paramType = "path", name = "applicationId", value = "微服务ID", dataType = "String")
     @PostMapping("/destroyToken/{ACToken}")
-    @SaveLog(applicationId = ConstantPool.Shiro.APPLICATION_ID)
     @Async
     public void destroyToken(@PathVariable String ACToken) {
         acService.tokenDestroy(ACToken);

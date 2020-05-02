@@ -726,6 +726,32 @@ public class ServerController {
         }
         return responseMap;
     }
+
+    @SaveLog(applicationId = ConstantPool.ComponentCenter.APPLICATION_ID)
+    @PostMapping("/reboot/{serverIp}")
+    public ResponseMap<String> reboot(@PathVariable String serverIp, HttpServletRequest request) {
+        ResponseMap<String> responseMap = new ResponseMap<>();
+        Integer userId = (Integer) request.getSession().getAttribute(ConstantPool.ComponentCenter.SESSION_USER_ID_KEY);
+        WebSSHDataDto webSSHDataDto = new WebSSHDataDto();
+        webSSHDataDto.setHost(serverIp);
+        try {
+            Session session = sshService.initConnection(String.valueOf(userId), webSSHDataDto);
+            List<Session> sessionList = new LinkedList<>();
+            sessionList.add(session);
+            //借用群发业务逻辑发送重启命令
+            sshService.groupCommand(sessionList, "reboot", userId);
+        } catch (Exception e) {
+            logger.error("重启异常:{}", e.getMessage());
+            responseMap.setCode(ConstantPool.Common.REQUEST_FAILURE_CODE);
+            responseMap.setMessage(ConstantPool.Common.REQUEST_FAILURE_MESSAGE);
+            return responseMap;
+        }
+        responseMap.setCode(ConstantPool.Common.REQUEST_SUCCESS_CODE);
+        responseMap.setMessage(ConstantPool.Common.REQUEST_SUCCESS_MESSAGE);
+
+        return responseMap;
+
+    }
     /*@SaveLog(applicationId = ConstantPool.ComponentCenter.APPLICATION_ID)
     @PostMapping("/touch/{serverIp}")
     public ResponseMap<String> touch(@PathVariable String serverIp,HttpServletRequest request){
